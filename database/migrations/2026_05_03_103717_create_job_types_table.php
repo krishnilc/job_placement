@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('job_types', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->integer('status')->default(1); // 1 for active, 0 for inactive
             $table->timestamps();
         });
     }
