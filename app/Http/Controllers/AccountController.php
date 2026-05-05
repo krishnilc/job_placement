@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\JobType;
 use App\Models\User;
+use App\Models\Job;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -157,7 +160,7 @@ class AccountController extends Controller
             $sourcePath = public_path('/profile_pic/' . $imageName); // Get the path of the uploaded image
             $manager = new ImageManager(Driver::class); // Create an instance of the Intervention Image Manager using the GD driver
             $image = $manager->read($sourcePath); // Read the uploaded image
-            
+
 
             // crop the best fitting 5:3 (600x360) ratio and resize to 600x360 pixel
             $image->cover(150, 150); // Crop the image to a 5:3 ratio (600x360) while maintaining the center of the image
@@ -180,6 +183,66 @@ class AccountController extends Controller
                 'status' => true,
                 'errors' => []
             ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+    }
+
+    public function createJob()
+    {
+        $categories = Category::orderBy('name', 'ASC')->where('status', '1')->get();
+        $jobTypes = JobType::orderBy('name', 'ASC')->where('status', '1')->get();
+
+
+        return view('front.account.job.create_job', [
+            'categories' => $categories,
+            'jobTypes' => $jobTypes
+        ]);
+    }
+
+    public function saveJob(Request $request)
+    {
+        $rules = [
+            'title' => 'required|min:5|max:200',
+            'category' => 'required',
+            'job_type' => 'required',
+            'vacancy' => 'required|integer',
+            'location' => 'required|max:50',
+            'description' => 'required',
+            'company_name' => 'required|min:3|max:75',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->passes()) {
+            $job = new Job();
+
+            $job->title = $request->title;
+            $job->category_id = $request->category;
+            $job->job_type_id = $request->job_type;
+            $job->vacancy = $request->vacancy;
+            $job->salary = $request->salary;
+            $job->location = $request->location;
+            $job->description = $request->description;
+            $job->benefits = $request->benefits;
+            $job->responsibilities = $request->responsibilities;
+            $job->qualifications = $request->qualifications;
+            $job->keywords = $request->keywords;
+            $job->experience = $request->experience;
+            $job->company_name = $request->company_name;
+            $job->company_website = $request->company_website;
+
+            $job->save();
+
+            session()->flash('success', 'Job created successfully!');
+            return response()->json([
+                'status' => true,
+                'errors' => []
+            ]);
+
 
         } else {
             return response()->json([
@@ -187,7 +250,11 @@ class AccountController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
-
     }
 
+    public function myJobs(Request $request)
+    {
+        // Logic to retrieve and display the jobs posted by the authenticated user will go here
+        return view('front.account.job.my_jobs');
+    }
 }
