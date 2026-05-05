@@ -210,7 +210,7 @@ class AccountController extends Controller
             'category' => 'required',
             'job_type' => 'required',
             'vacancy' => 'required|integer',
-            'location' => 'required|max:50',
+            'location' => 'required|max:50',          
             'description' => 'required',
             'company_name' => 'required|min:3|max:75',
         ];
@@ -233,6 +233,7 @@ class AccountController extends Controller
             $job->keywords = $request->keywords;
             $job->experience = $request->experience;
             $job->company_name = $request->company_name;
+            $job->company_location = $request->company_location;
             $job->company_website = $request->company_website;
 
             $job->save();

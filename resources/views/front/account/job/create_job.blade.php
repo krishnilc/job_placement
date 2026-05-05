@@ -75,7 +75,7 @@
 
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location<span class="req">*</span></label>
-                                        <input type="text" placeholder="location" id="location" name="Location"
+                                        <input type="text" placeholder="location" id="location" name="location"
                                             class="form-control">
                                         <p class="text-danger" id="locationError"></p>
                                     </div>
@@ -92,9 +92,9 @@
                                     <textarea class="form-control" name="benefits" id="benefits" cols="5" rows="5" placeholder="Benefits"></textarea>
                                 </div>
                                 <div class="mb-4">
-                                    <label for="" class="mb-2">Responsibility</label>
-                                    <textarea class="form-control" name="responsibility" id="responsibility" cols="5" rows="5"
-                                        placeholder="Responsibility"></textarea>
+                                    <label for="" class="mb-2">Responsibilities</label>
+                                    <textarea class="form-control" name="responsibilities" id="responsibilities" cols="5" rows="5"
+                                        placeholder="Responsibilities"></textarea>
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Qualifications</label>
@@ -140,14 +140,14 @@
 
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location</label>
-                                        <input type="text" placeholder="Location" id="location" name="location"
+                                        <input type="text" placeholder="Company Location" id="company_location" name="company_location"
                                             class="form-control">
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Website</label>
-                                    <input type="text" placeholder="Website" id="website" name="website"
+                                    <input type="text" placeholder="Website" id="company_website" name="company_website"
                                         class="form-control">
                                 </div>
                             </div>
