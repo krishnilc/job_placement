@@ -210,7 +210,7 @@ class AccountController extends Controller
             'category' => 'required',
             'job_type' => 'required',
             'vacancy' => 'required|integer',
-            'location' => 'required|max:50',          
+            'location' => 'required|max:50',
             'description' => 'required',
             'company_name' => 'required|min:3|max:75',
         ];
@@ -223,6 +223,7 @@ class AccountController extends Controller
             $job->title = $request->title;
             $job->category_id = $request->category;
             $job->job_type_id = $request->job_type;
+            $job->user_id = Auth::id();
             $job->vacancy = $request->vacancy;
             $job->salary = $request->salary;
             $job->location = $request->location;
@@ -243,8 +244,6 @@ class AccountController extends Controller
                 'status' => true,
                 'errors' => []
             ]);
-
-
         } else {
             return response()->json([
                 'status' => false,
@@ -255,7 +254,11 @@ class AccountController extends Controller
 
     public function myJobs(Request $request)
     {
+        $jobs = Job::where('user_id', Auth::user()->id)->paginate(10); // Retrieve jobs posted by the authenticated user
+
         // Logic to retrieve and display the jobs posted by the authenticated user will go here
-        return view('front.account.job.my_jobs');
+        return view('front.account.job.my_jobs', [
+            'jobs' => $jobs
+        ]);
     }
 }

@@ -43,7 +43,20 @@
                                     </thead>
                                     <tbody class="border-0">
                                         <tr class="active">
-                                            <td>
+                                            @if ($jobs->isNotEmpty())
+                                                @foreach ($jobs as $job)
+                                                    <td>
+                                                        <div class="job-name fw-500">{{ $job->title }}</div>
+                                                        <div class="info1">Fulltime. {{ $job->location }}</div>
+                                                    </td>
+                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>
+                                                    <td>0 Applications</td>
+                                                    <td>
+                                                        <div class="job-status text-capitalize">
+                                                            {{ $job->status == 1 ? 'active' : 'inactive' }}</div>
+                                                @endforeach
+                                            @endif
+                                            {{-- <td>
                                                 <div class="job-name fw-500">Web Developer</div>
                                                 <div class="info1">Fulltime . Noida</div>
                                             </td>
@@ -51,10 +64,11 @@
                                             <td>130 Applications</td>
                                             <td>
                                                 <div class="job-status text-capitalize">active</div>
-                                            </td>
+                                            </td> --}}
                                             <td>
                                                 <div class="action-dots float-end">
-                                                    <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <a href="#" class="" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                     </a>
                                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -68,7 +82,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr class="pending">
+                                        {{-- <tr class="pending">
                                             <td>
                                                 <div class="job-name fw-500" .html Developer</div>
                                                     <div class="info1">Part-time . Delhi</div>
@@ -80,7 +94,8 @@
                                             </td>
                                             <td>
                                                 <div class="action-dots float-end">
-                                                    <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <a href="#" class="" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                     </a>
                                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -106,7 +121,8 @@
                                             </td>
                                             <td>
                                                 <div class="action-dots float-end">
-                                                    <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <a href="#" class="" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                     </a>
                                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -114,8 +130,9 @@
                                                                     class="fa fa-eye" aria-hidden="true"></i> View</a></li>
                                                         <li><a class="dropdown-item" href="#"><i class="fa fa-edit"
                                                                     aria-hidden="true"></i> Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-trash"
-                                                                    aria-hidden="true"></i> Remove</a></li>
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="fa fa-trash" aria-hidden="true"></i> Remove</a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -132,20 +149,23 @@
                                             </td>
                                             <td>
                                                 <div class="action-dots float-end">
-                                                    <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <a href="#" class="" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                     </a>
                                                     <ul class="dropdown-menu dropdown-menu-end">
                                                         <li><a class="dropdown-item" href="job-detail.html"> <i
-                                                                    class="fa fa-eye" aria-hidden="true"></i> View</a></li>
+                                                                    class="fa fa-eye" aria-hidden="true"></i> View</a>
+                                                        </li>
                                                         <li><a class="dropdown-item" href="#"><i class="fa fa-edit"
                                                                     aria-hidden="true"></i> Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-trash"
-                                                                    aria-hidden="true"></i> Remove</a></li>
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="fa fa-trash" aria-hidden="true"></i> Remove</a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        </tr> --}}
                                     </tbody>
 
                                 </table>
@@ -159,5 +179,4 @@
 @endsection
 
 @section('customJS')
-
 @endsection
