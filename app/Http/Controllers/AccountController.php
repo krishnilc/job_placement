@@ -254,7 +254,7 @@ class AccountController extends Controller
 
     public function myJobs(Request $request)
     {
-        $jobs = Job::where('user_id', Auth::user()->id)->paginate(10); // Retrieve jobs posted by the authenticated user
+        $jobs = Job::where('user_id', Auth::user()->id)->with('jobType')->paginate(10); // Retrieve jobs posted by the authenticated user        
 
         // Logic to retrieve and display the jobs posted by the authenticated user will go here
         return view('front.account.job.my_jobs', [

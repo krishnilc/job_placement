@@ -42,46 +42,43 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
-                                        <tr class="active">
-                                            @if ($jobs->isNotEmpty())
-                                                @foreach ($jobs as $job)
+                                        @if ($jobs->isNotEmpty())
+                                            @foreach ($jobs as $job)
+                                                <tr class="active">
                                                     <td>
                                                         <div class="job-name fw-500">{{ $job->title }}</div>
-                                                        <div class="info1">Fulltime. {{ $job->location }}</div>
+                                                        <div class="info1">{{ $job->jobType->name }}. {{ $job->location }}
+                                                        </div>
                                                     </td>
                                                     <td>{{ $job->created_at->format('d M, Y') }}</td>
                                                     <td>0 Applications</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">
                                                             {{ $job->status == 1 ? 'active' : 'inactive' }}</div>
-                                                @endforeach
-                                            @endif
-                                            {{-- <td>
-                                                <div class="job-name fw-500">Web Developer</div>
-                                                <div class="info1">Fulltime . Noida</div>
-                                            </td>
-                                            <td>05 Jun, 2023</td>
-                                            <td>130 Applications</td>
-                                            <td>
-                                                <div class="job-status text-capitalize">active</div>
-                                            </td> --}}
-                                            <td>
-                                                <div class="action-dots float-end">
-                                                    <a href="#" class="" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                                    </a>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li><a class="dropdown-item" href="job-detail.html"> <i
-                                                                    class="fa fa-eye" aria-hidden="true"></i> View</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-edit"
-                                                                    aria-hidden="true"></i> Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-trash"
-                                                                    aria-hidden="true"></i> Remove</a></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="action-dots float-end">
+                                                            <a href="#" class="" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                                            </a>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item" href="job-detail.html"> <i
+                                                                            class="fa fa-eye" aria-hidden="true"></i>
+                                                                        View</a></li>
+                                                                <li><a class="dropdown-item" href="#"><i
+                                                                            class="fa fa-edit" aria-hidden="true"></i>
+                                                                        Edit</a></li>
+                                                                <li><a class="dropdown-item" href="#"><i
+                                                                            class="fa fa-trash" aria-hidden="true"></i>
+                                                                        Remove</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
                                         {{-- <tr class="pending">
                                             <td>
                                                 <div class="job-name fw-500" .html Developer</div>
@@ -167,8 +164,11 @@
                                             </td>
                                         </tr> --}}
                                     </tbody>
-
                                 </table>
+                            </div>
+
+                            <div>
+                                {{ $jobs->links() }}
                             </div>
                         </div>
                     </div>
