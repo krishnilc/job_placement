@@ -332,4 +332,29 @@ class AccountController extends Controller
             ]);
         }
     }
+
+    public function deleteJob(Request $request)
+    {
+        $job = Job::where([
+            'user_id' => Auth::user()->id,// Ensure that the job belongs to the authenticated user
+            'id' => $request->jobId // Find the job by its ID
+        ])->first();
+
+        if (!$job) {
+            session()->flash('error', 'Job not found or you do not have permission to delete this job!');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Job not found or you do not have permission to delete this job!']
+            ]);
+           // abort(404); // Job not found or does not belong to the authenticated user
+        }
+
+        //$job->delete(); 
+        Job::where('id', $request->jobId)->delete(); // Permanently delete the job from the database
+        session()->flash('success', 'Job deleted successfully!');
+
+        return response()->json([
+            'status' => true           
+        ]);
+    }   
 }

@@ -60,19 +60,22 @@
 
                                                     <td>
                                                         <div class="action-dots float-end">
-                                                            <button href="#" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <button href="#" class="btn" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item" href="job-detail.html"> <i
                                                                             class="fa fa-eye" aria-hidden="true"></i>
                                                                         View</a></li>
-                                                                <li><a class="dropdown-item" href="{{ route('account.editJob', $job->id) }}"><i class="fa fa-edit"
-                                                                            aria-hidden="true"></i>
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('account.editJob', $job->id) }}"><i
+                                                                            class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="#"><i class="fa fa-trash"
+                                                                <li><a class="dropdown-item" href="#"
+                                                                        onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"
                                                                             aria-hidden="true"></i>
-                                                                        Remove</a></li>
+                                                                        Delete</a></li>
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -95,4 +98,24 @@
 @endsection
 
 @section('customJS')
+    <script type="text/javascript">
+        function deleteJob(jobId) {
+            if (confirm('Are you sure you want to delete this job?')) {
+                $.ajax({
+                    url: "{{ route('account.deleteJob') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: { jobId: jobId },
+
+                    success: function (response) {                       
+                        window.location.href = "{{ route('account.myJobs') }}"; // Redirect to the My Jobs page after deletion
+                    },
+
+                    error: function (xhr, status, error) {
+                        alert('An error occurred while deleting the job. Please try again.');
+                    }
+                });
+            }
+        }            
+    </script>
 @endsection
