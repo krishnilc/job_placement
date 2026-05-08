@@ -19,7 +19,7 @@ class JobFactory extends Factory
     {
         return [
             'title' => fake()->name,
-            'user_id' => rand(1, 3), // Assuming you have 3 users
+            'user_id' => 1, // Assuming you have 3 users
             'job_type_id' => rand(1, 5), // Assuming you have 3 job types
             'category_id' => rand(1, 5), // Assuming you have 5 categories
             'vacancy' => rand(1, 5),
