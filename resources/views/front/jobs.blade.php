@@ -19,62 +19,69 @@
 
             <div class="row pt-5">
                 <div class="col-md-4 col-lg-3 sidebar mb-4">
-                    <div class="card border-0 shadow p-4">
-                        <div class="mb-4">
-                            <h2>Keywords</h2>
-                            <input type="text" placeholder="Keywords" class="form-control">
-                        </div>
+                    <form action="" name="searchForm" id="searchForm">
+                        <div class="card border-0 shadow p-4">
+                            <div class="mb-4">
+                                <h2>Keywords</h2>
+                                <input value="{{ Request::get('keywords') }}" type="text" placeholder="Keywords" name="keywords" id="keywords"
+                                    class="form-control">
+                            </div>
 
-                        <div class="mb-4">
-                            <h2>Location</h2>
-                            <input type="text" placeholder="Location" class="form-control">
-                        </div>
+                            <div class="mb-4">
+                                <h2>Location</h2>
+                                <input value="{{ Request::get('location') }}" type="text" placeholder="Location" name="location" id="location"
+                                    class="form-control">
+                            </div>
 
-                        <div class="mb-4">
-                            <h2>Category</h2>
-                            <select name="category" id="category" class="form-control">
-                                <option value="">Select a Category</option>
-                                @if ($categories->isNotEmpty())
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            <div class="mb-4">
+                                <h2>Category</h2>
+                                <select value="{{ Request::get('category') }}" name="category" id="category" class="form-control">
+                                    <option value="">Select a Category</option>
+                                    @if ($categories->isNotEmpty())
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <h2>Job Type</h2>
+                                @if ($jobTypes->isNotEmpty())
+                                    @foreach ($jobTypes as $jobType)
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input " name="job_type" type="checkbox"
+                                                value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}"
+                                                {{ in_array($jobType->id, explode(',', Request::get('job_type'))) ? 'checked' : '' }}>
+                                            <label class="form-check-label "
+                                                for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
+                                        </div>
                                     @endforeach
                                 @endif
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <h2>Job Type</h2>
-                            @if ($jobTypes->isNotEmpty())
-                                @foreach ($jobTypes as $jobType)
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input " name="job_type" type="checkbox"
-                                            value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
-                                        <label class="form-check-label "
-                                            for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
-                                    </div>
-                                @endforeach
-                            @endif
-                        </div>
+                            </div>
 
 
-                        <div class="mb-4">
-                            <h2>Experience</h2>
-                            <select name="category" id="category" class="form-control">
-                                <option value="">Select Experience</option>
-                                <option value="">1 Year</option>
-                                <option value="">2 Years</option>
-                                <option value="">3 Years</option>
-                                <option value="">4 Years</option>
-                                <option value="">5 Years</option>
-                                <option value="">6 Years</option>
-                                <option value="">7 Years</option>
-                                <option value="">8 Years</option>
-                                <option value="">9 Years</option>
-                                <option value="">10 Years</option>
-                                <option value="">10+ Years</option>
-                            </select>
+                            <div class="mb-4">
+                                <h2>Experience</h2>
+                                <select value="{{ Request::get('experience') }}" name="experience" id="experience" class="form-control">
+                                    <option value="">Select Experience</option>
+                                    <option value="1" {{ Request::get('experience') == '1' ? 'selected' : '' }}>1 Year</option>
+                                    <option value="2" {{ Request::get('experience') == '2' ? 'selected' : '' }}>2 Years</option>
+                                    <option value="3" {{ Request::get('experience') == '3' ? 'selected' : '' }}>3 Years</option>
+                                    <option value="4" {{ Request::get('experience') == '4' ? 'selected' : '' }}>4 Years</option>
+                                    <option value="5" {{ Request::get('experience') == '5' ? 'selected' : '' }}>5 Years</option>
+                                    <option value="6" {{ Request::get('experience') == '6' ? 'selected' : '' }}>6 Years</option>
+                                    <option value="7" {{ Request::get('experience') == '7' ? 'selected' : '' }}>7 Years</option>
+                                    <option value="8" {{ Request::get('experience') == '8' ? 'selected' : '' }}>8 Years</option>
+                                    <option value="9" {{ Request::get('experience') == '9' ? 'selected' : '' }}>9 Years</option>
+                                    <option value="10" {{ Request::get('experience') == '10' ? 'selected' : '' }}>10 Years</option>
+                                    <option value="11" {{ Request::get('experience') == '11' ? 'selected' : '' }}>10+ Years</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                             <a href="{{ route('front.jobs') }}" class="btn btn-secondary mt-3">Reset Filters</a>
                         </div>
-                    </div>
+                    </form>
                 </div>
                 <div class="col-md-8 col-lg-9 ">
                     <div class="job_listing_area">
@@ -96,6 +103,10 @@
                                                             <span class="fw-bolder"><i class="fa fa-clock-o"></i></span>
                                                             <span class="ps-1">{{ $job->jobType?->name ?? 'N/A' }}</span>
                                                         </p>
+                                                        <p>Keywords: {{ $job->keywords ?? 'N/A' }}</p>
+                                                        <p>Category: {{ $job->category ?? 'N/A' }}</p>
+                                                        <p>Experience: {{ $job->experience ?? 'N/A' }}</p>
+
                                                         @if (is_null($job->salary))
                                                             <p class="mb-0">
                                                                 <span class="fw-bolder"><i class="fa fa-usd"></i></span>
@@ -129,4 +140,27 @@
     </section>
 @endsection
 @section('customJS')
+    <script>
+        $(document).ready(function () {
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+
+                var url = '{{ route('front.jobs') }}?';
+
+                var keywords = $('#keywords').val();
+                var location = $('#location').val();
+                var category = $('#category').val();
+                var jobType = $('input[name="job_type"]:checked').val();
+                var experience = $('#experience').val();
+
+                //if keywords is not empty, add to url
+                if (keywords !== '') {
+                    url += '&keywords=' + encodeURIComponent(keywords); // Append keywords to the URL
+                }
+
+                window.location.href = url; // Redirect to the constructed URL
+            });
+
+        });
+    </script>
 @endsection

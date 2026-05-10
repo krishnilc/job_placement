@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
-Route::get('/jobs', [JobsController::class, 'index'])->name('jobs');
+Route::get('/jobs', [JobsController::class, 'index'])->name('front.jobs');
 
 // Route::get('/account/register', [AccountController::class, 'registration'])->name('account.registration');
 // Route::post('/account/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');

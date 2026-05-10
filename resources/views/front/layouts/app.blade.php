@@ -32,7 +32,7 @@
                             <a class="nav-link" aria-current="page" href="{{ route('home') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="#">Find Jobs</a>
+                            <a class="nav-link" aria-current="page" href="{{ route('front.jobs') }}">Find Jobs</a>
                         </li>
                     </ul>
 
