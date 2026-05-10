@@ -18,37 +18,33 @@ class JobsController extends Controller
       $jobs = Job::where('status', 1); // Start building the query to retrieve active jobs
 
       //Search using keywords
-      if ($request->has('keywords') && !empty($request->keywords)) {
-         $keywords = $request->input('keywords');
-         $jobs = $jobs->where(function ($query) use ($keywords) {
-            $query->where('title', 'like', '%' . $keywords . '%')
-               ->orWhere('description', 'like', '%' . $keywords . '%');
+      if (!empty($request->keywords)) {
+         $jobs = $jobs->where(function ($query) use ($request) {
+            $query->orWhere('title', 'like', '%' . $request->keywords . '%');
+            $query->orWhere('keywords', 'like', '%' . $request->keywords . '%');
          });
       }
 
       //Search using location
-      if ($request->has('location') && !empty($request->location)) {
-         $location = $request->input('location');
-         $jobs = $jobs->where('location', 'like', '%' . $location . '%');
+      if (!empty($request->location)) {         
+         $jobs = $jobs->where('location', $request->location);
       }
 
       //Search using category
-      if ($request->has('category') && !empty($request->category)) {
-         $category = $request->input('category');
-         $jobs = $jobs->where('category_id', $category);
+      if (!empty($request->category)) {        
+         $jobs = $jobs->where('category_id', $request->category);
       }
 
       //Search using job type
-      if ($request->has('job_type') && !empty($request->job_type)) {
-        $jobTypeArray =  explode('Job Type: ' . $request->input('job_type')); // Debugging line to check the value of job_type input
-         $jobType = $request->input('job_type');
-         $jobs = $jobs->where('job_type_id', $jobTypeArray);
+      $jobTypeArray = [];
+      if (!empty($request->job_type)) {
+         $jobTypeArray = explode(',', $request->job_type); // Convert the comma-separated string of job types into an array
+         $jobs = $jobs->whereIn('job_type_id', $jobTypeArray);
       }
 
-//Search using experience
-      if ($request->has('experience') && !empty($request->experience)) {
-         $experience = $request->input('experience');
-         $jobs = $jobs->where('experience', $experience);
+      //Search using experience
+      if (!empty($request->experience)) {       
+         $jobs = $jobs->where('experience', $request->experience);
       }
 
       $jobs = $jobs->with('jobType')->orderBy('created_at', 'desc')->paginate(9); // Retrieve active jobs with their associated job types, ordered by creation date, and paginate the results
@@ -57,7 +53,8 @@ class JobsController extends Controller
       return view('front.jobs', [
          'categories' => $categories,
          'jobTypes' => $jobTypes,
-         'jobs' => $jobs
+         'jobs' => $jobs,
+         'jobTypeArray' => $jobTypeArray
       ]);
    }
 }

@@ -23,23 +23,26 @@
                         <div class="card border-0 shadow p-4">
                             <div class="mb-4">
                                 <h2>Keywords</h2>
-                                <input value="{{ Request::get('keywords') }}" type="text" placeholder="Keywords" name="keywords" id="keywords"
-                                    class="form-control">
+                                <input value="{{ Request::get('keywords') }}" type="text" placeholder="Keywords"
+                                    name="keywords" id="keywords" class="form-control">
                             </div>
 
                             <div class="mb-4">
                                 <h2>Location</h2>
-                                <input value="{{ Request::get('location') }}" type="text" placeholder="Location" name="location" id="location"
-                                    class="form-control">
+                                <input value="{{ Request::get('location') }}" type="text" placeholder="Location"
+                                    name="location" id="location" class="form-control">
                             </div>
 
                             <div class="mb-4">
                                 <h2>Category</h2>
-                                <select value="{{ Request::get('category') }}" name="category" id="category" class="form-control">
+                                <select value="{{ Request::get('category') }}" name="category" id="category"
+                                    class="form-control">
                                     <option value="">Select a Category</option>
                                     @if ($categories->isNotEmpty())
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}"
+                                                {{ Request::get('category') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -50,9 +53,9 @@
                                 @if ($jobTypes->isNotEmpty())
                                     @foreach ($jobTypes as $jobType)
                                         <div class="form-check mb-2">
-                                            <input class="form-check-input " name="job_type" type="checkbox"
-                                                value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}"
-                                                {{ in_array($jobType->id, explode(',', Request::get('job_type'))) ? 'checked' : '' }}>
+                                            <input {{ in_array($jobType->id, $jobTypeArray) ? 'checked' : '' }}
+                                                class="form-check-input " name="job_type" type="checkbox"
+                                                value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
                                             <label class="form-check-label "
                                                 for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
                                         </div>
@@ -63,23 +66,35 @@
 
                             <div class="mb-4">
                                 <h2>Experience</h2>
-                                <select value="{{ Request::get('experience') }}" name="experience" id="experience" class="form-control">
+                                <select value="{{ Request::get('experience') }}" name="experience" id="experience"
+                                    class="form-control">
                                     <option value="">Select Experience</option>
-                                    <option value="1" {{ Request::get('experience') == '1' ? 'selected' : '' }}>1 Year</option>
-                                    <option value="2" {{ Request::get('experience') == '2' ? 'selected' : '' }}>2 Years</option>
-                                    <option value="3" {{ Request::get('experience') == '3' ? 'selected' : '' }}>3 Years</option>
-                                    <option value="4" {{ Request::get('experience') == '4' ? 'selected' : '' }}>4 Years</option>
-                                    <option value="5" {{ Request::get('experience') == '5' ? 'selected' : '' }}>5 Years</option>
-                                    <option value="6" {{ Request::get('experience') == '6' ? 'selected' : '' }}>6 Years</option>
-                                    <option value="7" {{ Request::get('experience') == '7' ? 'selected' : '' }}>7 Years</option>
-                                    <option value="8" {{ Request::get('experience') == '8' ? 'selected' : '' }}>8 Years</option>
-                                    <option value="9" {{ Request::get('experience') == '9' ? 'selected' : '' }}>9 Years</option>
-                                    <option value="10" {{ Request::get('experience') == '10' ? 'selected' : '' }}>10 Years</option>
-                                    <option value="11" {{ Request::get('experience') == '11' ? 'selected' : '' }}>10+ Years</option>
+                                    <option value="1" {{ Request::get('experience') == '1' ? 'selected' : '' }}>1 Year
+                                    </option>
+                                    <option value="2" {{ Request::get('experience') == '2' ? 'selected' : '' }}>2
+                                        Years</option>
+                                    <option value="3" {{ Request::get('experience') == '3' ? 'selected' : '' }}>3
+                                        Years</option>
+                                    <option value="4" {{ Request::get('experience') == '4' ? 'selected' : '' }}>4
+                                        Years</option>
+                                    <option value="5" {{ Request::get('experience') == '5' ? 'selected' : '' }}>5
+                                        Years</option>
+                                    <option value="6" {{ Request::get('experience') == '6' ? 'selected' : '' }}>6
+                                        Years</option>
+                                    <option value="7" {{ Request::get('experience') == '7' ? 'selected' : '' }}>7
+                                        Years</option>
+                                    <option value="8" {{ Request::get('experience') == '8' ? 'selected' : '' }}>8
+                                        Years</option>
+                                    <option value="9" {{ Request::get('experience') == '9' ? 'selected' : '' }}>9
+                                        Years</option>
+                                    <option value="10" {{ Request::get('experience') == '10' ? 'selected' : '' }}>10
+                                        Years</option>
+                                    <option value="11" {{ Request::get('experience') == '11' ? 'selected' : '' }}>10+
+                                        Years</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary">Apply Filters</button>
-                             <a href="{{ route('front.jobs') }}" class="btn btn-secondary mt-3">Reset Filters</a>
+                            <a href="{{ route('front.jobs') }}" class="btn btn-secondary mt-3">Reset Filters</a>
                         </div>
                     </form>
                 </div>
@@ -104,8 +119,9 @@
                                                             <span class="ps-1">{{ $job->jobType?->name ?? 'N/A' }}</span>
                                                         </p>
                                                         <p>Keywords: {{ $job->keywords ?? 'N/A' }}</p>
-                                                        <p>Category: {{ $job->category ?? 'N/A' }}</p>
+                                                        <p>Category: {{ $job->category?->name ?? 'N/A' }}</p>
                                                         <p>Experience: {{ $job->experience ?? 'N/A' }}</p>
+                                                        <p>Job Type: {{ $job->jobType?->name ?? 'N/A' }}</p>
 
                                                         @if (is_null($job->salary))
                                                             <p class="mb-0">
@@ -141,8 +157,8 @@
 @endsection
 @section('customJS')
     <script>
-        $(document).ready(function () {
-            $('#searchForm').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#searchForm').on('submit', function(e) {
                 e.preventDefault();
 
                 var url = '{{ route('front.jobs') }}?';
@@ -153,9 +169,35 @@
                 var jobType = $('input[name="job_type"]:checked').val();
                 var experience = $('#experience').val();
 
+                var checkedJobTypes = $("input[type='checkbox'][name='job_type']:checked").map(function() {
+                    return $(this).val();
+                }).get();
+
                 //if keywords is not empty, add to url
-                if (keywords !== '') {
+                if (has(keywords) && keywords !== '') {
                     url += '&keywords=' + encodeURIComponent(keywords); // Append keywords to the URL
+                }
+                //if location is not empty, add to url
+                if (location !== '') {
+                    url += '&location=' + encodeURIComponent(location); // Append location to the URL
+                }
+                //if category is not empty, add to url
+                if (category !== '') {
+                    url += '&category=' + encodeURIComponent(category); // Append category to the URL
+                }
+                //if job type is not empty, add to url
+                if (jobType !== undefined) {
+                    url += '&job_type=' + encodeURIComponent(jobType); // Append job type to the URL
+                }
+                //if experience is not empty, add to url
+                if (experience !== '') {
+                    url += '&experience=' + encodeURIComponent(experience); // Append experience to the URL
+                }
+
+                //Append all checked job types to the URL
+                if (checkedJobTypes.length > 0) {
+                    url += '&job_type=' + encodeURIComponent(
+                        checkedJobTypes); // Append job types to the URL
                 }
 
                 window.location.href = url; // Redirect to the constructed URL
