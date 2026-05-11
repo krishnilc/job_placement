@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Job;
+use App\Models\JobApplication;
 use App\Models\JobType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobsController extends Controller
 {
@@ -76,5 +78,59 @@ class JobsController extends Controller
          abort(404);
       }
       return view('front.job_detail', ['job' => $job]); // Pass the job data to the job detail view
+   }
+
+   public function applyJob(Request $request)
+   {
+      $id = $request->input('job_id'); // Get the job ID from the request input
+
+      $job = Job::where(['id' => $id, 'status' => 1])->first(); // Retrieve the job with the specified ID and ensure it is active  
+
+      if (!$job) {
+         session()->flash('error', 'Job not found'); // Flash an error message to the session if the job is not found
+
+         return response()->json([
+            'status' => false,
+            'message' => 'Job not found'
+         ]); // Return a JSON response with a 404 status code if the job is not found   .
+      }
+
+      //you cannot aply on your own job
+      $employerId = $job->user_id; // Get the employer ID associated with the job
+
+      if ($employerId == Auth::user()->id()) {
+         session()->flash('error', 'You cannot apply for your own job'); // Flash an error message to the session if the user is trying to apply for their own job   
+
+         return response()->json([
+            'status' => false,
+            'message' => 'You cannot apply for your own job'
+         ]);
+      }
+
+      // you can not apply on a job twice
+      $existingApplication = JobApplication::where(['job_id' => $id, 'user_id' => Auth::user()->id()])->first(); // Check if the user has already applied for the job by querying the JobApplication model with the job ID and user ID
+
+      if ($existingApplication) {
+         session()->flash('error', 'You have already applied for this job'); // Flash an error message to the session if the user has already applied for the job
+
+         return response()->json([
+            'status' => false,
+            'message' => 'You have already applied for this job'
+         ]);
+      }
+
+      // Logic to handle job application will go here
+      $application = new JobApplication(); // Create a new instance of the Application model
+      $application->job_id = $id; // Set the job ID on the application
+      $application->user_id = Auth::user()->id(); // Set the user ID on the application to the currently authenticated user's ID
+      $application->employer_id = $employer_id; // Set the employer ID on the application to the employer ID associated with the job
+      $application->application_date = now(); // Set the application date to the current date and time
+      $application->save(); // Save the application to the database
+
+      session()->flash('success', 'You have successfully applied for the job'); // Flash a success message to the session if the application is successful
+      return response()->json([
+         'status' => true,
+         'message' => 'You have successfully applied for the job'
+      ]); // Return a JSON response indicating that the application was successful
    }
 }

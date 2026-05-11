@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::table('jobs', function (Blueprint $table) {
-            $table->foreignId('user_id')->after('job_type_id')->constrained()->onDelete('cascade');
+        //  Schema::table('jobs', function (Blueprint $table) {
+        //     $table->foreignId('user_id')->after('job_type_id')->constrained()->onDelete('cascade');
               
-        });
+        // });
     }
 
     /**
@@ -22,9 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-            Schema::table('jobs', function (Blueprint $table) {
-                $table->dropForeign(['user_id']);
-                $table->dropColumn('user_id');
-            });
+            // Schema::table('jobs', function (Blueprint $table) {
+            //     $table->dropForeign(['user_id']);
+            //     $table->dropColumn('user_id');
+            // });
     }
 };

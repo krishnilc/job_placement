@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('jobs', function (Blueprint $table) {
-            $table->integer('status')->default(1)->after('company_website'); // 1 for active, 0 for inactive         
-            $table->integer('isFeatured')->default(0)->after('status'); // 1 for active, 0 for inactive        
-        });
+        // Schema::table('jobs', function (Blueprint $table) {
+        //     $table->integer('status')->default(1)->after('company_website'); // 1 for active, 0 for inactive         
+        //     $table->integer('isFeatured')->default(0)->after('status'); // 1 for active, 0 for inactive        
+        // });
     }
 
     /**
@@ -22,9 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('jobs', function (Blueprint $table) {
-            $table->dropColumn('status');
-            $table->dropColumn('isFeatured');
-        });
+        // Schema::table('jobs', function (Blueprint $table) {
+        //     $table->dropColumn('status');
+        //     $table->dropColumn('isFeatured');
+        // });
     }
 };
