@@ -49,11 +49,10 @@ class JobsController extends Controller
 
       $jobs = $jobs->with('jobType', 'category');
       // $jobs = $jobs->orderBy('created_at', 'desc');
-      
+
       if ($request->sort == '0') {
          $jobs = $jobs->orderBy('created_at', 'asc'); // If sort is 0, order by creation date in ascending order
-      }
-      else {
+      } else {
          $jobs = $jobs->orderBy('created_at', 'desc'); // Default order by creation date in descending order
       }
 
@@ -66,5 +65,16 @@ class JobsController extends Controller
          'jobs' => $jobs,
          'jobTypeArray' => $jobTypeArray
       ]);
+   }
+
+   //this method will show job detail page
+   public function detail($id)
+   {
+      $job = Job::where(['id' => $id, 'status' => 1])->with(['jobType', 'category'])->first(); // Retrieve the job with the specified ID and ensure it is active, along with its associated job type and category
+
+      if (!$job) {
+         abort(404);
+      }
+      return view('front.job_detail', ['job' => $job]); // Pass the job data to the job detail view
    }
 }
