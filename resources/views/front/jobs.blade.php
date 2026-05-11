@@ -10,8 +10,8 @@
                 <div class="col-6 col-md-2">
                     <div class="align-end">
                         <select name="sort" id="sort" class="form-control">
-                            <option value="">Latest</option>
-                            <option value="">Oldest</option>
+                            <option value="1" {{ (Request::get('sort')) == '1' ? 'selected' : '' }}>Latest</option>
+                            <option value="0" {{ (Request::get('sort')) == '0' ? 'selected' : '' }}>Oldest</option>
                         </select>
                     </div>
                 </div>
@@ -48,16 +48,13 @@
                                 </select>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-4">                                
                                 <h2>Job Type</h2>
                                 @if ($jobTypes->isNotEmpty())
                                     @foreach ($jobTypes as $jobType)
                                         <div class="form-check mb-2">
-                                            <input {{ in_array($jobType->id, $jobTypeArray) ? 'checked' : '' }}
-                                                class="form-check-input " name="job_type" type="checkbox"
-                                                value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
-                                            <label class="form-check-label "
-                                                for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
+                                            <input {{ (in_array($jobType->id, $jobTypeArray)) ? 'checked' : '' }} class="form-check-input " name="job_type" type="checkbox" value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
+                                            <label class="form-check-label " for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
                                         </div>
                                     @endforeach
                                 @endif
@@ -166,15 +163,16 @@
                 var keywords = $('#keywords').val();
                 var location = $('#location').val();
                 var category = $('#category').val();
-                var jobType = $('input[name="job_type"]:checked').val();
+                // var jobType = $('input[name="job_type"]:checked').val();
                 var experience = $('#experience').val();
+                var sort = $('#sort').val();
 
                 var checkedJobTypes = $("input[type='checkbox'][name='job_type']:checked").map(function() {
                     return $(this).val();
                 }).get();
 
                 //if keywords is not empty, add to url
-                if (has(keywords) && keywords !== '') {
+                if (keywords !== '') {
                     url += '&keywords=' + encodeURIComponent(keywords); // Append keywords to the URL
                 }
                 //if location is not empty, add to url
@@ -185,24 +183,31 @@
                 if (category !== '') {
                     url += '&category=' + encodeURIComponent(category); // Append category to the URL
                 }
-                //if job type is not empty, add to url
-                if (jobType !== undefined) {
-                    url += '&job_type=' + encodeURIComponent(jobType); // Append job type to the URL
-                }
+                // //if job type is not empty, add to url
+                // if (jobType !== undefined) {
+                //     url += '&job_type=' + encodeURIComponent(jobType); // Append job type to the URL
+                // }
                 //if experience is not empty, add to url
                 if (experience !== '') {
                     url += '&experience=' + encodeURIComponent(experience); // Append experience to the URL
                 }
+                //if sort is not empty, add to url
+                if (sort !== '') {
+                    url += '&sort=' + encodeURIComponent(sort); // Append sort to the URL
+                }
 
-                //Append all checked job types to the URL
+                // Append all checked job types to the URL as a comma-separated list
                 if (checkedJobTypes.length > 0) {
-                    url += '&job_type=' + encodeURIComponent(
-                        checkedJobTypes); // Append job types to the URL
+                    url += '&job_type=' + encodeURIComponent(checkedJobTypes.join(','));
                 }
 
                 window.location.href = url; // Redirect to the constructed URL
             });
 
+        });
+
+        $('#sort').on('change', function() {
+            $('#searchForm').submit();
         });
     </script>
 @endsection

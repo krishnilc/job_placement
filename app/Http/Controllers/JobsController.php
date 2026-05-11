@@ -26,12 +26,12 @@ class JobsController extends Controller
       }
 
       //Search using location
-      if (!empty($request->location)) {         
+      if (!empty($request->location)) {
          $jobs = $jobs->where('location', $request->location);
       }
 
       //Search using category
-      if (!empty($request->category)) {        
+      if (!empty($request->category)) {
          $jobs = $jobs->where('category_id', $request->category);
       }
 
@@ -43,11 +43,21 @@ class JobsController extends Controller
       }
 
       //Search using experience
-      if (!empty($request->experience)) {       
+      if (!empty($request->experience)) {
          $jobs = $jobs->where('experience', $request->experience);
       }
 
-      $jobs = $jobs->with('jobType')->orderBy('created_at', 'desc')->paginate(9); // Retrieve active jobs with their associated job types, ordered by creation date, and paginate the results
+      $jobs = $jobs->with('jobType', 'category');
+      // $jobs = $jobs->orderBy('created_at', 'desc');
+      
+      if ($request->sort == '0') {
+         $jobs = $jobs->orderBy('created_at', 'asc'); // If sort is 0, order by creation date in ascending order
+      }
+      else {
+         $jobs = $jobs->orderBy('created_at', 'desc'); // Default order by creation date in descending order
+      }
+
+      $jobs = $jobs->paginate(9); // Retrieve active jobs with their associated job types, ordered by creation date, and paginate the results
 
       // Logic to retrieve and display all jobs will go here
       return view('front.jobs', [
