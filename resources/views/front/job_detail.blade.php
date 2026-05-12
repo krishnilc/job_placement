@@ -138,20 +138,31 @@
 
 @section('customJS')
     <script type="text/javascript">
-        function applyJob(jobId) {
+    
+        function applyJob(jobId) {     
             if (confirm('Are you sure you want to apply for this job?')) {
                 // Send AJAX request to apply for the job
                 $.ajax({
                     url: '{{ route("applyJob") }}',
                     type: 'POST',
-                    data: { id: jobId },
+                    data: { job_id: jobId }, // Fix key to match controller
                     dataType: 'json',
-
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
                     success: function (response) {
-                        window.location.reload();
+                        // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
+                        let alertClass = response.status ? 'alert-success' : 'alert-danger';
+                        let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
+                            ${response.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`;
+                        // Insert message at the top of the main column
+                        $(".col-md-8").prepend(alertBox);
                     },
                     error: function (xhr) {
-                        alert('An error occurred while applying for the job.');
+                        let alertBox = `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
+                        $(".col-md-8").prepend(alertBox);
                     }
                 });
             }
