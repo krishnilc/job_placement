@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\JobApplication;
 use App\Models\JobType;
 use App\Models\User;
 use App\Models\Job;
@@ -284,7 +285,7 @@ class AccountController extends Controller
         ]);
     }
 
-     public function updateJob(Request $request, $id)
+    public function updateJob(Request $request, $id)
     {
         $rules = [
             'title' => 'required|min:5|max:200',
@@ -346,7 +347,7 @@ class AccountController extends Controller
                 'status' => false,
                 'errors' => ['Job not found or you do not have permission to delete this job!']
             ]);
-           // abort(404); // Job not found or does not belong to the authenticated user
+            // abort(404); // Job not found or does not belong to the authenticated user
         }
 
         //$job->delete(); 
@@ -354,7 +355,17 @@ class AccountController extends Controller
         session()->flash('success', 'Job deleted successfully!');
 
         return response()->json([
-            'status' => true           
+            'status' => true
         ]);
-    }   
+    }
+
+    public function myJobApplications(Request $request)
+    {
+        $jobApplications = JobApplication::where('user_id', Auth::user()->id)->with(['job', 'job.JobType'])->orderBy('created_at', 'desc')->paginate(10); // Retrieve job applications submitted by the authenticated user
+
+        return view('front.account.job.my-job-applications', [
+            'jobApplications' => $jobApplications
+        ]);
+    }
 }
+
