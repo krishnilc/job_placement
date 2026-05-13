@@ -40,8 +40,8 @@
                                     </div>
                                 </div>
                                 <div class="jobs_right">
-                                    <div class="apply_now">
-                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
+                                    <div class="apply_now {{ $count == 1 ? 'saved-job' : '' }}">                                        
+                                        <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i class="fa fa-heart-o"
                                                 aria-hidden="true"></i></a>
                                     </div>
                                 </div>
@@ -177,14 +177,12 @@
             }
         }
 
-        function saveJob(jobId) {
+        function saveJob(id) {
             // Send AJAX request to save the job
             $.ajax({
                 url: '{{ route('saveJob') }}',
                 type: 'POST',
-                data: {
-                    job_id: jobId
-                }, // Fix key to match controller
+                data: {id: id}, // Fix key to match controller
                 dataType: 'json',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'

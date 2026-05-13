@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
+use App\Models\SavedJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -81,7 +82,13 @@ class JobsController extends Controller
       if (!$job) {
          abort(404);
       }
-      return view('front.job_detail', ['job' => $job]); // Pass the job data to the job detail view
+
+      $count = SavedJob::where([
+         'jobs_id' => $id, 
+         'users_id' => Auth::id()
+         ])->count(); // Check if the currently authenticated user has already saved the job by counting the number of saved job records that match the job ID and user ID
+
+      return view('front.job_detail', ['job' => $job, 'count' => $count]); // Pass the job data and save count to the job detail view
    }
 
    public function applyJob(Request $request)
@@ -152,7 +159,7 @@ class JobsController extends Controller
 
    public function saveJob(Request $request)
    {
-      $id = $request->job_id; // Get the job ID from the request input
+      $id = $request->id; // Get the job ID from the request input
       $job = Job::find($id); // Retrieve the job with the specified ID
 
       if ($job == null) {
@@ -160,15 +167,17 @@ class JobsController extends Controller
 
          return response()->json([
             'status' => false,
-            // 'message' => 'Job not found'
+            'message' => 'Job not found'
          ]); // Return a JSON response with a 404 status code if the job is not found   .
       }
 
-      // Logic to handle saving the job will go here
-      $user = Auth::user(); // Get the currently authenticated user
-      $savedJobs = $user->saved_jobs ? explode(',', $user->saved_jobs) : []; // Retrieve the user's saved jobs and convert them into an array
+     // Check if the user has already saved the job
+      $savedJobCount = SavedJob::where([
+         'users_id' => Auth::user()->id,
+         'jobs_id' => $id
+      ])->count();
 
-      if (in_array($id, $savedJobs)) {
+      if($savedJobCount > 0) {
          session()->flash('error', 'You have already saved this job'); // Flash an error message to the session if the user has already saved the job 
 
          return response()->json([
@@ -177,9 +186,10 @@ class JobsController extends Controller
          ]); // Return a JSON response indicating that the user has already saved the job
       }
 
-      $savedJobs[] = $id; // Add the job ID to the array of saved jobs
-      $user->saved_jobs = implode(',', $savedJobs); // Convert the array of saved jobs back into a comma-separated string and save it to the user's record
-      $user->save(); // Save the updated user record to the database
+      $savedJob = new SavedJob();
+      $savedJob->users_id = Auth::user()->id;
+      $savedJob->jobs_id = $id;
+      $savedJob->save();
 
       session()->flash('success', 'Job saved successfully'); // Flash a success message to the session if the job is saved successfully
       return response()->json([

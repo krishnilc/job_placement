@@ -14,6 +14,7 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::get('/jobs', [JobsController::class, 'index'])->name('front.jobs');
 Route::get('/jobs/detail/{id}', [JobsController::class, 'detail'])->name('jobDetail');
 Route::post('/apply-job', [JobsController::class, 'applyJob'])->name('applyJob');
+Route::post('/save-job', [JobsController::class, 'saveJob'])->name('saveJob');
 
 // Route::get('/account/register', [AccountController::class, 'registration'])->name('account.registration');
 // Route::post('/account/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');
