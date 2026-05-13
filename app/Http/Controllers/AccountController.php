@@ -337,7 +337,7 @@ class AccountController extends Controller
     public function deleteJob(Request $request)
     {
         $job = Job::where([
-            'user_id' => Auth::user()->id,// Ensure that the job belongs to the authenticated user
+            'user_id' => Auth::user()->id, // Ensure that the job belongs to the authenticated user
             'id' => $request->jobId // Find the job by its ID
         ])->first();
 
@@ -361,11 +361,36 @@ class AccountController extends Controller
 
     public function myJobApplications(Request $request)
     {
-        $jobApplications = JobApplication::where('user_id', Auth::user()->id)->with(['job', 'job.JobType'])->orderBy('created_at', 'desc')->paginate(10); // Retrieve job applications submitted by the authenticated user
+        $jobApplications = JobApplication::where('user_id', Auth::user()->id) 
+            ->with(['job', 'job.JobType', 'job.applications'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10); // Retrieve job applications submitted by the authenticated user
 
         return view('front.account.job.my-job-applications', [
             'jobApplications' => $jobApplications
         ]);
     }
-}
 
+    public function removeJobApplication(Request $request)
+    {
+        $jobApplication = JobApplication::where([
+            'id' => $request->id, // Find the job application by its ID
+            'user_id' => Auth::user()->id, // Ensure that the job application belongs to the authenticated user            
+        ])->first();
+
+        if ($jobApplication == null) {
+            session()->flash('error', 'Job application not found or you do not have permission to remove this application!');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Job application not found or you do not have permission to remove this application!']
+            ]);
+        }
+
+        JobApplication::find($request->id)->delete(); // Permanently delete the job application from the database
+
+        session()->flash('success', 'Job application removed successfully!');
+        return response()->json([
+            'status' => true
+        ]);
+    }
+}

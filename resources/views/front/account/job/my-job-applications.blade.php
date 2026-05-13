@@ -49,7 +49,7 @@
                                                         </div>
                                                     </td>
                                                     <td>{{ $jobApplication->created_at->format('d M, Y') }}</td>
-                                                    <td>0 Applications</td>
+                                                    <td>{{ $jobApplication->job->applications->count() }} Applications</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">
                                                             {{ $jobApplication->job->status == 1 ? 'active' : 'inactive' }}
@@ -67,10 +67,6 @@
                                                                         href="{{ route('jobDetail', $jobApplication->job->id) }}">
                                                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                                                         View</a></li>
-                                                                <li><a class="dropdown-item"
-                                                                        href="{{ route('account.editJob', $jobApplication->job->id) }}"><i
-                                                                            class="fa fa-edit" aria-hidden="true"></i>
-                                                                        Edit</a></li>
                                                                 <li><a class="dropdown-item" href="#"
                                                                         onclick="removeApplication({{ $jobApplication->id }})"><i
                                                                             class="fa fa-trash" aria-hidden="true"></i>
@@ -80,6 +76,10 @@
                                                     </td>
                                                 </tr>
                                             @endforeach
+                                            @else
+                                            <tr>
+                                                <td colspan="5"> No job applications found. </td>
+                                            </tr>
                                         @endif
                                     </tbody>
                                 </table>
@@ -98,23 +98,26 @@
 
 @section('customJS')
     <script type="text/javascript">
-        function removeApplication(jobId) {
+        function removeApplication(id) {
             if (confirm('Are you sure you want to remove this application?')) {
                 $.ajax({
-                    url: "{{ route('account.deleteJob') }}",
+                    url: "{{ route('account.removeJobApplication') }}",
                     type: "POST",
                     dataType: "json",
-                    data: { jobId: jobId },
-
-                    success: function (response) {
-                        window.location.href = "{{ route('account.myJobs') }}"; // Redirect to the My Jobs page after deletion
+                    data: {
+                        id: id
                     },
 
-                    error: function (xhr, status, error) {
-                        alert('An error occurred while deleting the job. Please try again.');
+                    success: function(response) {
+                        window.location.href =
+                        "{{ route('account.myJobApplications') }}"; // Redirect to the My Job Applications page after removal
+                    },
+
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while removing the application. Please try again.');
                     }
                 });
             }
-        }            
+        }
     </script>
 @endsection
