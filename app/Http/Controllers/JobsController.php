@@ -149,4 +149,42 @@ class JobsController extends Controller
          'message' => 'You have successfully applied for the job'
       ]); // Return a JSON response indicating that the application was successful
    }
+
+   public function saveJob(Request $request)
+   {
+      $id = $request->job_id; // Get the job ID from the request input
+      $job = Job::find($id); // Retrieve the job with the specified ID
+
+      if ($job == null) {
+         session()->flash('error', 'Job not found'); // Flash an error message to the session if the job is not found
+
+         return response()->json([
+            'status' => false,
+            // 'message' => 'Job not found'
+         ]); // Return a JSON response with a 404 status code if the job is not found   .
+      }
+
+      // Logic to handle saving the job will go here
+      $user = Auth::user(); // Get the currently authenticated user
+      $savedJobs = $user->saved_jobs ? explode(',', $user->saved_jobs) : []; // Retrieve the user's saved jobs and convert them into an array
+
+      if (in_array($id, $savedJobs)) {
+         session()->flash('error', 'You have already saved this job'); // Flash an error message to the session if the user has already saved the job 
+
+         return response()->json([
+            'status' => false,
+            'message' => 'You have already saved this job'
+         ]); // Return a JSON response indicating that the user has already saved the job
+      }
+
+      $savedJobs[] = $id; // Add the job ID to the array of saved jobs
+      $user->saved_jobs = implode(',', $savedJobs); // Convert the array of saved jobs back into a comma-separated string and save it to the user's record
+      $user->save(); // Save the updated user record to the database
+
+      session()->flash('success', 'Job saved successfully'); // Flash a success message to the session if the job is saved successfully
+      return response()->json([
+         'status' => true,
+         'message' => 'Job saved successfully'
+      ]); // Return a JSON response indicating that the job was saved successfully
+   }
 }

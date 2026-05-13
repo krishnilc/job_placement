@@ -41,34 +41,35 @@
                                 </div>
                                 <div class="jobs_right">
                                     <div class="apply_now">
-                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
+                                                aria-hidden="true"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="descript_wrap white-bg">
-                            @if(!empty($job->description))
+                            @if (!empty($job->description))
                                 <div class="single_wrap">
                                     <h4>Job description</h4>
                                     <p>{!! nl2br($job->description) !!}</p>
                                 </div>
                             @endif
 
-                            @if(!empty($job->responsibilities))
+                            @if (!empty($job->responsibilities))
                                 <div class="single_wrap">
                                     <h4>Responsibility</h4>
                                     <p>{!! nl2br($job->responsibilities) !!}</p>
                                 </div>
                             @endif
 
-                            @if(!empty($job->qualifications))
+                            @if (!empty($job->qualifications))
                                 <div class="single_wrap">
                                     <h4>Qualifications</h4>
                                     <p>{!! nl2br($job->qualifications) !!}</p>
                                 </div>
                             @endif
 
-                            @if(!empty($job->benefits))
+                            @if (!empty($job->benefits))
                                 <div class="single_wrap">
                                     <h4>Benefits</h4>
                                     <p>{!! nl2br($job->benefits) !!}</p>
@@ -77,10 +78,16 @@
 
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
-                                <a href="#" class="btn btn-secondary">Save</a>
+                                @if (Auth::check())
+                                    <a href="#" onclick="saveJob({{ $job->id }})"
+                                        class="btn btn-secondary">Save</a>
+                                @else
+                                    <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
+                                @endif
                                 <!-- apply if user is logged in -->
-                                @if(Auth::check())
-                                    <a href="#" class="btn btn-primary" onclick="applyJob({{ $job->id }})">Apply</a>
+                                @if (Auth::check())
+                                    <a href="#" class="btn btn-primary"
+                                        onclick="applyJob({{ $job->id }})">Apply</a>
                                 @else
                                     <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
                                 @endif
@@ -98,10 +105,10 @@
                                 <ul>
                                     <li>Published on: <span>{{ $job->created_at->format('d M, Y') }}</span></li>
                                     <li>Vacancy: <span>{{ $job->vacancy }}</span></li>
-                                    @if(!empty($job->salary))
+                                    @if (!empty($job->salary))
                                         <li>Salary: <span>{{ $job->salary }}</span></li>
                                     @endif
-                                    @if(!empty($job->location))
+                                    @if (!empty($job->location))
                                         <li>Location: <span>{{ $job->location }}</span></li>
                                     @endif
                                     <li>Job Nature: <span>{{ $job->jobType->name ?? 'N/A' }}</span></li>
@@ -116,13 +123,13 @@
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    @if(!empty($job->company_name))
+                                    @if (!empty($job->company_name))
                                         <li>Name: <span>{{ $job->company_name }}</span></li>
                                     @endif
-                                    @if(!empty($job->company_location))
+                                    @if (!empty($job->company_location))
                                         <li>Location: <span>{{ $job->company_location }}</span></li>
                                     @endif
-                                    @if(!empty($job->company_website))
+                                    @if (!empty($job->company_website))
                                         <li>Website: <span> <a href="{{ $job->company_website }}"
                                                     target="_blank">{{ $job->company_website }}</a></span></li>
                                     @endif
@@ -138,19 +145,20 @@
 
 @section('customJS')
     <script type="text/javascript">
-    
-        function applyJob(jobId) {     
+        function applyJob(jobId) {
             if (confirm('Are you sure you want to apply for this job?')) {
                 // Send AJAX request to apply for the job
                 $.ajax({
-                    url: '{{ route("applyJob") }}',
+                    url: '{{ route('applyJob') }}',
                     type: 'POST',
-                    data: { job_id: jobId }, // Fix key to match controller
+                    data: {
+                        job_id: jobId
+                    }, // Fix key to match controller
                     dataType: 'json',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    success: function (response) {
+                    success: function(response) {
                         // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
                         let alertClass = response.status ? 'alert-success' : 'alert-danger';
                         let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
@@ -160,12 +168,43 @@
                         // Insert message at the top of the main column
                         $(".col-md-8").prepend(alertBox);
                     },
-                    error: function (xhr) {
-                        let alertBox = `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
+                    error: function(xhr) {
+                        let alertBox =
+                            `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
                         $(".col-md-8").prepend(alertBox);
                     }
                 });
             }
+        }
+
+        function saveJob(jobId) {
+            // Send AJAX request to save the job
+            $.ajax({
+                url: '{{ route('saveJob') }}',
+                type: 'POST',
+                data: {
+                    job_id: jobId
+                }, // Fix key to match controller
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
+                    let alertClass = response.status ? 'alert-success' : 'alert-danger';
+                    let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
+                            ${response.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`;
+                    // Insert message at the top of the main column
+                    $(".col-md-8").prepend(alertBox);
+                },
+                error: function(xhr) {
+                    let alertBox =
+                        `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
+                    $(".col-md-8").prepend(alertBox);
+                }
+            });
         }
     </script>
 @endsection
