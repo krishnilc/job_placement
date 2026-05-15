@@ -9,9 +9,19 @@ class JobApplication extends Model
 {
      use HasFactory;
 
+     protected $casts = [
+         'applied_at' => 'datetime',
+     ];
+
      public function job()
      {
          return $this->belongsTo(Job::class);
+         
+     }
+
+      public function user()
+     {
+         return $this->belongsTo(User::class);
          
      }
 }

@@ -396,12 +396,7 @@ class AccountController extends Controller
     }
 
     public function savedJobs(Request $request)
-    {
-        //  $jobApplications = JobApplication::where('user_id', Auth::user()->id) 
-        //     ->with(['job', 'job.JobType', 'job.applications'])
-        //     ->orderBy('created_at', 'desc')
-        //     ->paginate(10); // Retrieve job applications submitted by the authenticated user
-
+    {        
         $savedJobs = SavedJob::where([
             'users_id' => Auth::user()->id
         ])->with(['job', 'job.jobType', 'job.applications'])->orderBy('created_at', 'desc')->paginate(10); // Retrieve saved jobs by the authenticated user

@@ -83,12 +83,19 @@ class JobsController extends Controller
          abort(404);
       }
 
-      $count = SavedJob::where([
-         'jobs_id' => $id, 
-         'users_id' => Auth::id()
-         ])->count(); // Check if the currently authenticated user has already saved the job by counting the number of saved job records that match the job ID and user ID
+      $count = 0; // Initialize the count variable to 0
 
-      return view('front.job_detail', ['job' => $job, 'count' => $count]); // Pass the job data and save count to the job detail view
+      if (Auth::user()){
+         $count = SavedJob::where([
+            'jobs_id' => $id, 
+            'users_id' => Auth::id()
+         ])->count(); // Check if the currently authenticated user has already saved the job by counting the number of saved job records that match the job ID and user ID
+      }
+
+      //fetch applications count for the job
+      $applications = JobApplication::where('job_id', $id)->with('user')->get(); //
+     
+      return view('front.job_detail', ['job' => $job, 'count' => $count, 'applications' => $applications]); // Pass the job data and save count to the job detail view
    }
 
    public function applyJob(Request $request)
