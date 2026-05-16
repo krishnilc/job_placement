@@ -83,22 +83,22 @@
 
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Description<span class="req">*</span></label>
-                                    <textarea class="form-control" name="description" id="description" cols="5" rows="5"
+                                    <textarea class="textarea" name="description" id="description" cols="5" rows="5"
                                         placeholder="Description"></textarea>
                                     <p class="text-danger" id="descriptionError"></p>
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Benefits</label>
-                                    <textarea class="form-control" name="benefits" id="benefits" cols="5" rows="5" placeholder="Benefits"></textarea>
+                                    <textarea class="textarea" name="benefits" id="benefits" cols="5" rows="5" placeholder="Benefits"></textarea>
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Responsibilities</label>
-                                    <textarea class="form-control" name="responsibilities" id="responsibilities" cols="5" rows="5"
+                                    <textarea class="textarea" name="responsibilities" id="responsibilities" cols="5" rows="5"
                                         placeholder="Responsibilities"></textarea>
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Qualifications</label>
-                                    <textarea class="form-control" name="qualifications" id="qualifications" cols="5" rows="5"
+                                    <textarea class="textarea" name="qualifications" id="qualifications" cols="5" rows="5"
                                         placeholder="Qualifications"></textarea>
                                 </div>
 
