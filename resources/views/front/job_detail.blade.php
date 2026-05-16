@@ -112,6 +112,7 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Email</th>
+                                            <th>Mobile</th>
                                             <th>Applied Date</th>
                                         </tr>
                                     </thead>
@@ -121,12 +122,13 @@
                                                 <tr>
                                                     <td>{{ $application->user->name }}</td>
                                                     <td>{{ $application->user->email }}</td>
+                                                    <td>{{ $application->user->mobile ?? 'N/A' }}</td>
                                                     <td>{{ optional($application->applied_at)->format('d M, Y') }}</td>
                                                 </tr>
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="3" class="text-center">No applicants found.</td>
+                                                <td colspan="4" class="text-center">No applicants found.</td>
                                             </tr>
                                         @endif
 
