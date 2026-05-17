@@ -10029,3 +10029,7 @@ footer .nav-link {
 .trumbowyg ul li {
   list-style: disc; 
 }
+
+.dashboard{
+  height: 400px;
+}
