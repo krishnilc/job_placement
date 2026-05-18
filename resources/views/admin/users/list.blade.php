@@ -24,7 +24,7 @@
                             <div class="d-flex justify-content-between">
                                 <div>
                                     <h3 class="fs-4 mb-1">Users</h3>
-                                </div>                             
+                                </div>
 
                             </div>
                             <div class="table-responsive">
@@ -54,11 +54,13 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="{{ route("admin.users.edit", $user->id) }}"><i class="fa fa-edit"
-                                                                            aria-hidden="true"></i>
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.users.edit', $user->id) }}"><i
+                                                                            class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href=""><i class="fa fa-trash"
-                                                                            aria-hidden="true"></i>
+                                                                <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                        onclick="deleteUser({{ $user->id }})"><i
+                                                                            class="fa fa-trash" aria-hidden="true"></i>
                                                                         Delete</a></li>
                                                             </ul>
                                                         </div>
@@ -82,5 +84,27 @@
 @endsection
 
 @section('customJS')
+    <script type="text/javascript">
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                $.ajax({
+                    url: "{{ route('admin.users.destroy') }}",
+                    type: "DELETE",
+                    dataType: "json",
+                    data: {
+                        id: id
+                    },
 
+                    success: function(response) {
+                        window.location.href =
+                        "{{ route('admin.users') }}"; // Redirect to the Users page after deletion
+                    },
+
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while deleting the user. Please try again.');
+                    }
+                });
+            }
+        }
+    </script>
 @endsection
