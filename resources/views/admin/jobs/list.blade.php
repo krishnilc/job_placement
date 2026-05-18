@@ -35,7 +35,7 @@
                                             <th scope="col">Title</th>
                                             <th scope="col">Date</th>
                                             <th scope="col">Company</th>
-                                            <!-- <th scope="col">Location</th> -->
+                                            <th scope="col">Status</th>
                                             <th scope="col">Created By</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -51,7 +51,11 @@
                                                     </td>
                                                     <td>{{ $job->created_at->format('Y-m-d') }}</td>
                                                     <td>{{ $job->company_name }}</td>
-
+                                                    <td>
+                                                        <span class="badge bg-{{ $job->status == 1 ? 'success' : 'danger' }}">
+                                                            {{ $job->status == 1 ? 'Active' : 'Blocked' }}
+                                                        </span>
+                                                    </td>
                                                     <td>{{ $job->user->name }}</td>
                                                     <td>
 

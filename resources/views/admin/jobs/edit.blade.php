@@ -84,83 +84,113 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Description<span class="req">*</span></label>
-                                    <textarea class="textarea" name="description" id="description" cols="5" rows="5"
-                                        placeholder="Description">{{ $job->description }}</textarea>
-                                    <p class="text-danger" id="descriptionError"></p>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Benefits</label>
-                                    <textarea class="textarea" name="benefits" id="benefits" cols="5" rows="5"
-                                        placeholder="Benefits">{{ $job->benefits }}</textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Responsibilities</label>
-                                    <textarea class="textarea" name="responsibilities" id="responsibilities" cols="5"
-                                        rows="5" placeholder="Responsibilities">{{ $job->responsibilities }}</textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Qualifications</label>
-                                    <textarea class="textarea" name="qualifications" id="qualifications" cols="5" rows="5"
-                                        placeholder="Qualifications">{{ $job->qualifications }}</textarea>
-                                </div>
-
-
-
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Keywords</label>
-                                    <input type="text" placeholder="keywords" id="keywords" name="keywords"
-                                        class="form-control" value="{{ $job->keywords }}">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Experience <span class="req">*</span></label>
-                                    <select name="experience" id="experience" class="form-control">
-                                        <option {{ $job->experience == '1' ? 'selected' : '' }} value="1">1 Year</option>
-                                        <option {{ $job->experience == '2' ? 'selected' : '' }} value="2">2 Years</option>
-                                        <option {{ $job->experience == '3' ? 'selected' : '' }} value="3">3 Years</option>
-                                        <option {{ $job->experience == '4' ? 'selected' : '' }} value="4">4 Years</option>
-                                        <option {{ $job->experience == '5' ? 'selected' : '' }} value="5">5 Years</option>
-                                        <option {{ $job->experience == '6' ? 'selected' : '' }} value="6">6 Years</option>
-                                        <option {{ $job->experience == '7' ? 'selected' : '' }} value="7">7 Years</option>
-                                        <option {{ $job->experience == '8' ? 'selected' : '' }} value="8">8 Years</option>
-                                        <option {{ $job->experience == '9' ? 'selected' : '' }} value="9">9 Years</option>
-                                        <option {{ $job->experience == '10' ? 'selected' : '' }} value="10">10 Years</option>
-                                        <option {{ $job->experience == '10_plus' ? 'selected' : '' }} value="10_plus">10+
-                                            Years</option>
-                                    </select>
-                                    <p class="text-danger" id="experienceError"></p>
-                                </div>
-
-                                <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
 
                                 <div class="row">
                                     <div class="mb-4 col-md-6">
-                                        <label for="" class="mb-2">Name<span class="req">*</span></label>
-                                        <input value="{{ $job->company_name }}" type="text" placeholder="Company Name"
-                                            id="company_name" name="company_name" class="form-control">
-                                        <p class="text-danger" id="companyNameError"></p>
+                                        <div class="form-check">
+                                            <input {{ $job->isFeatured == 1 ? 'checked' : '' }} class="form-check-input" type="checkbox" value="1" id="isFeatured"
+                                                name="isFeatured">
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                Featured Job
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="mb-4 col-md-6">
-                                        <label for="" class="mb-2">Location</label>
-                                        <input value="{{ $job->company_location }}" type="text"
-                                            placeholder="Company Location" id="company_location" name="company_location"
-                                            class="form-control">
+                                        <div class="form-check-inline">
+                                            <input {{ $job->status == 1 ? 'checked' : '' }} class="form-check-input" type="radio" value="1" id="status-active"
+                                                name="status">
+                                            <label class="form-check-label" for="status">
+                                                Active
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check-inline">
+                                            <input {{ $job->status == 0 ? 'checked' : '' }}  class="form-check-input" type="radio" value="0" id="status-block" name="status">
+                                            <label class="form-check-label" for="block">
+                                                Block
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Description<span class="req">*</span></label>
+                                        <textarea class="textarea" name="description" id="description" cols="5" rows="5"
+                                            placeholder="Description">{{ $job->description }}</textarea>
+                                        <p class="text-danger" id="descriptionError"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Benefits</label>
+                                        <textarea class="textarea" name="benefits" id="benefits" cols="5" rows="5"
+                                            placeholder="Benefits">{{ $job->benefits }}</textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Responsibilities</label>
+                                        <textarea class="textarea" name="responsibilities" id="responsibilities" cols="5"
+                                            rows="5" placeholder="Responsibilities">{{ $job->responsibilities }}</textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Qualifications</label>
+                                        <textarea class="textarea" name="qualifications" id="qualifications" cols="5"
+                                            rows="5" placeholder="Qualifications">{{ $job->qualifications }}</textarea>
+                                    </div>
+
+
+
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Keywords</label>
+                                        <input type="text" placeholder="keywords" id="keywords" name="keywords"
+                                            class="form-control" value="{{ $job->keywords }}">
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Experience <span class="req">*</span></label>
+                                        <select name="experience" id="experience" class="form-control">
+                                            <option {{ $job->experience == '1' ? 'selected' : '' }} value="1">1 Year</option>
+                                            <option {{ $job->experience == '2' ? 'selected' : '' }} value="2">2 Years</option>
+                                            <option {{ $job->experience == '3' ? 'selected' : '' }} value="3">3 Years</option>
+                                            <option {{ $job->experience == '4' ? 'selected' : '' }} value="4">4 Years</option>
+                                            <option {{ $job->experience == '5' ? 'selected' : '' }} value="5">5 Years</option>
+                                            <option {{ $job->experience == '6' ? 'selected' : '' }} value="6">6 Years</option>
+                                            <option {{ $job->experience == '7' ? 'selected' : '' }} value="7">7 Years</option>
+                                            <option {{ $job->experience == '8' ? 'selected' : '' }} value="8">8 Years</option>
+                                            <option {{ $job->experience == '9' ? 'selected' : '' }} value="9">9 Years</option>
+                                            <option {{ $job->experience == '10' ? 'selected' : '' }} value="10">10 Years
+                                            </option>
+                                            <option {{ $job->experience == '10_plus' ? 'selected' : '' }} value="10_plus">10+
+                                                Years</option>
+                                        </select>
+                                        <p class="text-danger" id="experienceError"></p>
+                                    </div>
+
+                                    <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
+
+                                    <div class="row">
+                                        <div class="mb-4 col-md-6">
+                                            <label for="" class="mb-2">Name<span class="req">*</span></label>
+                                            <input value="{{ $job->company_name }}" type="text" placeholder="Company Name"
+                                                id="company_name" name="company_name" class="form-control">
+                                            <p class="text-danger" id="companyNameError"></p>
+                                        </div>
+
+                                        <div class="mb-4 col-md-6">
+                                            <label for="" class="mb-2">Location</label>
+                                            <input value="{{ $job->company_location }}" type="text"
+                                                placeholder="Company Location" id="company_location" name="company_location"
+                                                class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="" class="mb-2">Website</label>
+                                        <input value="{{ $job->company_website }}" type="text" placeholder="Website"
+                                            id="company_website" name="company_website" class="form-control">
                                     </div>
                                 </div>
-
-                                <div class="mb-4">
-                                    <label for="" class="mb-2">Website</label>
-                                    <input value="{{ $job->company_website }}" type="text" placeholder="Website"
-                                        id="company_website" name="company_website" class="form-control">
+                                <div class="card-footer  p-4">
+                                    <button type="submit" class="btn btn-primary">Update Job</button>
                                 </div>
                             </div>
-                            <div class="card-footer  p-4">
-                                <button type="submit" class="btn btn-primary">Update Job</button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
