@@ -69,7 +69,7 @@
                                                                 <li><a class="dropdown-item" href="{{ route('admin.jobs.edit', $job->id) }}"><i class="fa fa-edit"
                                                                             aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"><i
+                                                                <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteJob({{ $job->id }})"><i
                                                                             class="fa fa-trash" aria-hidden="true"></i>
                                                                         Delete</a></li>
                                                             </ul>
@@ -99,6 +99,26 @@
 
 @section('customJS')
     <script type="text/javascript">
+        function deleteJob(id) {
+            if (confirm('Are you sure you want to delete this job?')) {
+                $.ajax({
+                    url: "{{ route('admin.jobs.destroy') }}",
+                    type: "DELETE",
+                    dataType: "json",
+                    data: {
+                        id: id
+                    },
 
+                    success: function(response) {
+                        window.location.href =
+                        "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
+                    },
+
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while deleting the job. Please try again.');
+                    }
+                });
+            }
+        }
     </script>
 @endsection

@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use session;
 
 class JobController extends Controller
 {
@@ -82,4 +83,16 @@ class JobController extends Controller
             ]);
         }
     }
+
+        public function destroy(Request $request)
+        {
+            $job = Job::findOrFail($request->id); // Find the job by ID or throw a 404 error if not found
+            $job->delete(); // Delete the job from the database
+    
+            session()->flash('success', 'Job deleted successfully!'); // Flash a success message to the session
+            
+            return response()->json([
+                'status' => true
+            ]);
+        }
 }
