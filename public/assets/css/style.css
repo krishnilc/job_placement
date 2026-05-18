@@ -10033,3 +10033,7 @@ footer .nav-link {
 .dashboard{
   height: 400px;
 }
+
+.pagination span{
+  font-size: inherit;
+}

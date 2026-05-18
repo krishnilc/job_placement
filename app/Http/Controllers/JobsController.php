@@ -87,8 +87,8 @@ class JobsController extends Controller
 
       if (Auth::user()){
          $count = SavedJob::where([
-            'jobs_id' => $id, 
-            'users_id' => Auth::id()
+            'job_id' => $id, 
+            'user_id' => Auth::id()
          ])->count(); // Check if the currently authenticated user has already saved the job by counting the number of saved job records that match the job ID and user ID
       }
 
