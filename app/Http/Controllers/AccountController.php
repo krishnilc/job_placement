@@ -459,4 +459,9 @@ class AccountController extends Controller
             ]);
         }
     }
+
+    public function forgotPassword()
+    {
+        return view('front.account.forgot-password');
+    }
 }

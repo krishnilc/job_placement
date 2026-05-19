@@ -20,6 +20,8 @@ Route::get('/jobs/detail/{id}', [JobsController::class, 'detail'])->name('jobDet
 Route::post('/apply-job', [JobsController::class, 'applyJob'])->name('applyJob');
 Route::post('/save-job', [JobsController::class, 'saveJob'])->name('saveJob');
 
+Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->name('account.forgotPassword');
+
 // Route::get('/account/register', [AccountController::class, 'registration'])->name('account.registration');
 // Route::post('/account/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');
 // Route::get('/account/login', [AccountController::class, 'login'])->name('account.login');
