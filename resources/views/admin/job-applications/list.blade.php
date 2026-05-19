@@ -90,26 +90,26 @@
 
 @section('customJS')
     <script type="text/javascript">
-        // function deleteJob(id) {
-        //     if (confirm('Are you sure you want to delete this job?')) {
-        //         $.ajax({
-        //             url: "{{ route('admin.jobs.destroy') }}",
-        //             type: "DELETE",
-        //             dataType: "json",
-        //             data: {
-        //                 id: id
-        //             },
+        function deleteApplication(id) {
+            if (confirm('Are you sure you want to delete this application?')) {
+                $.ajax({
+                    url: "{{ route('admin.jobApplications.destroy') }}",
+                    type: "DELETE",
+                    dataType: "json",
+                    data: {
+                        id: id
+                    },
 
-        //             success: function(response) {
-        //                 window.location.href =
-        //                     "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
-        //             },
+                    success: function(response) {
+                        window.location.href =
+                            "{{ route('admin.jobApplications') }}"; // Redirect to the Job Applications page after deletion
+                    },
 
-        //             error: function(xhr, status, error) {
-        //                 alert('An error occurred while deleting the job. Please try again.');
-        //             }
-        //         });
-        //     }
-        // }
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while deleting the application. Please try again.');
+                    }
+                });
+            }
+        }
     </script>
 @endsection
