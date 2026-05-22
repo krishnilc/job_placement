@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>CareerVibe | Find Best Jobs</title>
+    <title>FNU Job Placement | Find Best Jobs</title>
     <meta name="description" content="" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no" />
@@ -23,7 +23,9 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-3">
             <div class="container">
-                <a class="navbar-brand" href="{{ route('home') }}">CareerVibe</a>
+                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                    <img src="{{ asset('assets/images/logo.png') }}" alt="FNU Job Placement" style="height:80px;">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -39,17 +41,50 @@
                         </li>
                     </ul>
 
-                    @if(Auth::check())
-                        @if(Auth::user()->role == 'admin')
-                            <a class="btn btn-outline-primary me-2" href="{{ route('admin.dashboard') }}" type="submit">Admin
+                    {{-- @if (Auth::check())
+                        @if (Auth::user()->role == 'admin')
+                            <a class="btn btn-primary btn-block" href="{{ route('admin.dashboard') }}"
+                                type="submit">Admin
                                 Dashboard</a>
                         @endif
-                        <a class="btn btn-outline-primary me-2" href="{{ route('account.profile') }}" type="submit">My
+                        <a class="btn btn-primary btn-block" href="{{ route('account.profile') }}" type="submit">My
                             Account</a>
-                        <a class="btn btn-primary" href="{{ route('account.logout') }}" type="submit">Logout</a>
-
+                        <a class="btn btn-primary btn-block" href="{{ route('account.logout') }}"
+                            type="submit">Logout</a>
                     @else
-                        <a class="btn btn-outline-primary me-2" href="{{ route('account.login') }}" type="submit">Login</a>
+                        <a class="btn btn-primary btn-block" href="{{ route('account.login') }}"
+                            type="submit">Login</a>
+                    @endif --}}
+
+                    {{-- <div class="d-flex align-items-center gap-2 ms-lg-3">
+                        @if (Auth::check())
+                            @if (Auth::user()->role == 'admin')
+                                <a class="btn btn-primary" href="{{ route('admin.dashboard') }}">Admin
+                                    Dashboard</a>
+                            @endif
+                            <a class="btn btn-primary" href="{{ route('account.profile') }}">My Account</a>
+                            <a class="btn btn-primary" href="{{ route('account.logout') }}">Logout</a>
+                        @else
+                            <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
+                        @endif
+                    </div> --}}
+
+                    @if (Auth::check())
+                        <div class="dropdown ms-lg-3">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ Auth::user()->name ?? 'Account' }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                                @if (Auth::user()->role == 'admin')
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ route('account.profile') }}">My Account</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('account.logout') }}">Logout</a></li>
+                            </ul>
+                        </div>
+                    @else
+                        <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
                     @endif
 
                     <!-- <a class="btn btn-primary" href="{{ route('account.createJob') }}" type="submit">Post a Job</a> -->
@@ -89,7 +124,7 @@
 
     <footer class="bg-dark py-3 bg-2">
         <div class="container">
-            <p class="text-center text-white pt-3 fw-bold fs-6">© 2023 xyz company, all right reserved</p>
+            <p class="text-center text-white pt-3 fw-bold fs-6">© 2026 Fiji National University, all right reserved</p>
         </div>
     </footer>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
@@ -111,7 +146,7 @@
             }
         });
 
-        $('#profilePicForm').submit(function (e) {
+        $('#profilePicForm').submit(function(e) {
             e.preventDefault();
             var formData = new FormData(this);
 
@@ -123,7 +158,7 @@
                 contentType: false,
                 processData: false,
 
-                success: function (response) {
+                success: function(response) {
                     if (response.status == false) {
                         var errors = response.errors;
 

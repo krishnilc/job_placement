@@ -1,17 +1,12 @@
 @extends('front.layouts.app')
 
 @section('main')
-    <section class="section-0 lazy d-flex bg-image-style dark align-items-center " class=""
-        data-bg="{{ asset('assets/images/banner5.jpg') }}">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-xl-8">
-                    <h1>Find a job</h1>
-                    <p>Thounsands of jobs available.</p>
-                    <div class="banner-btn mt-5"><a href="#" class="btn btn-primary mb-4 mb-sm-0">Explore Now</a></div>
-                </div>
-            </div>
-        </div>
+    {{-- <section class="section-0">
+        <img src="{{ asset('assets/images/banner7_1.png') }}" alt="Banner" class="img-fluid w-100 banner-img">
+    </section> --}}
+
+    <section class="section-0">
+        <img src="{{ asset('assets/images/banner7_2.png') }}" alt="Banner" class="img-fluid w-100" style="height: auto;">
     </section>
 
     <section class="section-1 py-5 ">
@@ -20,7 +15,8 @@
                 <form action="{{ route('front.jobs') }}" method="GET">
                     <div class="row">
                         <div class="col-md-3 mb-3 mb-sm-3 mb-lg-0">
-                            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="Keywords">
+                            <input type="text" class="form-control" name="keywords" id="keywords"
+                                placeholder="Keywords">
                         </div>
                         <div class="col-md-3 mb-3 mb-sm-3 mb-lg-0">
                             <input type="text" class="form-control" name="location" id="location"
@@ -52,13 +48,13 @@
 
     <section class="section-2 bg-2 py-5">
         <div class="container">
-            <h2>Popular Categories</h2>
+            <h2>Popular Categories</h2>     
             <div class="row pt-5">
                 @if ($categories->isNotEmpty())
                     @foreach ($categories as $category)
                         <div class="col-lg-4 col-xl-3 col-md-6">
                             <div class="single_catagory">
-                                <a href="{{ route('front.jobs').'?category='.$category->id }}">
+                                <a href="{{ route('front.jobs') . '?category=' . $category->id }}">
                                     <h4 class="pb-2">{{ $category->name }}</h4>
                                 </a>
                                 <p class="mb-0"> <span>0</span> Available position</p>
@@ -85,7 +81,8 @@
                                         <div class="card border-0 p-3 shadow mb-4">
                                             <div class="card-body">
                                                 <h3 class="border-0 fs-5 pb-2 mb-0">{{ $featuredJob->title }}</h3>
-                                                <p>{{ Str::words(strip_tags($featuredJob->description), $words = 10, '...') }}</p>
+                                                <p>{{ Str::words(strip_tags($featuredJob->description), $words = 10, '...') }}
+                                                </p>
                                                 <div class="bg-light p-3 border">
                                                     <p class="mb-0">
                                                         <span class="fw-bolder"><i class="fa fa-map-marker"></i></span>
@@ -140,7 +137,8 @@
                                         <div class="card border-0 p-3 shadow mb-4">
                                             <div class="card-body">
                                                 <h3 class="border-0 fs-5 pb-2 mb-0">{{ $latestJob->title }}</h3>
-                                                <p>{{ Str::words(strip_tags($latestJob->description), $words = 10, '...') }}</p>
+                                                <p>{{ Str::words(strip_tags($latestJob->description), $words = 10, '...') }}
+                                                </p>
                                                 <div class="bg-light p-3 border">
                                                     <p class="mb-0">
                                                         <span class="fw-bolder"><i class="fa fa-map-marker"></i></span>

@@ -9245,10 +9245,13 @@ button, .btn {
   display: inline-block;
   border-radius: 5px;
 }
+
+/* Button Styles custom colors */
 button.btn-primary, .btn.btn-primary {
   color: #ffffff;
-  background: #A8DF8E;
-  border: 2px solid #A8DF8E;
+  background: #3c5a99;
+  /* background: #A8DF8E; */
+  /* border: 2px solid #A8DF8E; */
 }
 button.btn-primary:hover, button.btn-primary:focus, .btn.btn-primary:hover, .btn.btn-primary:focus {
   border: 2px solid #242021;
@@ -9307,16 +9310,39 @@ header .navbar-brand {
     - modal             - Popup Modal
     - span.preheading   - If headings have a preheading
 */
+
+/* .hero-banner {
+    background-image: url('../images/banner7_1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    width: 100%;
+    height: 500px;
+} */
+
 .section-0 {
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    overflow: hidden;
+}
+
+.banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* .section-0 {
   min-height: 500px;
   background-size: cover;
   background-position: center;
   position: relative;
-}
+} */
 .section-0 .container {
   z-index: 2;
 }
-.section-0:after {
+/* .section-0:after {
   content: "";
   position: absolute;
   width: 100%;
@@ -9325,7 +9351,8 @@ header .navbar-brand {
   left: 0px;
   top: 0px;
   z-index: 1;
-}
+} */
+
 .section-0 h1 {
   color: #FFF;
   font-family: 'Inter-Bold';
@@ -9335,6 +9362,19 @@ header .navbar-brand {
   font-family: 'Inter-Bold';
   font-size: 24px;
 }
+
+.banner-img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .banner-img {
+        height: 300px;
+    }
+}
+
 .section-2 .single_catagory {
   background: #FFF;
   padding: 25px;
