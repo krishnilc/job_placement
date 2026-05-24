@@ -85,6 +85,7 @@
                         </div>
                     @else
                         <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
+                        <a class="btn btn-primary ms-2" href="{{ route('account.registration') }}">Register</a>
                     @endif
 
                     <!-- <a class="btn btn-primary" href="{{ route('account.createJob') }}" type="submit">Post a Job</a> -->

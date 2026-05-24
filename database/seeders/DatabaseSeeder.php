@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         User::factory(10)->create();
+        //  User::factory(10)->create();
 
         // User::factory()->create([
         //     'name' => 'Test User',
@@ -28,8 +28,53 @@ class DatabaseSeeder extends Seeder
         // Category::factory(5)->create();
         // JobType::factory(5)->create();
 
-        //Job::factory(20)->create();
+        $jobTypes = [
+            'Full Time',
+            'Part Time',
+            'Contract',
+            'Remote',
+            'Freelance',
+            'Attachment',
+        ];
 
+        foreach ($jobTypes as $type) {
+            JobType::firstOrCreate([
+                'name' => $type,
+            ], [
+                'status' => 1,
+            ]);
+        }
+
+        $categories = [
+            'Administration & Office Support',
+            'Agriculture & Environment',
+            'Accounting, Banking, & Finance',
+            'Information Technology (IT) & Computing',
+            'Engineering & Technical Fields',
+            'Health & Medical Services',
+            'Education & Training',
+            'Hospitality & Tourism',
+            'Creative Arts, Media & Design',
+            'Trades & Skilled Services',
+            'Science & Research',
+            'Government, Legal & Community Services',
+            'Student & Graduate Opportunities',
+            'Sales, Marketing & Customer Service',
+            'Logistics, Transport & Supply Chain',
+            'Executive & Management Roles',
+            'Other Opportunities',
+
+        ];
+
+        foreach ($categories as $category) {
+            Category::firstOrCreate([
+                'name' => $category,
+            ], [
+                'status' => 1,
+            ]);
+        }
+
+        //Job::factory(20)->create();
 
     }
 }

@@ -9,4 +9,11 @@ class Category extends Model
 {
     use HasFactory;
     //
+
+    
+     public function jobs()
+     {
+         return $this->hasMany(Job::class);
+     }
+
 }

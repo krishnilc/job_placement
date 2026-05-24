@@ -13,7 +13,8 @@ class HomeController extends Controller
     //home page
     public function index()
     {
-        $categories = Category::where('status', 1)->orderBy('name', 'asc')->take(8)->get();
+        // $categories = Category::where('status', 1)->orderBy('name', 'asc')->take(8)->get();
+         $categories = Category::where('status', 1)->orderBy('name', 'asc')->get();
         $newCategories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $featuredJobs = Job::where('status', 1)

@@ -20,16 +20,19 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('designation')->nullable();
             $table->string('mobile')->nullable();
+            $table->enum('role', ['admin', 'user', 'employer'])->default('user');
             $table->rememberToken();
             $table->timestamps();
         });
 
+        // Create password reset tokens table
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
+        // Create sessions table
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();
