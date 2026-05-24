@@ -59,6 +59,9 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item" href=""><i
+                                                                            class="fa fa-eye" aria-hidden="true"></i>
+                                                                        View</a></li>
                                                                 <li><a class="dropdown-item" href="javascript:void(0);"
                                                                         onclick="deleteApplication({{ $application->id }})"><i
                                                                             class="fa fa-trash" aria-hidden="true"></i>
@@ -100,12 +103,12 @@
                         id: id
                     },
 
-                    success: function(response) {
+                    success: function (response) {
                         window.location.href =
                             "{{ route('admin.jobApplications') }}"; // Redirect to the Job Applications page after deletion
                     },
 
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         alert('An error occurred while deleting the application. Please try again.');
                     }
                 });

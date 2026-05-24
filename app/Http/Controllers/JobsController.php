@@ -154,7 +154,7 @@ class JobsController extends Controller
         'user' => Auth::user(), // Pass the authenticated user's data to the email template
         'job' => $job, // Pass the job data to the email template
       ];
-      Mail::to($employer->email)->send(new JobNotificationEmail($mailData)); // Send a notification email to the employer using the JobNotificationEmail Mailable class   
+     // Mail::to($employer->email)->send(new JobNotificationEmail($mailData)); // Send a notification email to the employer using the JobNotificationEmail Mailable class   
 
 
       session()->flash('success', 'You have successfully applied for the job'); // Flash a success message to the session if the application is successful

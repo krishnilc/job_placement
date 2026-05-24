@@ -41,12 +41,13 @@
                                         value="{{ $user->mobile }}">
                                     <p class="text-danger" id="mobileError"></p>
                                 </div>
-                                <div class="mb-4">
+                                <!-- <div class="mb-4">
                                     <label for="designation" class="mb-2">Designation*</label>
                                     <input type="text" name="designation" id="designation" class="form-control"
                                         value="{{ $user->designation }}">
                                     <p class="text-danger" id="designationError"></p>
-                                </div>
+                                </div> -->
+                                
 
                             </div>
                             <div class="card-footer  p-4">

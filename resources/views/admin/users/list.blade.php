@@ -35,6 +35,7 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Mobile</th>
+                                             <th scope="col">Role</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -46,6 +47,7 @@
                                                     <td>{{ $user->name }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
+                                                    <td>{{ $user->role }}</td>
 
                                                     <td>
                                                         <div class="action-dots">

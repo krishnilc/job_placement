@@ -42,34 +42,31 @@
                     </ul>
 
                     {{-- @if (Auth::check())
-                        @if (Auth::user()->role == 'admin')
-                            <a class="btn btn-primary btn-block" href="{{ route('admin.dashboard') }}"
-                                type="submit">Admin
-                                Dashboard</a>
-                        @endif
-                        <a class="btn btn-primary btn-block" href="{{ route('account.profile') }}" type="submit">My
-                            Account</a>
-                        <a class="btn btn-primary btn-block" href="{{ route('account.logout') }}"
-                            type="submit">Logout</a>
+                    @if (Auth::user()->role == 'admin')
+                    <a class="btn btn-primary btn-block" href="{{ route('admin.dashboard') }}" type="submit">Admin
+                        Dashboard</a>
+                    @endif
+                    <a class="btn btn-primary btn-block" href="{{ route('account.profile') }}" type="submit">My
+                        Account</a>
+                    <a class="btn btn-primary btn-block" href="{{ route('account.logout') }}" type="submit">Logout</a>
                     @else
-                        <a class="btn btn-primary btn-block" href="{{ route('account.login') }}"
-                            type="submit">Login</a>
+                    <a class="btn btn-primary btn-block" href="{{ route('account.login') }}" type="submit">Login</a>
                     @endif --}}
 
                     {{-- <div class="d-flex align-items-center gap-2 ms-lg-3">
                         @if (Auth::check())
-                            @if (Auth::user()->role == 'admin')
-                                <a class="btn btn-primary" href="{{ route('admin.dashboard') }}">Admin
-                                    Dashboard</a>
-                            @endif
-                            <a class="btn btn-primary" href="{{ route('account.profile') }}">My Account</a>
-                            <a class="btn btn-primary" href="{{ route('account.logout') }}">Logout</a>
+                        @if (Auth::user()->role == 'admin')
+                        <a class="btn btn-primary" href="{{ route('admin.dashboard') }}">Admin
+                            Dashboard</a>
+                        @endif
+                        <a class="btn btn-primary" href="{{ route('account.profile') }}">My Account</a>
+                        <a class="btn btn-primary" href="{{ route('account.logout') }}">Logout</a>
                         @else
-                            <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
+                        <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
                         @endif
                     </div> --}}
 
-                    @if (Auth::check())
+                    <!-- @if (Auth::check())
                         <div class="dropdown ms-lg-3">
                             <button class="btn btn-outline-primary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ Auth::user()->name ?? 'Account' }}
@@ -86,9 +83,52 @@
                     @else
                         <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
                         <a class="btn btn-primary ms-2" href="{{ route('account.registration') }}">Register</a>
-                    @endif
+                    @endif -->
 
-                    <!-- <a class="btn btn-primary" href="{{ route('account.createJob') }}" type="submit">Post a Job</a> -->
+                    @if (Auth::check())
+                        <div class="dropdown ms-lg-3">
+                            <button class="btn btn-primary dropdown-toggle px-4 py-2 fw-semibold rounded-pill" type="button"
+                                id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ Auth::user()->name ?? 'Account' }}
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2"
+                                aria-labelledby="accountDropdown">
+                                @if (Auth::user()->role == 'admin')
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{{ route('admin.dashboard') }}">
+                                            Admin Dashboard
+                                        </a>
+                                    </li>
+                                @endif
+
+                                <li>
+                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
+                                        My Account
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item py-2 text-danger" href="{{ route('account.logout') }}">
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <a class="btn btn-primary px-4 py-2 fw-semibold rounded-pill" href="{{ route('account.login') }}">
+                            Login
+                        </a>
+
+                        <a class="btn btn-primary px-4 py-2 fw-semibold rounded-pill ms-2"
+                            href="{{ route('account.registration') }}">
+                            Register
+                        </a>
+                    @endif
                 </div>
             </div>
         </nav>
@@ -147,7 +187,7 @@
             }
         });
 
-        $('#profilePicForm').submit(function(e) {
+        $('#profilePicForm').submit(function (e) {
             e.preventDefault();
             var formData = new FormData(this);
 
@@ -159,7 +199,7 @@
                 contentType: false,
                 processData: false,
 
-                success: function(response) {
+                success: function (response) {
                     if (response.status == false) {
                         var errors = response.errors;
 
