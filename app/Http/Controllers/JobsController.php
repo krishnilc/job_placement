@@ -174,14 +174,14 @@ class JobsController extends Controller
 
          return response()->json([
             'status' => false,
-            'message' => 'Job not found'
+            'message' => 'Job not found' 
          ]); // Return a JSON response with a 404 status code if the job is not found   .
       }
 
      // Check if the user has already saved the job
       $savedJobCount = SavedJob::where([
-         'users_id' => Auth::user()->id,
-         'jobs_id' => $id
+         'user_id' => Auth::user()->id,
+         'job_id' => $id
       ])->count();
 
       if($savedJobCount > 0) {
@@ -194,8 +194,8 @@ class JobsController extends Controller
       }
 
       $savedJob = new SavedJob();
-      $savedJob->users_id = Auth::user()->id;
-      $savedJob->jobs_id = $id;
+      $savedJob->user_id = Auth::user()->id;
+      $savedJob->job_id = $id;
       $savedJob->save();
 
       session()->flash('success', 'Job saved successfully'); // Flash a success message to the session if the job is saved successfully

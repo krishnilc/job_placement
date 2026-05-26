@@ -9166,13 +9166,15 @@ h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
   font-size: inherit;
   font-family: inherit;
   display: inline-block;
-  color: #A8DF8E;
+  /* color: #A8DF8E; */
+  color: #0d6efd;
 }
 h1 {
   font-size: 66px;
 }
 h1 span {
-  color: #A8DF8E;
+  /* color: #A8DF8E; */
+    color: #0d6efd;
 }
 h2 {
   font-size: 30px;
@@ -9182,7 +9184,8 @@ h2 {
 h2:after {
   content: "";
   position: absolute;
-  background-color: #A8DF8E;
+  /* background-color: #A8DF8E; */
+  background-color: #0d6efd;
   width: 70px;
   height: 4px;
   bottom: 0px;
@@ -9219,7 +9222,8 @@ p span, q span {
   font-size: inherit;
 }
 a {
-  color: #A8DF8E;
+  /* color: #A8DF8E; */
+  color: #3c5a99;
 }
 a:hover {
   color: #000;
