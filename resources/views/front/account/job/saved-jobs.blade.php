@@ -27,12 +27,14 @@
                                 </div>
 
                             </div>
+
                             <div class="table-responsive">
                                 <table class="table ">
                                     <thead class="bg-light">
                                         <tr>
                                             <th scope="col">Title</th>
                                             <!-- <th scope="col">Saved Date</th> -->
+                                            <th scope="col">Employer</th>
                                             <th scope="col">Applicants</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
@@ -40,7 +42,6 @@
                                     </thead>
                                     <tbody class="border-0">
                                         @php $hasSavedJobs = false; @endphp
-
                                         @foreach ($savedJobs as $savedJob)
                                             @if ($savedJob->job)
                                                 @php $hasSavedJobs = true; @endphp
@@ -49,6 +50,11 @@
                                                         <div class="job-name fw-500">{{ $savedJob->job->title }}</div>
                                                         <div class="info1">{{ $savedJob->job->jobType->name }}.
                                                             {{ $savedJob->job->location }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="job-status text-capitalize">
+                                                            {{ $savedJob->job->company_name }}
                                                         </div>
                                                     </td>
                                                     <!-- <td>{{ $savedJob->created_at->format('d M, Y') }}</td> -->
@@ -115,7 +121,7 @@
 
                     success: function(response) {
                         window.location.href =
-                        "{{ route('account.savedJobs') }}"; // Redirect to the Saved Jobs page after removal
+                            "{{ route('account.savedJobs') }}"; // Redirect to the Saved Jobs page after removal
                     },
 
                     error: function(xhr, status, error) {

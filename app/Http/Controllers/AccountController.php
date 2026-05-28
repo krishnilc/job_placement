@@ -19,6 +19,59 @@ use Illuminate\Support\Facades\File;
 
 class AccountController extends Controller
 {
+    public function index()
+    {
+        // Total available jobs
+        $totalJobs = Job::where('status', 1)->count();
+
+        // Total saved jobs by logged-in user
+        $savedJobsCount = SavedJob::where('user_id', Auth::user()->id)->count();
+
+        // Total applications submitted by logged-in user
+        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count();
+
+        // Latest jobs
+        $latestJobs = Job::where('status', 1)
+            ->with(['jobType'])
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+
+        return view('front.account.student-dashboard', [
+            'totalJobs' => $totalJobs,
+            'savedJobsCount' => $savedJobsCount,
+            'appliedJobsCount' => $appliedJobsCount,
+            'latestJobs' => $latestJobs
+        ]);
+    }
+
+    public function index2()
+    {
+        // Total available jobs
+        $totalJobs = Job::where('status', 1)->count();
+
+        // Total saved jobs by logged-in user
+        $savedJobsCount = SavedJob::where('user_id', Auth::user()->id)->count();
+
+        // Total applications submitted by logged-in user
+        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count();
+
+        // Latest jobs
+        $latestJobs = Job::where('status', 1)
+            ->with(['jobType'])
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+
+        return view('front.account.student', [
+            'totalJobs' => $totalJobs,
+            'savedJobsCount' => $savedJobsCount,
+            'appliedJobsCount' => $appliedJobsCount,
+            'latestJobs' => $latestJobs
+        ]);
+    }
+
+
     //This method will show user registration form
     public function registration()
     {
@@ -362,11 +415,12 @@ class AccountController extends Controller
 
     public function myJobApplications(Request $request)
     {
-        $jobApplications = JobApplication::where('user_id', Auth::user()->id) 
+        $jobApplications = JobApplication::where('user_id', Auth::user()->id)
             ->with(['job', 'job.JobType', 'job.applications'])
             ->orderBy('created_at', 'desc')
             ->paginate(10); // Retrieve job applications submitted by the authenticated user
 
+        // dd($jobApplications); // Debugging statement to check if the job applications are being retrieved correctly
         return view('front.account.job.my-job-applications', [
             'jobApplications' => $jobApplications
         ]);
@@ -396,13 +450,12 @@ class AccountController extends Controller
     }
 
     public function savedJobs(Request $request)
-    {        
-
-    // dd(Auth::user()->id);
+    {
         $savedJobs = SavedJob::where([
             'user_id' => Auth::user()->id
         ])->with(['job', 'job.jobType', 'job.applications'])->orderBy('created_at', 'desc')->paginate(10); // Retrieve saved jobs by the authenticated user
 
+        // dd($savedJobs); // Debugging statement to check if the saved jobs are being retrieved correctly
         return view('front.account.job.saved-jobs', [
             'savedJobs' => $savedJobs
         ]);

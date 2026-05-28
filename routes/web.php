@@ -55,7 +55,9 @@ Route::group(['prefix' => 'account'], function () {
     });
 
     //Authenticated user routes
-    Route::group(['middleware' => 'auth'], function () {
+    Route::group(['middleware' => 'auth'], function () {         
+        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('account.dashboard');
+        Route::get('/student', [AccountController::class, 'index2'])->name('account.student');
         Route::get('/profile', [AccountController::class, 'profile'])->name('account.profile');
         Route::put('/update-profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
         Route::get('/logout', [AccountController::class, 'logout'])->name('account.logout');

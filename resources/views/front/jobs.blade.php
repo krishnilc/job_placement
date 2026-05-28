@@ -91,7 +91,7 @@
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary">Apply Filters</button>
-                            <a href="{{ route('front.jobs') }}" class="btn btn-secondary mt-3">Reset Filters</a>
+                            <a href="{{ route('front.jobs') }}" class="btn btn-primary mt-3">Reset Filters</a>
                         </div>
                     </form>
                 </div>

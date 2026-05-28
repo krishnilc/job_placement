@@ -13,6 +13,7 @@
                     </nav>
                 </div>
             </div>
+            
             <div class="row">
                 <div class="col-lg-3">
                     @include('front.account.sidebar')
@@ -36,7 +37,7 @@
                                     <p class="text-danger" id="emailError"></p>
                                 </div>
                                 <div class="mb-4">
-                                    <label for="mobile" class="mb-2">Mobile*</label>
+                                    <label for="mobile" class="mb-2">Mobile</label>
                                     <input type="text" name="mobile" id="mobile" class="form-control"
                                         value="{{ $user->mobile }}">
                                     <p class="text-danger" id="mobileError"></p>

@@ -41,7 +41,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
-                                        @if($jobs->isNotEmpty())
+                                        @if ($jobs->isNotEmpty())
                                             @foreach ($jobs as $job)
                                                 <tr>
                                                     <td>{{ $job->id }}</td>
@@ -52,13 +52,13 @@
                                                     <td>{{ $job->created_at->format('Y-m-d') }}</td>
                                                     <td>{{ $job->company_name }}</td>
                                                     <td>
-                                                        <span class="badge bg-{{ $job->status == 1 ? 'success' : 'danger' }}">
+                                                        <span
+                                                            class="badge bg-{{ $job->status == 1 ? 'success' : 'danger' }}">
                                                             {{ $job->status == 1 ? 'Active' : 'Blocked' }}
                                                         </span>
                                                     </td>
                                                     <td>{{ $job->user->name }}</td>
-                                                    <td>
-
+                                                   
                                                     <td>
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
@@ -66,15 +66,18 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="{{ route('admin.jobs.edit', $job->id) }}"><i class="fa fa-edit"
-                                                                            aria-hidden="true"></i>
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.jobs.edit', $job->id) }}"><i
+                                                                            class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteJob({{ $job->id }})"><i
+                                                                <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                        onclick="deleteJob({{ $job->id }})"><i
                                                                             class="fa fa-trash" aria-hidden="true"></i>
                                                                         Delete</a></li>
                                                             </ul>
                                                         </div>
                                                     </td>
+
                                                 </tr>
                                             @endforeach
                                         @else
@@ -87,7 +90,7 @@
                             </div>
 
                             <div>
-                                {{ $jobs->links() }} 
+                                {{ $jobs->links() }}
                             </div>
                         </div>
                     </div>
@@ -111,7 +114,7 @@
 
                     success: function(response) {
                         window.location.href =
-                        "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
+                            "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
                     },
 
                     error: function(xhr, status, error) {

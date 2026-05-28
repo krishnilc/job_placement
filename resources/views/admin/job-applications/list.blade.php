@@ -1,18 +1,18 @@
 @extends('front.layouts.app')
 
 @section('main')
-    <section class="section-5 bg-2">
-        <div class="container py-5">
-            <div class="row">
-                <div class="col">
-                    <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Job Applications</li>
-                        </ol>
-                    </nav>
-                </div>
+ <div class="container py-5">
+        <div class="row">
+            <div class="col">
+                <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item active"><a href="{{ route('account.profile') }}">Home</a></li>
+                        <!-- <li class="breadcrumb-item active">Account Settings</li> -->
+                    </ol>
+                </nav>
             </div>
+        </div>
+
             <div class="row">
                 <div class="col-lg-3">
                     @include('admin.sidebar')
@@ -48,9 +48,7 @@
                                                     </td>
                                                     <td>{{ $application->user->name }}</td>
                                                     <td>{{ $application->job->company_name }}</td>
-                                                    <td>{{ $application->applied_at->format('Y-m-d') }}</td>
-
-                                                    <td>
+                                                    <td>{{ $application->applied_at->format('Y-m-d') }}</td>                        
 
                                                     <td>
                                                         <div class="action-dots">
