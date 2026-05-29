@@ -21,6 +21,9 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             <li class="list-group-item d-flex justify-content-between p-3">
+                <a href="{{ route('account.dashboard') }}">Home</a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between p-3">
                 <a href="{{ route('account.profile') }}">Account Settings</a>
             </li>
             @if (Auth::user()->role == 'employer' || Auth::user()->role == 'admin')

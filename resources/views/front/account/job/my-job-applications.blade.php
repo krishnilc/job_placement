@@ -7,7 +7,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                              <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Home</a></li>
+                              <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
                             <li class="breadcrumb-item active">My Job Applications</li>
                         </ol>
                     </nav>
@@ -34,7 +34,8 @@
                                             <th scope="col">Title</th>
                                             <th scope="col">Applied Date</th>
                                             <th scope="col">Applicants</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col">Job Status</th>
+                                            <th scope="col">Application Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -55,7 +56,11 @@
                                                             {{ $jobApplication->job->status == 1 ? 'active' : 'inactive' }}
                                                         </div>
                                                     </td>
-
+                                                    <td>
+                                                        <div class="application-status text-capitalize">
+                                                            {{ $jobApplication->status == 1 ? 'shortlisted' : 'in progress' }}
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <div class="action-dots float-end">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"

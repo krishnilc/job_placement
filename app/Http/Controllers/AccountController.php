@@ -34,7 +34,7 @@ class AccountController extends Controller
         $latestJobs = Job::where('status', 1)
             ->with(['jobType'])
             ->orderBy('created_at', 'desc')
-            ->take(6)
+            ->take(6) 
             ->get();
 
         return view('front.account.student-dashboard', [
@@ -44,33 +44,6 @@ class AccountController extends Controller
             'latestJobs' => $latestJobs
         ]);
     }
-
-    public function index2()
-    {
-        // Total available jobs
-        $totalJobs = Job::where('status', 1)->count();
-
-        // Total saved jobs by logged-in user
-        $savedJobsCount = SavedJob::where('user_id', Auth::user()->id)->count();
-
-        // Total applications submitted by logged-in user
-        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count();
-
-        // Latest jobs
-        $latestJobs = Job::where('status', 1)
-            ->with(['jobType'])
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
-
-        return view('front.account.student', [
-            'totalJobs' => $totalJobs,
-            'savedJobsCount' => $savedJobsCount,
-            'appliedJobsCount' => $appliedJobsCount,
-            'latestJobs' => $latestJobs
-        ]);
-    }
-
 
     //This method will show user registration form
     public function registration()
@@ -128,7 +101,8 @@ class AccountController extends Controller
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 // Authentication passed...
-                return redirect()->route('account.profile');
+                return redirect()->route('account.dashboard')
+                    ->with('success', 'Login successful! Welcome back.');
             } else {
                 return redirect()->route('account.login')
                     ->with('error', 'Invalid credentials. Please try again.');

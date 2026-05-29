@@ -103,7 +103,7 @@
                                 @endif
 
                                 <li>
-                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
+                                    <a class="dropdown-item py-2" href="{{ route('account.dashboard') }}">
                                         My Account
                                     </a>
                                 </li>
