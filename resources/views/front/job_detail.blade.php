@@ -39,12 +39,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="jobs_right">
-                                    <div class="apply_now {{ $count == 1 ? 'saved-job' : '' }}">
-                                        <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i
-                                                class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                @if (Auth::check())
+                                    <div class="jobs_right">
+                                        <div class="apply_now {{ $count == 1 ? 'saved-job' : '' }}">
+                                            <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i
+                                                    class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </div>
                         <div class="descript_wrap white-bg">
@@ -79,20 +81,22 @@
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
                                 @if (Auth::check())
-                                    <a href="#" onclick="saveJob({{ $job->id }})" class="btn btn-secondary">Save</a>
+                                    <a href="#" onclick="saveJob({{ $job->id }})"
+                                        class="btn btn-secondary">Save</a>
                                 @else
                                     <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
                                 @endif
                                 <!-- apply if user is logged in -->
                                 @if (Auth::check())
-                                    <a href="#" class="btn btn-primary" onclick="applyJob({{ $job->id }})">Apply</a>
+                                    <a href="#" class="btn btn-primary"
+                                        onclick="applyJob({{ $job->id }})">Apply</a>
                                 @else
                                     <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
                                 @endif
                             </div>
                         </div>
                     </div>
-                    @if(Auth::user() && Auth::user()->id == $job->user_id)
+                    @if (Auth::user() && Auth::user()->id == $job->user_id)
                         <div class="card shadow border-0 mt-4">
                             <div class="job_details_header">
                                 <div class="single_jobs white-bg d-flex justify-content-between">
@@ -201,7 +205,7 @@
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    success: function (response) {
+                    success: function(response) {
                         // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
                         let alertClass = response.status ? 'alert-success' : 'alert-danger';
                         let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
@@ -211,7 +215,7 @@
                         // Insert message at the top of the main column
                         $(".col-md-8").prepend(alertBox);
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         let alertBox =
                             `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
                         $(".col-md-8").prepend(alertBox);
@@ -225,12 +229,14 @@
             $.ajax({
                 url: '{{ route('saveJob') }}',
                 type: 'POST',
-                data: { id: id }, // Fix key to match controller
+                data: {
+                    id: id
+                }, // Fix key to match controller
                 dataType: 'json',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                success: function (response) {
+                success: function(response) {
                     // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
                     let alertClass = response.status ? 'alert-success' : 'alert-danger';
                     let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
@@ -240,7 +246,7 @@
                     // Insert message at the top of the main column
                     $(".col-md-8").prepend(alertBox);
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     let alertBox =
                         `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
                     $(".col-md-8").prepend(alertBox);

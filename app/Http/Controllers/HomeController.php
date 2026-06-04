@@ -14,7 +14,7 @@ class HomeController extends Controller
     public function index()
     {
         // $categories = Category::where('status', 1)->orderBy('name', 'asc')->take(8)->get();
-         $categories = Category::where('status', 1)->orderBy('name', 'asc')->get();
+        $categories = Category::where('status', 1)->withCount('jobs')->orderBy('jobs_count', 'desc')->take(8)->get();
         $newCategories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $featuredJobs = Job::where('status', 1)

@@ -64,7 +64,7 @@
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body text-center p-4">
                                                 <h3 class="fw-bold text-primary">
-                                                    {{ $totalJobs ?? 0 }}
+                                                    {{ $availableJobs ?? 0 }}
                                                 </h3>
                                                 <p class="mb-0 text-muted">
                                                     Available Jobs
@@ -119,14 +119,13 @@
                             </div>
 
                             <div class="row g-4">
-
                                 @forelse($latestJobs as $job)
                                     <div class="col-lg-4 col-md-6">
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body p-4">
-                                                <h5 class="fw-bold mb-2">
+                                                <h6 class="fw-bold mb-2">
                                                     {{ $job->title }}
-                                                </h5>
+                                                </h6>
                                                 <div class="mb-3">
                                                     <span class="badge bg-light text-dark border">
                                                         {{ $job->jobType->name ?? 'Job' }}
@@ -136,7 +135,7 @@
                                                     {{ $job->company_name }}
                                                 </p>
                                                 <p class="text-muted small">
-                                                    <i class="fa fa-map-marker-alt me-1"></i>
+                                                    
                                                     {{ $job->location }}
                                                 </p>
                                                 <div class="mt-4 d-flex justify-content-between align-items-center">
