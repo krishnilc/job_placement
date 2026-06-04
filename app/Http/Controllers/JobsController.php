@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use to;
 
 class JobsController extends Controller
@@ -139,12 +140,51 @@ class JobsController extends Controller
             'message' => 'You have already applied for this job'
          ]); // Return a JSON response indicating that the user has already applied for the job
       }
-      // Logic to handle job application will go here
+      // Validate uploaded files (optional)
+      $validator = \Validator::make($request->all(), [
+         'application' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+         'resume' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+         'certificates.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+      ]);
+
+      if ($validator->fails()) {
+         return response()->json([
+            'status' => false,
+            'message' => $validator->errors()->first()
+         ], 422);
+      }
+
+      // Create new application and attach file paths if provided
       $application = new JobApplication(); // Create a new instance of the Application model
       $application->job_id = $id; // Set the job ID on the application
       $application->user_id = Auth::user()->id; // Set the user ID on the application to the currently authenticated user's ID
       $application->employer_id = $employer_id; // Set the employer ID on the application to the employer ID associated with the job
       $application->applied_at = now(); // Set the application date to the current date and time
+
+      // Store single application file
+      if ($request->hasFile('application')) {
+         $path = $request->file('application')->store('uploads/applications', 'public');
+         $application->application_file = $path;
+      }
+
+      // Store resume
+      if ($request->hasFile('resume')) {
+         $path = $request->file('resume')->store('uploads/resumes', 'public');
+         $application->resume_file = $path;
+      }
+
+      // Store certificates (allow multiple)
+      $certificatePaths = [];
+      if ($request->hasFile('certificates')) {
+         foreach ($request->file('certificates') as $file) {
+            $certificatePaths[] = $file->store('uploads/certificates', 'public');
+         }
+      }
+
+      if (!empty($certificatePaths)) {
+         $application->certificates_file = json_encode($certificatePaths);
+      }
+
       $application->save(); // Save the application to the database
 
       // Send a notification email to the employer about the new job application

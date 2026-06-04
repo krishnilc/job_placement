@@ -34,6 +34,9 @@
                                             <th scope="col">Title</th>
                                             <th scope="col">Applicant</th>
                                             <th scope="col">Company</th>
+                                            <th scope="col">Application</th>
+                                            <th scope="col">Resume</th>
+                                            <th scope="col">Certificates</th>
                                             <th scope="col">Application Date</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -48,7 +51,61 @@
                                                     </td>
                                                     <td>{{ $application->user->name }}</td>
                                                     <td>{{ $application->job->company_name }}</td>
-                                                    <td>{{ $application->applied_at->format('Y-m-d') }}</td>                        
+                                                    <td>
+                                                        @if(!empty($application->application_file))
+                                                            @php
+                                                                $path = $application->application_file;
+                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
+                                                                $size = 0;
+                                                                try { $size = Storage::size($path); } catch (Exception $e) { $size = 0; }
+                                                                if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
+                                                                elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
+                                                                else { $sizeText = $size . ' B'; }
+                                                            @endphp
+                                                            <a href="{{ Storage::url($path) }}" target="_blank" download><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if(!empty($application->resume_file))
+                                                            @php
+                                                                $path = $application->resume_file;
+                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
+                                                                $size = 0;
+                                                                try { $size = Storage::size($path); } catch (Exception $e) { $size = 0; }
+                                                                if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
+                                                                elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
+                                                                else { $sizeText = $size . ' B'; }
+                                                            @endphp
+                                                            <a href="{{ Storage::url($path) }}" target="_blank" download><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if(!empty($application->certificates_file))
+                                                            @php $certs = json_decode($application->certificates_file, true) ?? []; @endphp
+                                                            @if(!empty($certs))
+                                                                @foreach($certs as $cert)
+                                                                    @php
+                                                                        $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
+                                                                        $certSize = 0;
+                                                                        try { $certSize = Storage::size($cert); } catch (Exception $e) { $certSize = 0; }
+                                                                        if ($certSize >= 1048576) { $certSizeText = round($certSize / 1048576, 2) . ' MB'; }
+                                                                        elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
+                                                                        else { $certSizeText = $certSize . ' B'; }
+                                                                    @endphp
+                                                                    <a href="{{ Storage::url($cert) }}" target="_blank" download><i class="fa fa-file"></i> {{ $certExt }} ({{ $certSizeText }})</a>@if(!$loop->last), @endif
+                                                                @endforeach
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $application->applied_at->format('Y-m-d') }}</td>
 
                                                     <td>
                                                         <div class="action-dots">
@@ -71,7 +128,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No jobs found.</td>
+                                                <td colspan="8" class="text-center">No jobs found.</td>
                                             </tr>
                                         @endif
                                     </tbody>

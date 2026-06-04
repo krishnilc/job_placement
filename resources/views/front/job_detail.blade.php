@@ -88,8 +88,7 @@
                                 @endif
                                 <!-- apply if user is logged in -->
                                 @if (Auth::check())
-                                    <a href="#" class="btn btn-primary"
-                                        onclick="applyJob({{ $job->id }})">Apply</a>
+                                    <a href="#" class="btn btn-primary" onclick="openApplyModal({{ $job->id }})">Apply</a>
                                 @else
                                     <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
                                 @endif
@@ -117,6 +116,9 @@
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Mobile</th>
+                                            <th>Application</th>
+                                            <th>Resume</th>
+                                            <th>Certificates</th>
                                             <th>Applied Date</th>
                                         </tr>
                                     </thead>
@@ -127,12 +129,88 @@
                                                     <td>{{ $application->user->name }}</td>
                                                     <td>{{ $application->user->email }}</td>
                                                     <td>{{ $application->user->mobile ?? 'N/A' }}</td>
+                                                    <td>
+                                                        @if(!empty($application->application_file))
+                                                            @php
+                                                                $path = $application->application_file;
+                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
+                                                                $size = 0;
+                                                                try {
+                                                                    $size = Storage::size($path);
+                                                                } catch (Exception $e) {
+                                                                    $size = 0;
+                                                                }
+                                                                if ($size >= 1048576) {
+                                                                    $sizeText = round($size / 1048576, 2) . ' MB';
+                                                                } elseif ($size >= 1024) {
+                                                                    $sizeText = round($size / 1024, 2) . ' KB';
+                                                                } else {
+                                                                    $sizeText = $size . ' B';
+                                                                }
+                                                            @endphp
+                                                            <a href="{{ Storage::url($path) }}" target="_blank" download>
+                                                                <i class="fa fa-file" aria-hidden="true"></i> {{ $ext }} ({{ $sizeText }})
+                                                            </a>
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if(!empty($application->resume_file))
+                                                            @php
+                                                                $path = $application->resume_file;
+                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
+                                                                $size = 0;
+                                                                try {
+                                                                    $size = Storage::size($path);
+                                                                } catch (Exception $e) {
+                                                                    $size = 0;
+                                                                }
+                                                                if ($size >= 1048576) {
+                                                                    $sizeText = round($size / 1048576, 2) . ' MB';
+                                                                } elseif ($size >= 1024) {
+                                                                    $sizeText = round($size / 1024, 2) . ' KB';
+                                                                } else {
+                                                                    $sizeText = $size . ' B';
+                                                                }
+                                                            @endphp
+                                                            <a href="{{ Storage::url($path) }}" target="_blank" download>
+                                                                <i class="fa fa-file" aria-hidden="true"></i> {{ $ext }} ({{ $sizeText }})
+                                                            </a>
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if(!empty($application->certificates_file))
+                                                            @php $certs = json_decode($application->certificates_file, true) ?? []; @endphp
+                                                            @if(!empty($certs))
+                                                                @foreach($certs as $cert)
+                                                                    @php
+                                                                        $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
+                                                                        $certSize = 0;
+                                                                        try { $certSize = Storage::size($cert); } catch (Exception $e) { $certSize = 0; }
+                                                                        if ($certSize >= 1048576) { $certSizeText = round($certSize / 1048576, 2) . ' MB'; }
+                                                                        elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
+                                                                        else { $certSizeText = $certSize . ' B'; }
+                                                                    @endphp
+                                                                    <a href="{{ Storage::url($cert) }}" target="_blank" download>
+                                                                        <i class="fa fa-file" aria-hidden="true"></i> {{ $certExt }} ({{ $certSizeText }})
+                                                                    </a>@if(!$loop->last), @endif
+                                                                @endforeach
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
                                                     <td>{{ optional($application->applied_at)->format('d M, Y') }}</td>
                                                 </tr>
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="4" class="text-center">No applicants found.</td>
+                                                <td colspan="7" class="text-center">No applicants found.</td>
                                             </tr>
                                         @endif
 
@@ -188,41 +266,76 @@
             </div>
         </div>
     </section>
+    <!-- Apply Modal -->
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="applyForm" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="applyModalLabel">Apply for Job</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="job_id" id="applyJobId" value="">
+                        <div class="mb-3">
+                            <label class="form-label">Application Letter (PDF/DOC)</label>
+                            <input type="file" name="application" class="form-control" accept=".pdf,.doc,.docx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Resume (PDF/DOC)</label>
+                            <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Certificates (you can select multiple)</label>
+                            <input type="file" name="certificates[]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('customJS')
     <script type="text/javascript">
-        function applyJob(jobId) {
-            if (confirm('Are you sure you want to apply for this job?')) {
-                // Send AJAX request to apply for the job
-                $.ajax({
-                    url: '{{ route('applyJob') }}',
-                    type: 'POST',
-                    data: {
-                        job_id: jobId
-                    }, // Fix key to match controller
-                    dataType: 'json',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        // window.location.href = '{{ url()->current() }}'; // Redirect to current page after successful application
-                        let alertClass = response.status ? 'alert-success' : 'alert-danger';
-                        let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
-                                                        ${response.message}
-                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                    </div>`;
-                        // Insert message at the top of the main column
-                        $(".col-md-8").prepend(alertBox);
-                    },
-                    error: function(xhr) {
-                        let alertBox =
-                            `<div class=\"alert alert-danger alert-dismissible fade show mt-3\" role=\"alert\">An error occurred while applying for the job.<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>`;
-                        $(".col-md-8").prepend(alertBox);
-                    }
-                });
-            }
+        function openApplyModal(jobId) {
+            $('#applyJobId').val(jobId);
+            $('#applyModal').modal('show');
         }
+
+        $(document).on('submit', '#applyForm', function(e) {
+            e.preventDefault();
+            var form = document.getElementById('applyForm');
+            var formData = new FormData(form);
+
+            $.ajax({
+                url: '{{ route('applyJob') }}',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#applyModal').modal('hide');
+                    let alertClass = response.status ? 'alert-success' : 'alert-danger';
+                    let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">${response.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                    $(".col-md-8").prepend(alertBox);
+                },
+                error: function(xhr) {
+                    let msg = 'An error occurred while applying for the job.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                    let alertBox = `<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                    $(".col-md-8").prepend(alertBox);
+                }
+            });
+        });
 
         function saveJob(id) {
             // Send AJAX request to save the job

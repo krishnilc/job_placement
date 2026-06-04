@@ -9,6 +9,16 @@ class JobApplication extends Model
 {
      use HasFactory;
 
+    protected $fillable = [
+        'job_id',
+        'user_id',
+        'employer_id',
+        'applied_at',
+        'application_file',
+        'resume_file',
+        'certificates_file',
+    ];
+
      protected $casts = [
          'applied_at' => 'datetime',
      ];
