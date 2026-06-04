@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
+Route::post('/contact/send', [HomeController::class, 'submitContact'])->name('front.contact.send');
 Route::get('/jobs', [JobsController::class, 'index'])->name('front.jobs');
 Route::get('/jobs/detail/{id}', [JobsController::class, 'detail'])->name('jobDetail');
 Route::post('/apply-job', [JobsController::class, 'applyJob'])->name('applyJob');

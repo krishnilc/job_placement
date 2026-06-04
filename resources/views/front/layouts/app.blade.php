@@ -23,7 +23,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-3">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <a class="navbar-brand d-flex align-items-center" href="https://www.fnu.ac.fj/" target="_blank">
                     <img src="{{ asset('assets/images/logo.png') }}" alt="FNU Job Placement" style="height:80px;">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -39,6 +39,9 @@
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('front.jobs') }}">Find Jobs</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
+                        </li>                       
                     </ul>
 
                     {{-- @if (Auth::check())
@@ -163,9 +166,23 @@
         </div>
     </div>
 
-    <footer class="bg-dark py-3 bg-2">
+    <footer class="bg-dark py-5 bg-2 text-white">
         <div class="container">
-            <p class="text-center text-white pt-3 fw-bold fs-6">© 2026 Fiji National University, all right reserved</p>
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">FNU Job Placement</h5>
+                    <p class="mb-1">Fiji National University</p>
+                    <p class="mb-1">Email: <a class="text-white text-decoration-underline" href="mailto:info@fnu.ac.fj">info@fnu.ac.fj</a></p>
+                    <p class="mb-0">Phone: +679 1234 567</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <a class="text-white d-block mb-2" href="{{ route('home') }}">Home</a>
+                    <a class="text-white d-block mb-2" href="{{ route('front.jobs') }}">Find Jobs</a>
+                    <a class="text-white d-block" href="{{ route('front.contact') }}">Contact Us</a>
+                </div>
+            </div>
+            <p class="text-center text-white pt-3 fw-bold fs-6 mb-0">© 2026 Fiji National University, all right reserved</p>
         </div>
     </footer>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>

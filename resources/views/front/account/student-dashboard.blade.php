@@ -78,7 +78,7 @@
                                     <a href="{{ route('account.savedJobs') }}">
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body text-center p-4">
-                                                <h3 class="fw-bold text-success">
+                                                <h3 class="fw-bold text-danger">
                                                     {{ $savedJobsCount ?? 0 }}
                                                 </h3>
                                                 <p class="mb-0 text-muted">
@@ -93,7 +93,7 @@
                                     <a href="{{ route('account.myJobApplications') }}">
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body text-center p-4">
-                                                <h3 class="fw-bold text-danger">
+                                                <h3 class="fw-bold text-success">
                                                     {{ $appliedJobsCount ?? 0 }}
                                                 </h3>
                                                 <p class="mb-0 text-muted">
