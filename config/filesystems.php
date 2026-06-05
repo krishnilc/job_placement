@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        'applications' => [
+            'driver' => 'local',
+            'root' => public_path('assets/applications'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/assets/applications',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

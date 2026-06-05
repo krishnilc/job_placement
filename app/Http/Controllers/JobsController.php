@@ -163,13 +163,15 @@ class JobsController extends Controller
 
       // Store single application file
       if ($request->hasFile('application')) {
-         $path = $request->file('application')->store('uploads/applications', 'public');
+         $fileName = 'application_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $request->file('application')->getClientOriginalExtension();
+         $path = $request->file('application')->storeAs('', $fileName, 'applications');
          $application->application_file = $path;
       }
 
       // Store resume
       if ($request->hasFile('resume')) {
-         $path = $request->file('resume')->store('uploads/resumes', 'public');
+         $fileName = 'resume_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $request->file('resume')->getClientOriginalExtension();
+         $path = $request->file('resume')->storeAs('', $fileName, 'applications');
          $application->resume_file = $path;
       }
 
@@ -177,7 +179,8 @@ class JobsController extends Controller
       $certificatePaths = [];
       if ($request->hasFile('certificates')) {
          foreach ($request->file('certificates') as $file) {
-            $certificatePaths[] = $file->store('uploads/certificates', 'public');
+            $fileName = 'certificate_' . Auth::user()->id . '_' . $id . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $certificatePaths[] = $file->storeAs('', $fileName, 'applications');
          }
       }
 
@@ -202,6 +205,48 @@ class JobsController extends Controller
          'status' => true,
          'message' => 'You have successfully applied for the job'
       ]); // Return a JSON response indicating that the application was successful
+   }
+
+   public function downloadApplicationFile(Request $request, JobApplication $application, $type)
+   {
+      if (!Auth::check()) {
+         abort(403);
+      }
+
+      $userId = Auth::id();
+      if ($userId !== $application->user_id && $userId !== $application->employer_id) {
+         abort(403);
+      }
+
+      if (!in_array($type, ['application', 'resume', 'certificate'])) {
+         abort(404);
+      }
+
+      if ($type === 'certificate') {
+         $encodedFile = $request->query('file');
+         if (empty($encodedFile)) {
+            abort(404);
+         }
+         $path = base64_decode($encodedFile, true);
+      } elseif ($type === 'resume') {
+         $path = $application->resume_file;
+      } else {
+         $path = $application->application_file;
+      }
+
+      if (empty($path)) {
+         abort(404);
+      }
+
+      $disk = Storage::disk('applications')->exists($path)
+         ? 'applications'
+         : (Storage::disk('public')->exists($path) ? 'public' : null);
+
+      if (!$disk) {
+         abort(404);
+      }
+
+      return Storage::disk($disk)->download($path, basename($path));
    }
 
    public function saveJob(Request $request)
