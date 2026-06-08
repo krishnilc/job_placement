@@ -65,7 +65,7 @@
                                                                 elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
                                                                 else { $sizeText = $size . ' B'; }
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" target="_blank" download><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" download="application-{{ $application->id }}.{{ strtolower(pathinfo($path, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
                                                         @else
                                                             N/A
                                                         @endif
@@ -84,7 +84,7 @@
                                                                 elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
                                                                 else { $sizeText = $size . ' B'; }
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" target="_blank" download><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" download="resume-{{ $application->id }}.{{ strtolower(pathinfo($path, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
                                                         @else
                                                             N/A
                                                         @endif
@@ -105,7 +105,7 @@
                                                                         elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
                                                                         else { $certSizeText = $certSize . ' B'; }
                                                                     @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" target="_blank" download><i class="fa fa-file"></i> {{ $certExt }} ({{ $certSizeText }})</a>@if(!$loop->last), @endif
+                                                                    <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="certificate-{{ $application->id }}-{{ $loop->index }}.{{ strtolower(pathinfo($cert, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $certExt }} ({{ $certSizeText }})</a>@if(!$loop->last), @endif
                                                                 @endforeach
                                                             @else
                                                                 N/A

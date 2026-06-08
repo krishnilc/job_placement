@@ -238,15 +238,35 @@ class JobsController extends Controller
          abort(404);
       }
 
-      $disk = Storage::disk('applications')->exists($path)
-         ? 'applications'
-         : (Storage::disk('public')->exists($path) ? 'public' : null);
+      // Get MIME type based on extension
+      $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+      $mimeTypes = [
+         'pdf' => 'application/pdf',
+         'doc' => 'application/msword',
+         'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+         'jpg' => 'image/jpeg',
+         'jpeg' => 'image/jpeg',
+         'png' => 'image/png'
+      ];
+      $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
 
-      if (!$disk) {
-         abort(404);
+      // Try applications disk first (public/assets/applications)
+      $applicationsPath = public_path('assets' . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $path);
+      if (is_file($applicationsPath) && is_readable($applicationsPath)) {
+         return response()->download($applicationsPath, basename($path), [
+            'Content-Type' => $mimeType
+         ]);
       }
 
-      return Storage::disk($disk)->download($path, basename($path));
+      // Try public disk (storage/app/public)
+      $publicPath = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $path);
+      if (is_file($publicPath) && is_readable($publicPath)) {
+         return response()->download($publicPath, basename($path), [
+            'Content-Type' => $mimeType
+         ]);
+      }
+
+      abort(404);
    }
 
    public function saveJob(Request $request)
