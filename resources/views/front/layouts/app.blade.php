@@ -15,13 +15,19 @@
         integrity="sha512-Fm8kRNVGCBZn0sPmwJbVXlqfJmPC13zRsMElZenX6v721g/H7OukJd8XzDEBRQ2FSATK8xNF9UYvzsCtUpfeJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}" />
+    <style>
+        /* Keep navbar fixed at top and prevent content overlap */
+        .navbar.fixed-top { position: fixed; top: 0; left: 0; right: 0; z-index: 1030; }
+        body { padding-top: 80px; }
+        @media (max-width: 576px) { body { padding-top: 110px; } }
+    </style>
     <!-- Fav Icon -->
     <link rel="shortcut icon" type="image/x-icon" href="#" />
 </head>
 
 <body data-instant-intensity="mousedown">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-2 fixed-top">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="https://www.fnu.ac.fj/" target="_blank">
                     <img src="{{ asset('assets/images/logo.png') }}" alt="FNU Job Placement" style="height:80px;">
@@ -43,51 +49,7 @@
                             <a class="nav-link" aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
                         </li>                       
                     </ul>
-
-                    {{-- @if (Auth::check())
-                    @if (Auth::user()->role == 'admin')
-                    <a class="btn btn-primary btn-block" href="{{ route('admin.dashboard') }}" type="submit">Admin
-                        Dashboard</a>
-                    @endif
-                    <a class="btn btn-primary btn-block" href="{{ route('account.profile') }}" type="submit">My
-                        Account</a>
-                    <a class="btn btn-primary btn-block" href="{{ route('account.logout') }}" type="submit">Logout</a>
-                    @else
-                    <a class="btn btn-primary btn-block" href="{{ route('account.login') }}" type="submit">Login</a>
-                    @endif --}}
-
-                    {{-- <div class="d-flex align-items-center gap-2 ms-lg-3">
-                        @if (Auth::check())
-                        @if (Auth::user()->role == 'admin')
-                        <a class="btn btn-primary" href="{{ route('admin.dashboard') }}">Admin
-                            Dashboard</a>
-                        @endif
-                        <a class="btn btn-primary" href="{{ route('account.profile') }}">My Account</a>
-                        <a class="btn btn-primary" href="{{ route('account.logout') }}">Logout</a>
-                        @else
-                        <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
-                        @endif
-                    </div> --}}
-
-                    <!-- @if (Auth::check())
-                        <div class="dropdown ms-lg-3">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ Auth::user()->name ?? 'Account' }}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                @if (Auth::user()->role == 'admin')
-                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
-                                @endif
-                                <li><a class="dropdown-item" href="{{ route('account.profile') }}">My Account</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ route('account.logout') }}">Logout</a></li>
-                            </ul>
-                        </div>
-                    @else
-                        <a class="btn btn-primary" href="{{ route('account.login') }}">Login</a>
-                        <a class="btn btn-primary ms-2" href="{{ route('account.registration') }}">Register</a>
-                    @endif -->
-
+                
                     @if (Auth::check())
                         <div class="dropdown ms-lg-3">
                             <button class="btn btn-primary dropdown-toggle px-4 py-2 fw-semibold rounded-pill" type="button"
@@ -106,8 +68,8 @@
                                 @endif
 
                                 <li>
-                                    <a class="dropdown-item py-2" href="{{ route('account.dashboard') }}">
-                                        My Account
+                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
+                                        Account Settings
                                     </a>
                                 </li>
 
@@ -166,9 +128,9 @@
         </div>
     </div>
 
-    <footer class="bg-dark py-5 bg-2 text-white">
+    <footer class="bg-dark py-2 bg-2 text-white">
         <div class="container">
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-md-6 mb-4 mb-md-0">
                     <h5 class="text-white mb-3">FNU Job Placement</h5>
                     <p class="mb-1">Fiji National University</p>
@@ -181,7 +143,7 @@
                     <a class="text-white d-block mb-2" href="{{ route('front.jobs') }}">Find Jobs</a>
                     <a class="text-white d-block" href="{{ route('front.contact') }}">Contact Us</a>
                 </div>
-            </div>
+            </div> -->
             <p class="text-center text-white pt-3 fw-bold fs-6 mb-0">© 2026 Fiji National University, all right reserved</p>
         </div>
     </footer>

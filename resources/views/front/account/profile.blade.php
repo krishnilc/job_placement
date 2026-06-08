@@ -16,7 +16,11 @@
             
             <div class="row">
                 <div class="col-lg-3">
-                    @include('front.account.sidebar')
+                    @if(auth()->user()->role == 'admin')
+                        @include('admin.sidebar')
+                    @else
+                        @include('front.account.sidebar')
+                    @endif
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')

@@ -52,6 +52,16 @@
                                             <p class="text-danger" id="designationError"></p>
                                         </div>
 
+                                        <div class="mb-4">
+                                            <label for="role" class="mb-2">Role*</label>
+                                            <select name="role" id="role" class="form-control">
+                                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
+                                                <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
+                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                            </select>
+                                            <p class="text-danger" id="roleError"></p>
+                                        </div>
+
                                     </div>
                                     <div class="card-footer  p-4">
                                         <button type="submit" class="btn btn-primary">Update</button>
@@ -81,13 +91,15 @@
                 dataType: "json",
                 data: $("#userForm").serializeArray(),
 
-                success: function(response) {
+                    success: function(response) {
                     // Always clear all error messages first
                     $("#nameError").text('');
                     $("#emailError").text('');
                     $("#passwordError").text('');
                     $("#confirmPasswordError").text('');
                     $("#mobileError").text('');
+                    $("#designationError").text('');
+                    $("#roleError").text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('admin.users') }}";
@@ -105,6 +117,9 @@
                         }
                         if (errors.mobile) {
                             $("#mobileError").text(errors.mobile[0]);
+                        }
+                        if (errors.role) {
+                            $("#roleError").text(errors.role[0]);
                         }
                     }
                 },

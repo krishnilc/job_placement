@@ -7,8 +7,8 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Admin Dashboard</li>
+                            <!-- <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li> -->
+                            <li class="breadcrumb-item active">Home</li>
                         </ol>
                     </nav>
                 </div>
@@ -28,7 +28,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="text-muted mb-1">Total Users</h6>
+                                            <h7 class="text-muted mb-1">Total Users</h7>
                                             <h2 class="text-primary mb-0">{{ $totalUsers }}</h2>
                                         </div>
                                         <div class="text-primary" style="font-size: 2rem;">
@@ -45,7 +45,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="text-muted mb-1">Total Jobs</h6>
+                                            <h7 class="text-muted mb-1">Total Jobs</h7>
                                             <h2 class="text-success mb-0">{{ $totalJobs }}</h2>
                                         </div>
                                         <div class="text-success" style="font-size: 2rem;">
@@ -62,7 +62,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="text-muted mb-1">Total Applications</h6>
+                                            <h7 class="text-muted mb-1">Total Applications</h7>
                                             <h2 class="text-info mb-0">{{ $totalApplications }}</h2>
                                         </div>
                                         <div class="text-info" style="font-size: 2rem;">
@@ -79,7 +79,7 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="text-muted mb-1">Pending Applications</h6>
+                                            <h7 class="text-muted mb-1">Pending&nbsp;Applications</h7>
                                             <h2 class="text-warning mb-0">{{ $pendingApplications }}</h2>
                                         </div>
                                         <div class="text-warning" style="font-size: 2rem;">
