@@ -108,8 +108,14 @@ class AccountController extends Controller
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 // Authentication passed...
-                return redirect()->route('account.dashboard')
-                    ->with('success', 'Login successful! Welcome back.');
+                // Check if user is admin
+                if (Auth::user()->role === 'admin') {
+                    return redirect()->route('admin.dashboard')
+                        ->with('success', 'Login successful! Welcome back.');
+                } else {
+                    return redirect()->route('account.dashboard')
+                        ->with('success', 'Login successful! Welcome back.');
+                }
             } else {
                 return redirect()->route('account.login')
                     ->with('error', 'Invalid credentials. Please try again.');

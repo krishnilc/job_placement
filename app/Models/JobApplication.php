@@ -17,6 +17,7 @@ class JobApplication extends Model
         'application_file',
         'resume_file',
         'certificates_file',
+        'status',
     ];
 
      protected $casts = [
