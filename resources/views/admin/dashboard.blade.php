@@ -106,7 +106,7 @@
                                                 <th>Applicant</th>
                                                 <th>Employer</th>
                                                 <th>Applied Date</th>
-                                                <th>Action</th>
+                                                {{-- <th>Action</th> --}}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -116,15 +116,15 @@
                                                         <strong>{{ $application->job->title ?? 'N/A' }}</strong>
                                                     </td>
                                                     <td>{{ $application->user->name ?? 'N/A' }}</td>
-                                                    <td>{{ $application->employer->name ?? 'N/A' }}</td>
+                                                    <td>{{ $application->job->company_name ?? 'N/A' }}</td>
                                                     <td>
                                                         {{ $application->created_at->format('M d, Y') }}
                                                     </td>
-                                                    <td>
+                                                    {{-- <td>
                                                         <a href="{{ route('admin.jobApplications') }}" class="btn btn-sm btn-primary">
                                                             <i class="fa fa-eye"></i> View
                                                         </a>
-                                                    </td>
+                                                    </td> --}}
                                                 </tr>
                                             @endforeach
                                         </tbody>

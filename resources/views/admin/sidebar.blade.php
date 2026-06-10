@@ -22,22 +22,31 @@
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
+              <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <a href="{{ route('account.createJob') }}">
+                    <i class="fa fa-arrow-right"></i> Create Job
+                </a>
+            </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <a href="{{ route('account.myJobs') }}">
+                    <i class="fa fa-arrow-right"></i> My Jobs
+                </a>
+            </li>
             <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('admin.jobs') }}">Jobs</a>
+                <a href="{{ route('admin.jobs') }}">
+                     <i class="fa fa-arrow-right"></i> Manage Jobs
+                </a>
             </li>
                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('admin.jobApplications') }}">Job Applications</a>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('account.createJob') }}">Create Job</a>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('account.myJobs') }}">My Jobs</a>
-            </li>
-
-         
+                <a href="{{ route('admin.jobApplications') }}">
+                    <i class="fa fa-arrow-right"></i> Review Applications
+                </a>
+            </li>      
+     
             <li class="list-group-item d-flex justify-content-between p-3">
-                <a href="{{ route('admin.users') }}">Users</a>
+                <a href="{{ route('admin.users') }}">
+                    <i class="fa fa-arrow-right"></i> Manage Users
+                </a>
             </li>
         </ul>
     </div>

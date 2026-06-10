@@ -20,26 +20,26 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             <li class="list-group-item d-flex justify-content-between p-3">
-                <a href="{{ route('account.dashboard') }}">Home</a>
+                <a href="{{ route('account.dashboard') }}"> <i class="fa fa-arrow-right"></i> Home</a>
             </li>
             <li class="list-group-item d-flex justify-content-between p-3">
-                <a href="{{ route('account.profile') }}">Account Settings</a>
+                <a href="{{ route('account.profile') }}"> <i class="fa fa-arrow-right"></i> Account Settings</a>
             </li>
             @if (Auth::user()->role == 'employer' || Auth::user()->role == 'admin')
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.createJob') }}">Post a Job</a>
+                    <a href="{{ route('account.createJob') }}"> <i class="fa fa-arrow-right"></i> Post a Job</a>
                 </li>
 
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.myJobs') }}">My Jobs</a>
+                    <a href="{{ route('account.myJobs') }}"> <i class="fa fa-arrow-right"></i> My Jobs</a>
                 </li>
             @endif
             @if (Auth::user()->role == 'user')
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.myJobApplications') }}">Jobs Applied</a>
+                    <a href="{{ route('account.myJobApplications') }}"> <i class="fa fa-arrow-right"></i> Jobs Applied</a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.savedJobs') }}">Saved Jobs</a>
+                    <a href="{{ route('account.savedJobs') }}"> <i class="fa fa-arrow-right"></i> Saved Jobs</a>
                 </li>
             @endif
             {{-- <li class="list-group-item d-flex justify-content-between align-items-center p-3">

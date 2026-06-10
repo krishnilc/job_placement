@@ -28,7 +28,7 @@
 
                             </div>
                             <div class="table-responsive">
-                                <table class="table ">
+                                <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
                                             <th scope="col">ID</th>

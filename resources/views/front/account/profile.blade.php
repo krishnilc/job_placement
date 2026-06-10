@@ -7,16 +7,22 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active"><a href="{{ route('account.profile') }}">Account Settings</a></li>
+                            @if (auth()->user()->role == 'user')
+                                <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
+                            @elseif (auth()->user()->role == 'admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            @endif
+
+                            <li class="breadcrumb-item active"><a href="{{ route('account.profile') }}">Account Settings</a>
+                            </li>
                         </ol>
                     </nav>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-lg-3">
-                    @if(auth()->user()->role == 'admin')
+                    @if (auth()->user()->role == 'admin')
                         @include('admin.sidebar')
                     @else
                         @include('front.account.sidebar')
@@ -31,7 +37,8 @@
                                 <h3 class="fs-4 mb-1">My Profile</h3>
                                 <div class="mb-4">
                                     <label for="name" class="mb-2">Name*</label>
-                                    <input type="text" name="name" id="name" class="form-control" value="{{ $user->name }}">
+                                    <input type="text" name="name" id="name" class="form-control"
+                                        value="{{ $user->name }}">
                                     <p class="text-danger" id="nameError"></p>
                                 </div>
                                 <div class="mb-4">
@@ -47,12 +54,12 @@
                                     <p class="text-danger" id="mobileError"></p>
                                 </div>
                                 <!-- <div class="mb-4">
-                                    <label for="designation" class="mb-2">Designation*</label>
-                                    <input type="text" name="designation" id="designation" class="form-control"
-                                        value="{{ $user->designation }}">
-                                    <p class="text-danger" id="designationError"></p>
-                                </div> -->
-                                
+                                        <label for="designation" class="mb-2">Designation*</label>
+                                        <input type="text" name="designation" id="designation" class="form-control"
+                                            value="{{ $user->designation }}">
+                                        <p class="text-danger" id="designationError"></p>
+                                    </div> -->
+
 
                             </div>
                             <div class="card-footer  p-4">
@@ -78,7 +85,8 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="confirm_password" class="mb-2">Confirm Password*</label>
-                                    <input type="password" name="confirm_password" id="confirm_password" class="form-control">
+                                    <input type="password" name="confirm_password" id="confirm_password"
+                                        class="form-control">
                                     <p class="text-danger" id="confirm_passwordError"></p>
                                 </div>
                             </div>
@@ -95,7 +103,7 @@
 
 @section('customJS')
     <script>
-        $('#userForm').submit(function (e) {
+        $('#userForm').submit(function(e) {
             e.preventDefault();
             // var formData = $(this).serialize();
             $.ajax({
@@ -104,7 +112,7 @@
                 dataType: "json",
                 data: $("#userForm").serializeArray(),
 
-                success: function (response) {
+                success: function(response) {
                     // Always clear all error messages first
                     $("#nameError").text('');
                     $("#emailError").text('');
@@ -131,13 +139,13 @@
                         }
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     alert('An error occurred: ' + error);
                 }
             });
         });
 
-        $('#changePasswordForm').submit(function (e) {
+        $('#changePasswordForm').submit(function(e) {
             e.preventDefault();
             // var formData = $(this).serialize();
             $.ajax({
@@ -146,11 +154,11 @@
                 dataType: "json",
                 data: $("#changePasswordForm").serializeArray(),
 
-                success: function (response) {
+                success: function(response) {
                     // Always clear all error messages first
                     $("#old_passwordError").text('');
                     $("#new_passwordError").text('');
-                    $("#confirm_passwordError").text('');                  
+                    $("#confirm_passwordError").text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('account.profile') }}";
@@ -165,10 +173,10 @@
                         }
                         if (errors.confirm_password) {
                             $("#confirm_passwordError").text(errors.confirm_password[0]);
-                        }                       
+                        }
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     alert('An error occurred: ' + error);
                 }
             });

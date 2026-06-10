@@ -7,7 +7,12 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Home</a></li>
+                            @if (auth()->user()->role == 'user')
+                                <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
+                            @elseif (auth()->user()->role == 'admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            @endif
+                            {{-- <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Home</a></li> --}}
                             <li class="breadcrumb-item active">My Job Applications</li>
                         </ol>
                     </nav>
@@ -15,7 +20,11 @@
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                    @include('front.account.sidebar')
+                  @if (auth()->user()->role == 'admin')
+                        @include('admin.sidebar')
+                    @else
+                        @include('front.account.sidebar')
+                    @endif
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
@@ -31,7 +40,7 @@
 
                             </div>
                             <div class="table-responsive">
-                                <table class="table ">
+                                <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
                                             <th scope="col">Title</th>
