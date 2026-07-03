@@ -52,6 +52,49 @@ class AccountController extends Controller
         ]);
     }
 
+    //This method will show employer dashboard
+    public function employerDashboard()
+    {
+        $userId = Auth::user()->id;
+
+        // Total jobs posted by the employer
+        $totalJobs = Job::where('user_id', $userId)->count();
+
+        // Total job applications received
+        $totalApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->count();
+
+        // Pending applications
+        $pendingApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->where('status', 'pending')->count();
+
+        // Recent job applications
+        $recentApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+            ->with(['user', 'job'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Recent jobs posted by employer
+        $recentJobs = Job::where('user_id', $userId)
+            ->with(['jobType'])
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+
+        return view('front.account.employer-dashboard', [
+            'totalJobs' => $totalJobs,
+            'totalApplications' => $totalApplications,
+            'pendingApplications' => $pendingApplications,
+            'recentApplications' => $recentApplications,
+            'recentJobs' => $recentJobs
+        ]);
+    }
+
     //This method will show user registration form
     public function registration()
     {
@@ -66,6 +109,7 @@ class AccountController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
+            'role' => 'required|in:student,employer',
         ]);
 
         if ($validator->passes()) {
@@ -74,6 +118,8 @@ class AccountController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make($request->password); // Hash the password before saving
+            // Set the role based on the selected option in the radio button (student or employer)
+            $user->role = $request->role;
             $user->save();
 
             session()->flash('success', 'Registration successful! ');
@@ -108,9 +154,12 @@ class AccountController extends Controller
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 // Authentication passed...
-                // Check if user is admin
+                // Check user role and redirect accordingly
                 if (Auth::user()->role === 'admin') {
                     return redirect()->route('admin.dashboard')
+                        ->with('success', 'Login successful! Welcome back.');
+                } elseif (Auth::user()->role === 'employer') {
+                    return redirect()->route('account.employer-dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } else {
                     return redirect()->route('account.dashboard')

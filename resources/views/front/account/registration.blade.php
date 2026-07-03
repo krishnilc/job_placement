@@ -14,7 +14,7 @@
                                 <label for="" class="mb-2">Name*</label>
                                 <input type="text" name="name" id="name" class="form-control"
                                     placeholder="Enter Name" required>
-                              <p class="text-danger" id="nameError"></p>
+                                <p class="text-danger" id="nameError"></p>
                             </div>
 
                             <div class="mb-3">
@@ -36,6 +36,24 @@
                                 <input type="password" name="confirm_password" id="confirm_password" class="form-control"
                                     placeholder="Please confirm Password" required>
                                 <p class="text-danger" id="confirmPasswordError"></p>
+                            </div>
+
+                            <div class="mb-4 col-md-6">
+                                <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" value="student" id="student_role"
+                                        name="role" checked>
+                                    <label class="form-check-label">
+                                        Student
+                                    </label>
+                                </div>
+
+                                <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" value="employer" id="employer_role"
+                                        name="role">
+                                    <label class="form-check-label">
+                                        Employer
+                                    </label>
+                                </div>
                             </div>
 
                             <button class="btn btn-primary mt-2">Register</button>
