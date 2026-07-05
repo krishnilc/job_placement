@@ -19,6 +19,7 @@
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
+            
             <li class="list-group-item d-flex justify-content-between p-3">
                 <a href="{{ route('account.dashboard') }}"> <i class="fa fa-arrow-right"></i> Home</a>
             </li>
@@ -34,7 +35,7 @@
                     <a href="{{ route('account.myJobs') }}"> <i class="fa fa-arrow-right"></i> My Jobs</a>
                 </li>
             @endif
-            @if (Auth::user()->role == 'user')
+            @if (Auth::user()->role == 'student')
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('account.myJobApplications') }}"> <i class="fa fa-arrow-right"></i> Jobs Applied</a>
                 </li>

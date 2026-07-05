@@ -52,49 +52,7 @@ class AccountController extends Controller
         ]);
     }
 
-    //This method will show employer dashboard
-    public function employerDashboard()
-    {
-        $userId = Auth::user()->id;
-
-        // Total jobs posted by the employer
-        $totalJobs = Job::where('user_id', $userId)->count();
-
-        // Total job applications received
-        $totalApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->count();
-
-        // Pending applications
-        $pendingApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->where('status', 'pending')->count();
-
-        // Recent job applications
-        $recentApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })
-            ->with(['user', 'job'])
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
-
-        // Recent jobs posted by employer
-        $recentJobs = Job::where('user_id', $userId)
-            ->with(['jobType'])
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
-
-        return view('front.account.employer-dashboard', [
-            'totalJobs' => $totalJobs,
-            'totalApplications' => $totalApplications,
-            'pendingApplications' => $pendingApplications,
-            'recentApplications' => $recentApplications,
-            'recentJobs' => $recentJobs
-        ]);
-    }
-
+   
     //This method will show user registration form
     public function registration()
     {

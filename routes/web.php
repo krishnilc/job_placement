@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\JobApplicationController;
 use App\Http\Controllers\admin\JobController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\employer\EmployerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobsController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::delete('/job-applications/delete', [JobApplicationController::class, 'destroy'])->name('admin.jobApplications.destroy');
 });
 
+Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
+     Route::get('/employer-dashboard', [EmployerController::class, 'employerDashboard'])->name('employer.employer-dashboard');
+});
+
 
 Route::group(['prefix' => 'account'], function () {
     //Guest routes
@@ -60,8 +65,7 @@ Route::group(['prefix' => 'account'], function () {
 
     //Authenticated user routes
     Route::group(['middleware' => 'auth'], function () {
-        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('account.dashboard');
-        Route::get('/employer-dashboard', [AccountController::class, 'employerDashboard'])->name('account.employer-dashboard');
+        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('account.dashboard');       
         Route::get('/profile', [AccountController::class, 'profile'])->name('account.profile');
         Route::put('/update-profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
         Route::get('/logout', [AccountController::class, 'logout'])->name('account.logout');
