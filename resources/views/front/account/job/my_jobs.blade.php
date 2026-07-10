@@ -22,6 +22,8 @@
                 <div class="col-lg-3">
                   @if (auth()->user()->role == 'admin')
                         @include('admin.sidebar')
+                    @elseif (auth()->user()->role == 'employer')
+                        @include('employer.sidebar')
                     @else
                         @include('front.account.sidebar')
                     @endif
@@ -59,8 +61,8 @@
                                                         <div class="info1">{{ $job->jobType->name }}. {{ $job->location }}
                                                         </div>
                                                     </td>
-                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>
-                                                    <td>0 Applications</td>
+                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>   
+                                                    <td>{{ $job->applications->count() }} Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">
                                                             {{ $job->status == 1 ? 'active' : 'inactive' }}

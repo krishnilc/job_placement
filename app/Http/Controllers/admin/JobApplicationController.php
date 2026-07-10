@@ -10,9 +10,25 @@ class JobApplicationController extends Controller
 {
     public function index()
     {
-        $applications = JobApplication::orderBy('job_id', 'asc')
-            ->with('job', 'user', 'employer')
-            ->paginate(10);
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            $applications = JobApplication::orderBy('job_id', 'asc')
+                ->with('job', 'user', 'employer')
+                ->paginate(10);
+        } elseif ($user->role === 'employer') {
+            $applications = JobApplication::whereHas('job', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+                ->with('job', 'user', 'employer')
+                ->orderBy('job_id', 'asc')
+                ->paginate(10);
+        } else {
+            $applications = JobApplication::where('user_id', $user->id)
+                ->with('job', 'user', 'employer')
+                ->orderBy('job_id', 'asc')
+                ->paginate(10);
+        }
 
         return view('admin.job-applications.list', [
             'applications' => $applications

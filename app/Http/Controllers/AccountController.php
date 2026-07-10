@@ -117,7 +117,7 @@ class AccountController extends Controller
                     return redirect()->route('admin.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } elseif (Auth::user()->role === 'employer') {
-                    return redirect()->route('account.employer-dashboard')
+                    return redirect()->route('employer.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } else {
                     return redirect()->route('account.dashboard')

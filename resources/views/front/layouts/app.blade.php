@@ -66,6 +66,13 @@
                                         </a>
                                     </li>
                                 @endif
+                                @if (Auth::user()->role == 'employer')
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{{ route('employer.dashboard') }}">
+                                            Employer Dashboard
+                                        </a>
+                                    </li>
+                                @endif
 
                                 <li>
                                     <a class="dropdown-item py-2" href="{{ route('account.profile') }}">

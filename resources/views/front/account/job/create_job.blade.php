@@ -15,7 +15,11 @@
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                    @include('admin.sidebar')
+                    @if(auth()->user()->role === 'admin')
+                        @include('admin.sidebar')
+                    @elseif(auth()->user()->role === 'employer')
+                        @include('employer.sidebar')
+                    @endif
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
@@ -146,8 +150,8 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="" class="mb-2">Website</label>
-                                    <input type="text" placeholder="Website" id="company_website" name="company_website"
+                                    <label for="" class="mb-2">Company Website</label>
+                                    <input type="text" placeholder="Company Website (including http://)" id="company_website" name="company_website"
                                         class="form-control">
                                 </div>
                             </div>

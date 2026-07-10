@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class EmployerController extends Controller
 {
      //This method will show employer dashboard
-    public function employerDashboard()
+    public function index()
     {
         $userId = Auth::user()->id;
 
@@ -44,7 +44,7 @@ class EmployerController extends Controller
             ->take(6)
             ->get();
 
-        return view('front.account.employer-dashboard', [
+        return view('employer.employer-dashboard', [
             'totalJobs' => $totalJobs,
             'totalApplications' => $totalApplications,
             'pendingApplications' => $pendingApplications,

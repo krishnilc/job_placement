@@ -7,7 +7,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item active"><a href="{{ route('account.employer-dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item active"><a href="{{ route('employer.dashboard') }}">Home</a></li>
                         </ol>
                     </nav>
                 </div>
@@ -15,7 +15,7 @@
 
             <div class="row">
                 <div class="col-lg-3">
-                    @include('front.employer.sidebar')
+                    @include('employer.sidebar')
                 </div>
                 <div class="col-lg-9">
                     <div class="card border-0 shadow mb-4">

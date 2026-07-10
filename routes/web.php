@@ -50,7 +50,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
 });
 
 Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
-     Route::get('/employer-dashboard', [EmployerController::class, 'employerDashboard'])->name('employer.employer-dashboard');
+    Route::get('/home', [EmployerController::class, 'index'])->name('employer.dashboard');   
 });
 
 
