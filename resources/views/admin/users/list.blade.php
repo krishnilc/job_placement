@@ -44,11 +44,11 @@
                                         <tr>
                                             <th scope="col">ID</th>
                                             <th scope="col">Name</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Mobile</th>
-                                            @if (($list_type ?? 'all') === 'students')
+                                             @if (($list_type ?? 'all') === 'students')
                                                  <th scope="col">Student ID</th>
                                             @endif
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Mobile</th>                                           
                                             @if (($list_type ?? 'all') === 'employers')
                                                 <th scope="col">Designation</th>
                                             @endif
@@ -62,11 +62,12 @@
                                                 <tr class="active">
                                                     <td> {{ $user->id }} </td>
                                                     <td>{{ $user->name }}</td>
-                                                    <td>{{ $user->email }}</td>
-                                                    <td>{{ $user->mobile }}</td>
-                                                    @if (($list_type ?? 'all') === 'students')
+                                                      @if (($list_type ?? 'all') === 'students')
                                                         <td>{{ $user->student_id }}</td>
                                                     @endif
+                                                    <td>{{ $user->email }}</td>
+                                                    <td>{{ $user->mobile }}</td>
+                                                  
                                                     @if (($list_type ?? 'all') === 'employers')
                                                         <td>{{ $user->designation }}</td>
                                                     @endif
