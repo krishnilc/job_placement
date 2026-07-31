@@ -8,7 +8,18 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Users</li>
+                            <li class="breadcrumb-item active">
+                                @php
+                                    $listType = $list_type ?? 'all';
+                                    $title =
+                                        $listType === 'students'
+                                            ? 'Students'
+                                            : ($listType === 'employers'
+                                                ? 'Employers'
+                                                : 'Users');
+                                @endphp
+                                {{ $title }}
+                            </li>
                         </ol>
                     </nav>
                 </div>
@@ -23,7 +34,7 @@
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h3 class="fs-4 mb-1">Users</h3>
+                                    <h3 class="fs-4 mb-1">{{ $title }}</h3>
                                 </div>
 
                             </div>
@@ -35,7 +46,13 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Mobile</th>
-                                             <th scope="col">Role</th>
+                                            @if (($list_type ?? 'all') === 'students')
+                                                 <th scope="col">Student ID</th>
+                                            @endif
+                                            @if (($list_type ?? 'all') === 'employers')
+                                                <th scope="col">Designation</th>
+                                            @endif
+                                            {{-- <th scope="col">Role</th> --}}
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -47,7 +64,13 @@
                                                     <td>{{ $user->name }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
-                                                    <td>{{ $user->role }}</td>
+                                                    @if (($list_type ?? 'all') === 'students')
+                                                        <td>{{ $user->student_id }}</td>
+                                                    @endif
+                                                    @if (($list_type ?? 'all') === 'employers')
+                                                        <td>{{ $user->designation }}</td>
+                                                    @endif
+                                                    {{-- <td>{{ $user->role }}</td> --}}
 
                                                     <td>
                                                         <div class="action-dots">
@@ -57,7 +80,7 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item"
-                                                                        href="{{ route('admin.users.edit', $user->id) }}"><i
+                                                                        href="{{ route('admin.users.edit', $user->id) }}?list_type={{ $list_type ?? 'all' }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
                                                                 <li><a class="dropdown-item" href="javascript:void(0);"
@@ -98,8 +121,14 @@
                     },
 
                     success: function(response) {
-                        window.location.href =
-                        "{{ route('admin.users') }}"; // Redirect to the Users page after deletion
+                        var listType = "{{ $list_type ?? 'all' }}";
+                        var redirect = "{{ route('admin.users') }}";
+                        if (listType === 'students') {
+                            redirect = "{{ route('admin.users.students') }}";
+                        } else if (listType === 'employers') {
+                            redirect = "{{ route('admin.users.employers') }}";
+                        }
+                        window.location.href = redirect; // Redirect after deletion
                     },
 
                     error: function(xhr, status, error) {

@@ -68,6 +68,7 @@ class AccountController extends Controller
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
             'role' => 'required|in:student,employer',
+            'student_id' => 'required_if:role,student|string|max:100',
         ]);
 
         if ($validator->passes()) {
@@ -78,6 +79,9 @@ class AccountController extends Controller
             $user->password = Hash::make($request->password); // Hash the password before saving
             // Set the role based on the selected option in the radio button (student or employer)
             $user->role = $request->role;
+            if ($request->role === 'student') {
+                $user->student_id = $request->student_id;
+            }
             $user->save();
 
             session()->flash('success', 'Registration successful! ');

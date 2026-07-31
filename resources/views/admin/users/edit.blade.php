@@ -6,9 +6,21 @@
             <div class="row">
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
+                        @php
+                            $listType = $list_type ?? request()->query('list_type', 'all');
+                            $backRoute = route('admin.users');
+                            $backLabel = 'Users';
+                            if ($listType === 'students') {
+                                $backRoute = route('admin.users.students');
+                                $backLabel = 'Students';
+                            } elseif ($listType === 'employers') {
+                                $backRoute = route('admin.users.employers');
+                                $backLabel = 'Employees';
+                            }
+                        @endphp
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.users') }}">Users</a></li>
+                            <li class="breadcrumb-item"><a href="{{ $backRoute }}">{{ $backLabel }}</a></li>
                             <li class="breadcrumb-item active">Edit User</li>
                         </ol>
                     </nav>
@@ -57,11 +69,11 @@
                                             <select name="role" id="role" class="form-control">
                                                 <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
                                                 <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
-                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                                             </select>
                                             <p class="text-danger" id="roleError"></p>
                                         </div>
 
+                                        <input type="hidden" name="list_type" value="{{ $list_type ?? request()->query('list_type', 'all') }}">
                                     </div>
                                     <div class="card-footer  p-4">
                                         <button type="submit" class="btn btn-primary">Update</button>
@@ -84,14 +96,21 @@
     <script>
         $('#userForm').submit(function(e) {
             e.preventDefault();
-            // var formData = $(this).serialize();
+            var listType = "{{ $list_type ?? request()->query('list_type', 'all') }}";
+            var redirectRoute = "{{ route('admin.users') }}";
+            if (listType === 'students') {
+                redirectRoute = "{{ route('admin.users.students') }}";
+            } else if (listType === 'employers') {
+                redirectRoute = "{{ route('admin.users.employers') }}";
+            }
+
             $.ajax({
                 url: "{{ route('admin.users.update', $user->id) }}",
                 type: "PUT",
                 dataType: "json",
                 data: $("#userForm").serializeArray(),
 
-                    success: function(response) {
+                success: function(response) {
                     // Always clear all error messages first
                     $("#nameError").text('');
                     $("#emailError").text('');
@@ -102,7 +121,7 @@
                     $("#roleError").text('');
 
                     if (response.status == true) {
-                        window.location.href = "{{ route('admin.users') }}";
+                        window.location.href = redirectRoute;
                     } else {
                         var errors = response.errors;
 

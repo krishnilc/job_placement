@@ -74,12 +74,14 @@
                                     </li>
                                 @endif
 
-                                <li>
-                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
-                                        Account Settings
-                                    </a>
-                                </li>
-
+                                 @if (Auth::user()->role == 'student')
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{{ route('student.dashboard') }}">
+                                            Student Dashboard
+                                        </a>
+                                    </li>
+                                @endif
+                              
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

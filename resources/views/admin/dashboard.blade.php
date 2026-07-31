@@ -149,8 +149,13 @@
                                 <div class="card-body">
                                     <ul class="list-unstyled">
                                         <li class="mb-2">
-                                            <a href="{{ route('admin.users') }}" class="text-decoration-none">
-                                                <i class="fa fa-arrow-right"></i> Manage Users
+                                            <a href="{{ route('admin.users.students') }}" class="text-decoration-none">
+                                                <i class="fa fa-arrow-right"></i> Students
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="{{ route('admin.users.employers') }}" class="text-decoration-none">
+                                                <i class="fa fa-arrow-right"></i> Employees
                                             </a>
                                         </li>
                                         <li class="mb-2">

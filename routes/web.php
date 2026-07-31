@@ -38,6 +38,8 @@ Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->na
 Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+    Route::get('/users/students', [UserController::class, 'students'])->name('admin.users.students');
+    Route::get('/users/employers', [UserController::class, 'employers'])->name('admin.users.employers');
     Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
@@ -65,7 +67,7 @@ Route::group(['prefix' => 'account'], function () {
 
     //Authenticated user routes
     Route::group(['middleware' => 'auth'], function () {
-        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('account.dashboard');       
+        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('student.dashboard');       
         Route::get('/profile', [AccountController::class, 'profile'])->name('account.profile');
         Route::put('/update-profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
         Route::get('/logout', [AccountController::class, 'logout'])->name('account.logout');

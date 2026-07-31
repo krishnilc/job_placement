@@ -8,8 +8,8 @@
             <img src="assets/images/avatar7.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
         @endif
 
-        <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
-        <p class="text-muted mb-1 fs-6">{{ Auth::user()->role }}</p>
+        <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>         
+        <p class="text-muted mb-1 fs-6">Student Id: {{ Auth::user()->student_id }}</p>
         <div class="d-flex justify-content-center mb-2">
             <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" class="btn btn-primary">Change
                 Profile Picture</button>
@@ -20,9 +20,9 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             
-            <li class="list-group-item d-flex justify-content-between p-3">
+            {{-- <li class="list-group-item d-flex justify-content-between p-3">
                 <a href="{{ route('account.dashboard') }}"> <i class="fa fa-arrow-right"></i> Home</a>
-            </li>
+            </li> --}}
             <li class="list-group-item d-flex justify-content-between p-3">
                 <a href="{{ route('account.profile') }}"> <i class="fa fa-arrow-right"></i> Account Settings</a>
             </li>

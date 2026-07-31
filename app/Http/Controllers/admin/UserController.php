@@ -17,11 +17,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit($id)
+    public function students()
     {
-        $user =  User::findOrfail($id);
+        $user = User::where('role', 'student')->orderBy('created_at', 'asc')->paginate(10);
+        return view('admin.users.list', [
+            'users' => $user,
+            'list_type' => 'students'
+        ]);
+    }
+
+    public function employers()
+    {
+        $user = User::where('role', 'employer')->orderBy('created_at', 'asc')->paginate(10);
+        return view('admin.users.list', [
+            'users' => $user,
+            'list_type' => 'employers'
+        ]);
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $user = User::findOrfail($id);
         return view('admin.users.edit', [
-            'user' => $user
+            'user' => $user,
+            'list_type' => $request->query('list_type', 'all'),
         ]);
     }
 

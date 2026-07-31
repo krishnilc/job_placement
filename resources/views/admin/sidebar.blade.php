@@ -44,8 +44,13 @@
             </li>      
      
             <li class="list-group-item d-flex justify-content-between p-3">
-                <a href="{{ route('admin.users') }}">
-                    <i class="fa fa-arrow-right"></i> Manage Users
+                <a href="{{ route('admin.users.students') }}">
+                    <i class="fa fa-arrow-right"></i> Manage Students
+                </a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between p-3">
+                <a href="{{ route('admin.users.employers') }}">
+                    <i class="fa fa-arrow-right"></i> Manage Employers
                 </a>
             </li>
         </ul>

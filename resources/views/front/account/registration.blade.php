@@ -56,6 +56,13 @@
                                 </div>
                             </div>
 
+                            <div class="mb-3" id="studentIdGroup">
+                                <label for="student_id" class="mb-2">University Student ID*</label>
+                                <input type="text" name="student_id" id="student_id" class="form-control"
+                                    placeholder="Enter University Student ID">
+                                <p class="text-danger" id="studentIdError"></p>
+                            </div>
+
                             <button class="btn btn-primary mt-2">Register</button>
                         </form>
                     </div>
@@ -70,41 +77,64 @@
 
 @section('customJS')
     <script>
-        $("#registrationForm").submit(function(e) {
-            e.preventDefault();
-
-            $.ajax({
-                url: "{{ route('account.processRegistration') }}",
-                type: "POST",
-                data: $("#registrationForm").serialize(),
-                dataType: "json",
-
-                success: function(response) {
-                    // Always clear all error messages first
-                    $("#nameError").text('');
-                    $("#emailError").text('');
-                    $("#passwordError").text('');
-                    $("#confirmPasswordError").text('');
-
-                    if (response.status == false) {
-                        var errors = response.errors;
-                        if (errors.name) {
-                            $("#nameError").text(errors.name[0]);
-                        }
-                        if (errors.email) {
-                            $("#emailError").text(errors.email[0]);
-                        }
-                        if (errors.password) {
-                            $("#passwordError").text(errors.password[0]);
-                        }
-                        if (errors.confirm_password) {
-                            $("#confirmPasswordError").text(errors.confirm_password[0]);
-                        }
-                    } else {
-                        window.location.href = "{{ route('account.login') }}";
-                        $("#registrationForm")[0].reset();
-                    }
+        $(function() {
+            function toggleStudentField() {
+                if ($('#student_role').is(':checked')) {
+                    $('#studentIdGroup').show();
+                    $('#student_id').attr('required', true);
+                } else {
+                    $('#studentIdGroup').hide();
+                    $('#student_id').removeAttr('required');
+                    $('#studentIdError').text('');
                 }
+            }
+
+            toggleStudentField();
+
+            $('input[name="role"]').change(function() {
+                toggleStudentField();
+            });
+
+            $("#registrationForm").submit(function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: "{{ route('account.processRegistration') }}",
+                    type: "POST",
+                    data: $("#registrationForm").serialize(),
+                    dataType: "json",
+
+                    success: function(response) {
+                        // Always clear all error messages first
+                        $("#nameError").text('');
+                        $("#emailError").text('');
+                        $("#passwordError").text('');
+                        $("#confirmPasswordError").text('');
+                        $("#studentIdError").text('');
+
+                        if (response.status == false) {
+                            var errors = response.errors;
+                            if (errors.name) {
+                                $("#nameError").text(errors.name[0]);
+                            }
+                            if (errors.email) {
+                                $("#emailError").text(errors.email[0]);
+                            }
+                            if (errors.password) {
+                                $("#passwordError").text(errors.password[0]);
+                            }
+                            if (errors.confirm_password) {
+                                $("#confirmPasswordError").text(errors.confirm_password[0]);
+                            }
+                            if (errors.student_id) {
+                                $("#studentIdError").text(errors.student_id[0]);
+                            }
+                        } else {
+                            window.location.href = "{{ route('account.login') }}";
+                            $("#registrationForm")[0].reset();
+                        }
+                    }
+                });
             });
         });
     </script>
