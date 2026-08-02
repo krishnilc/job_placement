@@ -9,30 +9,65 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::orderBy('created_at', 'asc')->paginate(10);
+        $users = $this->buildUserQuery($request, 'all')->paginate(10);
+        $users->appends($request->query());
+
         return view('admin.users.list', [
-            'users' => $user
+            'users' => $users,
+            'list_type' => 'all',
         ]);
     }
 
-    public function students()
+    public function students(Request $request)
     {
-        $user = User::where('role', 'student')->orderBy('created_at', 'asc')->paginate(10);
+        $users = $this->buildUserQuery($request, 'students')->paginate(10);
+        $users->appends($request->query());
+
         return view('admin.users.list', [
-            'users' => $user,
+            'users' => $users,
             'list_type' => 'students'
         ]);
     }
 
-    public function employers()
+    public function employers(Request $request)
     {
-        $user = User::where('role', 'employer')->orderBy('created_at', 'asc')->paginate(10);
+        $users = $this->buildUserQuery($request, 'employers')->paginate(10);
+        $users->appends($request->query());
+
         return view('admin.users.list', [
-            'users' => $user,
+            'users' => $users,
             'list_type' => 'employers'
         ]);
+    }
+
+    private function buildUserQuery(Request $request, string $listType)
+    {
+        $query = User::query();
+
+        if ($listType === 'students') {
+            $query->where('role', 'student');
+        } elseif ($listType === 'employers') {
+            $query->where('role', 'employer');
+        }
+
+        $allowedSorts = ['id', 'name', 'email', 'mobile', 'created_at'];
+
+        if ($listType === 'students') {
+            $allowedSorts[] = 'student_id';
+        } elseif ($listType === 'employers') {
+            $allowedSorts[] = 'designation';
+        }
+
+        $sort = $request->query('sort', 'created_at');
+        $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        return $query->orderBy($sort, $direction);
     }
 
     public function edit(Request $request, $id)

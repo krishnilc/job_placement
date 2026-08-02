@@ -39,18 +39,38 @@
 
                             </div>
                             <div class="table-responsive">
+                                @php
+                                    $currentSort = request()->query('sort', 'created_at');
+                                    $currentDirection = strtolower(request()->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+                                    $listType = $list_type ?? 'all';
+                                    $baseRoute = match ($listType) {
+                                        'students' => route('admin.users.students'),
+                                        'employers' => route('admin.users.employers'),
+                                        default => route('admin.users'),
+                                    };
+                                    $buildSortUrl = function ($column) use ($baseRoute, $currentSort, $currentDirection) {
+                                        $nextDirection = ($currentSort === $column && $currentDirection === 'asc') ? 'desc' : 'asc';
+
+                                        return $baseRoute . '?' . http_build_query([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => 1,
+                                        ]);
+                                    };
+                                @endphp
+
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Name</th>
-                                             @if (($list_type ?? 'all') === 'students')
-                                                 <th scope="col">Student ID</th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('id') }}" class="text-decoration-none text-dark">ID @if ($currentSort === 'id')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('name') }}" class="text-decoration-none text-dark">Name @if ($currentSort === 'name')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                             @if ($listType === 'students')
+                                                 <th scope="col"><a href="{{ $buildSortUrl('student_id') }}" class="text-decoration-none text-dark">Student ID @if ($currentSort === 'student_id')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
                                             @endif
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Mobile</th>                                           
-                                            @if (($list_type ?? 'all') === 'employers')
-                                                <th scope="col">Designation</th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('email') }}" class="text-decoration-none text-dark">Email @if ($currentSort === 'email')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('mobile') }}" class="text-decoration-none text-dark">Mobile @if ($currentSort === 'mobile')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>                                           
+                                            @if ($listType === 'employers')
+                                                <th scope="col"><a href="{{ $buildSortUrl('designation') }}" class="text-decoration-none text-dark">Designation @if ($currentSort === 'designation')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
                                             @endif
                                             {{-- <th scope="col">Role</th> --}}
                                             <th scope="col">Action</th>

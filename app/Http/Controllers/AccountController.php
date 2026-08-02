@@ -62,13 +62,15 @@ class AccountController extends Controller
     //This method will save user registration data to database
     public function processRegistration(Request $request)
     {
+        $role = in_array($request->input('role'), ['student', 'employer'], true) ? $request->input('role') : 'student';
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
             'role' => 'required|in:student,employer',
-            'student_id' => 'required_if:role,student|string|max:100',
+            'student_id' => $role === 'student' ? 'required|string|max:100' : 'nullable|string|max:100',
         ]);
 
         if ($validator->passes()) {
@@ -78,9 +80,11 @@ class AccountController extends Controller
             $user->email = $request->email;
             $user->password = Hash::make($request->password); // Hash the password before saving
             // Set the role based on the selected option in the radio button (student or employer)
-            $user->role = $request->role;
-            if ($request->role === 'student') {
+            $user->role = $role;
+            if ($role === 'student') {
                 $user->student_id = $request->student_id;
+            } else {
+                $user->student_id = null;
             }
             $user->save();
 
@@ -124,7 +128,7 @@ class AccountController extends Controller
                     return redirect()->route('employer.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } else {
-                    return redirect()->route('account.dashboard')
+                    return redirect()->route('student.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 }
             } else {
