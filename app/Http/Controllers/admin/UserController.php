@@ -88,19 +88,20 @@ class UserController extends Controller
             'name' => 'required|min:5|max:20',
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
             'mobile' => 'required|digits:7',
-            'role' => 'required|in:admin,user,employer',
+            'role' => 'required|in:admin,student,employer,user',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
         ]);
 
         if ($validator->passes()) {
             $user = User::find($id);
+            $normalizedRole = $request->role === 'user' ? 'student' : $request->role;
 
             $user->name = $request->name;
             $user->email = $request->email;
             $user->mobile = $request->mobile;
             $user->designation = $request->designation;
-            $user->role = $request->role;
+            $user->role = $normalizedRole;
 
             $user->save();
 

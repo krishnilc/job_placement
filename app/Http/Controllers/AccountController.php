@@ -70,7 +70,9 @@ class AccountController extends Controller
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
             'role' => 'required|in:student,employer',
-            'student_id' => $role === 'student' ? 'required|string|max:100' : 'nullable|string|max:100',
+            'student_id' => $role === 'student' ? 'required|string|max:9|unique:users,student_id' : 'nullable|string|max:9',
+        ], [
+            'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
 
         if ($validator->passes()) {

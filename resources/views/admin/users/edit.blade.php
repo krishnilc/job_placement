@@ -67,7 +67,8 @@
                                         <div class="mb-4">
                                             <label for="role" class="mb-2">Role*</label>
                                             <select name="role" id="role" class="form-control">
-                                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
+                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                                <option value="student" {{ in_array($user->role, ['user', 'student'], true) ? 'selected' : '' }}>Student</option>
                                                 <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
                                             </select>
                                             <p class="text-danger" id="roleError"></p>

@@ -19,7 +19,7 @@
 
                             <div class="mb-3">
                                 <label for="" class="mb-2">Email*</label>
-                                <input type="text" name="email" id="email" class="form-control"
+                                <input type="email" name="email" id="email" class="form-control"
                                     placeholder="Enter Email" required>
                                 <p class="text-danger" id="emailError"></p>
                             </div>
