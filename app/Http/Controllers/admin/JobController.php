@@ -44,6 +44,7 @@ class JobController extends Controller
             'location' => 'required|max:50',
             'description' => 'required',
             'company_name' => 'required|min:3|max:75',
+            'closing_date' => 'nullable|date',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -55,6 +56,7 @@ class JobController extends Controller
             $job->category_id = $request->category;
             $job->job_type_id = $request->job_type;    
             $job->vacancy = $request->vacancy;
+            $job->closing_date = $request->closing_date;
             $job->salary = $request->salary;
             $job->location = $request->location;
             $job->description = $request->description;

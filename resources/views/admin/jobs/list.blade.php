@@ -33,7 +33,8 @@
                                         <tr>
                                             <th scope="col">ID</th>
                                             <th scope="col">Title</th>
-                                            <th scope="col">Date</th>
+                                            <th scope="col">Date Created</th>
+                                            <th scope="col">Closing Date</th>
                                             <th scope="col">Company</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Created By</th>
@@ -49,7 +50,8 @@
                                                         <p>{{ $job->title }}</p>
                                                         <p>Applicants: {{ $job->applications->count() }}</p>
                                                     </td>
-                                                    <td>{{ $job->created_at->format('Y-m-d') }}</td>
+                                                    <td>{{ $job->created_at->format('d-m-Y') }}</td>
+                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}</td>
                                                     <td>{{ $job->company_name }}</td>
                                                     <td>
                                                         <span

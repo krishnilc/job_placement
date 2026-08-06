@@ -113,6 +113,10 @@
                                                     </td>
                                                 </tr>
                                             @endforeach
+                                           @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">No users found.</td>
+                                            </tr>
                                         @endif
                                     </tbody>
                                 </table>

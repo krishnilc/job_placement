@@ -77,6 +77,13 @@
                                     </div>
 
                                     <div class="mb-4 col-md-6">
+                                        <label for="" class="mb-2">Closing Date</label>
+                                        <input type="date" id="closing_date" name="closing_date" class="form-control" value="{{ $job->closing_date }}">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location<span class="req">*</span></label>
                                         <input type="text" placeholder="location" id="location" name="location"
                                             class="form-control" value="{{ $job->location }}">

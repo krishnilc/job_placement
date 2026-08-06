@@ -47,6 +47,7 @@
                                         <tr>
                                             <th scope="col">Title</th>
                                             <th scope="col">Job Created</th>
+                                            <th scope="col">Closing Date</th>
                                             <th scope="col">Applicants</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
@@ -61,7 +62,8 @@
                                                         <div class="info1">{{ $job->jobType->name }}. {{ $job->location }}
                                                         </div>
                                                     </td>
-                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>   
+                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>
+                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d M, Y') : 'Not set' }}</td>
                                                     <td>{{ $job->applications->count() }} Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">

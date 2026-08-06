@@ -63,8 +63,8 @@
                                             <p class="text-danger" id="jobTypeError"></p>
                                     </div>
                                     <div class="col-md-6  mb-4">
-                                        <label for="" class="mb-2">Vacancy<span class="req">*</span></label>
-                                        <input type="number" min="1" placeholder="Job Openings" id="vacancy"
+                                        <label for="" class="mb-2">No. of Vacancy<span class="req">*</span></label>
+                                        <input type="number" min="1" placeholder="No. of Job Openings" id="vacancy"
                                             name="vacancy" class="form-control">
                                             <p class="text-danger" id="vacancyError"></p>
                                     </div>
@@ -77,6 +77,13 @@
                                             class="form-control">
                                     </div>
 
+                                    <div class="mb-4 col-md-6">
+                                        <label for="" class="mb-2">Closing Date</label>
+                                        <input type="date" id="closing_date" name="closing_date" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location<span class="req">*</span></label>
                                         <input type="text" placeholder="location" id="location" name="location"
