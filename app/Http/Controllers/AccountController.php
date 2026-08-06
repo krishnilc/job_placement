@@ -252,9 +252,14 @@ class AccountController extends Controller
 
     public function createJob()
     {
+        if (!in_array(Auth::user()->role, ['admin', 'employer'], true)) {
+            session()->flash('error', 'Only admins and employers can create jobs.');
+
+            return redirect()->route('home');
+        }
+
         $categories = Category::orderBy('name', 'ASC')->where('status', '1')->get();
         $jobTypes = JobType::orderBy('name', 'ASC')->where('status', '1')->get();
-
 
         return view('front.account.job.create_job', [
             'categories' => $categories,
@@ -287,7 +292,6 @@ class AccountController extends Controller
             $job->salary = $request->salary;
             $job->location = $request->location;
             $job->description = $request->description;
-            $job->benefits = $request->benefits;
             $job->responsibilities = $request->responsibilities;
             $job->qualifications = $request->qualifications;
             $job->keywords = $request->keywords;
@@ -368,7 +372,6 @@ class AccountController extends Controller
             $job->salary = $request->salary;
             $job->location = $request->location;
             $job->description = $request->description;
-            $job->benefits = $request->benefits;
             $job->responsibilities = $request->responsibilities;
             $job->qualifications = $request->qualifications;
             $job->keywords = $request->keywords;

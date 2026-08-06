@@ -58,7 +58,6 @@ class JobController extends Controller
             $job->salary = $request->salary;
             $job->location = $request->location;
             $job->description = $request->description;
-            $job->benefits = $request->benefits;
             $job->responsibilities = $request->responsibilities;
             $job->qualifications = $request->qualifications;
             $job->keywords = $request->keywords;

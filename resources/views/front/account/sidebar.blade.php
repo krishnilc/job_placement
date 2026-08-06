@@ -28,7 +28,9 @@
             </li>
             @if (Auth::user()->role == 'employer' || Auth::user()->role == 'admin')
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
                     <a href="{{ route('account.createJob') }}"> <i class="fa fa-arrow-right"></i> Post a Job</a>
+                @endif
                 </li>
 
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">

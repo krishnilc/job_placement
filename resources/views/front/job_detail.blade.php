@@ -71,13 +71,6 @@
                                 </div>
                             @endif
 
-                            @if (!empty($job->benefits))
-                                <div class="single_wrap">
-                                    <h4>Benefits</h4>
-                                    <p>{!! nl2br($job->benefits) !!}</p>
-                                </div>
-                            @endif
-
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
                                 @if (Auth::check())

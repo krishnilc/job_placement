@@ -154,9 +154,11 @@
                                 <h3 class="fs-4 mb-0">
                                     Your Latest Job Postings
                                 </h3>
-                                <a href="{{ route('account.createJob') }}" class="btn btn-sm btn-primary rounded-pill">
-                                    + New Job
-                                </a>
+                                @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
+                                    <a href="{{ route('account.createJob') }}" class="btn btn-sm btn-primary rounded-pill">
+                                        + New Job
+                                    </a>
+                                @endif
                             </div>
 
                             <div class="row g-4">
@@ -200,7 +202,10 @@
                                 @empty
                                     <div class="col-12">
                                         <div class="alert alert-info rounded-4">
-                                            You haven't posted any jobs yet. <a href="{{ route('account.createJob') }}">Create your first job posting</a>
+                                            You haven't posted any jobs yet.
+                                            @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
+                                                <a href="{{ route('account.createJob') }}">Create your first job posting</a>
+                                            @endif
                                         </div>
                                     </div>
                                 @endforelse

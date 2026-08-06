@@ -21,7 +21,7 @@ class CheckAdmin
        
         if ($request->user()->role !== 'admin' && $request->user()->role !== 'employer') {
             session()->flash('error', 'You do not have permission to access the admin page.');
-            return redirect()->route('account.dashboard');
+            return redirect()->route('student.dashboard');
         }
         
         return $next($request);

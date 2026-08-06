@@ -92,10 +92,6 @@
                                     <p class="text-danger" id="descriptionError"></p>
                                 </div>
                                 <div class="mb-4">
-                                    <label for="" class="mb-2">Benefits</label>
-                                    <textarea class="textarea" name="benefits" id="benefits" cols="5" rows="5" placeholder="Benefits"></textarea>
-                                </div>
-                                <div class="mb-4">
                                     <label for="" class="mb-2">Responsibilities</label>
                                     <textarea class="textarea" name="responsibilities" id="responsibilities" cols="5" rows="5"
                                         placeholder="Responsibilities"></textarea>
@@ -117,6 +113,7 @@
                                  <div class="mb-4">
                                     <label for="" class="mb-2">Experience <span class="req">*</span></label>
                                     <select name="experience" id="experience" class="form-control">
+                                        <option value="0">No Experience Required</option>
                                         <option value="1">1 Year</option>
                                         <option value="2">2 Years</option>
                                         <option value="3">3 Years</option>
