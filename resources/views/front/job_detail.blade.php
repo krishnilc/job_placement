@@ -7,8 +7,24 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('front.jobs') }}"><i class="fa fa-arrow-left"
-                                        aria-hidden="true"></i> &nbsp;Back to Jobs</a></li>
+                            <li class="breadcrumb-item">
+                                @if (Auth::check() && $isOwner)
+                                    <a href="{{ route('account.myJobs') }}"><i class="fa fa-arrow-left"
+                                            aria-hidden="true"></i>
+                                        &nbsp;Back to My Jobs
+                                    </a>
+                                @elseif (Auth::check() && Auth::user()->role === 'admin')
+                                    <a href="{{ route('admin.jobs') }}"><i class="fa fa-arrow-left"
+                                            aria-hidden="true"></i>
+                                        &nbsp;Back to Manage Jobs
+                                    </a>
+                                @else
+                                    <a href="{{ route('front.jobs') }}"><i class="fa fa-arrow-left"
+                                            aria-hidden="true"></i>
+                                        &nbsp;Back to Jobs
+                                    </a>
+                                @endif
+                            </li>                                
                         </ol>
                     </nav>
                 </div>
@@ -39,7 +55,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if (Auth::check())
+                                @if (Auth::check() && !$isOwner && !in_array(Auth::user()->role, ['admin', 'employer']))
                                     <div class="jobs_right">
                                         <div class="apply_now {{ $count == 1 ? 'saved-job' : '' }}">
                                             <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i
@@ -72,23 +88,26 @@
                             @endif
 
                             <div class="border-bottom"></div>
-                            <div class="pt-3 text-end">
-                                @if (Auth::check())
-                                    <a href="#" onclick="saveJob({{ $job->id }})"
-                                        class="btn btn-secondary">Save</a>
-                                @else
-                                    <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
-                                @endif
-                                <!-- apply if user is logged in -->
-                                @if (Auth::check())
-                                    <a href="#" class="btn btn-primary" onclick="openApplyModal({{ $job->id }})">Apply</a>
-                                @else
-                                    <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
-                                @endif
-                            </div>
+                            @if (!$isOwner && !in_array(Auth::user()->role ?? null, ['admin', 'employer']))
+                                <div class="pt-3 text-end">
+                                    @if (Auth::check())
+                                        <a href="#" onclick="saveJob({{ $job->id }})"
+                                            class="btn btn-secondary">Save</a>
+                                    @else
+                                        <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
+                                    @endif
+                                    <!-- apply if user is logged in -->
+                                    @if (Auth::check())
+                                        <a href="#" class="btn btn-primary"
+                                            onclick="openApplyModal({{ $job->id }})">Apply</a>
+                                    @else
+                                        <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </div>
-                    @if (Auth::user() && Auth::user()->id == $job->user_id)
+                    {{-- @if (Auth::user() && Auth::user()->id == $job->user_id)
                         <div class="card shadow border-0 mt-4">
                             <div class="job_details_header">
                                 <div class="single_jobs white-bg d-flex justify-content-between">
@@ -123,7 +142,7 @@
                                                     <td>{{ $application->user->email }}</td>
                                                     <td>{{ $application->user->mobile ?? 'N/A' }}</td>
                                                     <td>
-                                                        @if(!empty($application->application_file))
+                                                        @if (!empty($application->application_file))
                                                             @php
                                                                 $path = $application->application_file;
                                                                 $disk = Storage::disk('applications')->exists($path)
@@ -152,7 +171,7 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if(!empty($application->resume_file))
+                                                        @if (!empty($application->resume_file))
                                                             @php
                                                                 $path = $application->resume_file;
                                                                 $disk = Storage::disk('applications')->exists($path)
@@ -181,10 +200,10 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if(!empty($application->certificates_file))
+                                                        @if (!empty($application->certificates_file))
                                                             @php $certs = json_decode($application->certificates_file, true) ?? []; @endphp
-                                                            @if(!empty($certs))
-                                                                @foreach($certs as $cert)
+                                                            @if (!empty($certs))
+                                                                @foreach ($certs as $cert)
                                                                     @php
                                                                         $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
                                                                         $disk = Storage::disk('applications')->exists($cert)
@@ -198,7 +217,7 @@
                                                                     @endphp
                                                                     <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" target="_blank" download>
                                                                         <i class="fa fa-file" aria-hidden="true"></i> {{ $certExt }} ({{ $certSizeText }})
-                                                                    </a>@if(!$loop->last), @endif
+                                                                    </a>@if (!$loop->last), @endif
                                                                 @endforeach
                                                             @else
                                                                 N/A
@@ -220,17 +239,21 @@
                                 </table>
                             </div>
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
                 <div class="col-md-4">
                     <div class="card shadow border-0">
                         <div class="job_sumary">
                             <div class="summery_header pb-1 pt-4">
-                                <h3>Job Summery</h3>
+                                <h3>Job Summary</h3>
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
                                     <li>Published on: <span>{{ $job->created_at->format('d M, Y') }}</span></li>
+                                    <li>Closing Date:
+                                        <span>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d M, Y') : 'Not set' }}</span>
+                                    </li>
+
                                     <li>Vacancy: <span>{{ $job->vacancy }}</span></li>
                                     @if (!empty($job->salary))
                                         <li>Salary: <span>{{ $job->salary }}</span></li>
@@ -289,7 +312,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Certificates (you can select multiple)</label>
-                            <input type="file" name="certificates[]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                            <input type="file" name="certificates[]" class="form-control"
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -327,13 +351,15 @@
                 success: function(response) {
                     $('#applyModal').modal('hide');
                     let alertClass = response.status ? 'alert-success' : 'alert-danger';
-                    let alertBox = `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">${response.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                    let alertBox =
+                        `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">${response.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
                     $(".col-md-8").prepend(alertBox);
                 },
                 error: function(xhr) {
                     let msg = 'An error occurred while applying for the job.';
                     if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
-                    let alertBox = `<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                    let alertBox =
+                        `<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
                     $(".col-md-8").prepend(alertBox);
                 }
             });

@@ -401,9 +401,16 @@ class AccountController extends Controller
 
     public function deleteJob(Request $request)
     {
+        if (Auth::user()->role !== 'admin') {
+            session()->flash('error', 'Only admins can delete jobs.');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Only admins can delete jobs.']
+            ]);
+        }
+
         $job = Job::where([
-            'user_id' => Auth::user()->id, // Ensure that the job belongs to the authenticated user
-            'id' => $request->jobId // Find the job by its ID
+            'id' => $request->jobId
         ])->first();
 
         if (!$job) {
@@ -412,12 +419,76 @@ class AccountController extends Controller
                 'status' => false,
                 'errors' => ['Job not found or you do not have permission to delete this job!']
             ]);
-            // abort(404); // Job not found or does not belong to the authenticated user
         }
 
-        //$job->delete(); 
-        Job::where('id', $request->jobId)->delete(); // Permanently delete the job from the database
+        Job::where('id', $request->jobId)->delete();
         session()->flash('success', 'Job deleted successfully!');
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
+
+    public function blockJob(Request $request)
+    {
+        if (Auth::user()->role !== 'employer') {
+            session()->flash('error', 'Only employers can block jobs.');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Only employers can block jobs.']
+            ]);
+        }
+
+        $job = Job::where([
+            'id' => $request->jobId,
+            'user_id' => Auth::id()
+        ])->first();
+
+        if (!$job) {
+            session()->flash('error', 'Job not found or you do not have permission to block this job!');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Job not found or you do not have permission to block this job!']
+            ]);
+        }
+
+        $job->status = 0;
+        $job->save();
+
+        session()->flash('success', 'Job blocked successfully!');
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
+
+    public function unblockJob(Request $request)
+    {
+        if (Auth::user()->role !== 'employer') {
+            session()->flash('error', 'Only employers can unblock jobs.');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Only employers can unblock jobs.']
+            ]);
+        }
+
+        $job = Job::where([
+            'id' => $request->jobId,
+            'user_id' => Auth::id()
+        ])->first();
+
+        if (!$job) {
+            session()->flash('error', 'Job not found or you do not have permission to unblock this job!');
+            return response()->json([
+                'status' => false,
+                'errors' => ['Job not found or you do not have permission to unblock this job!']
+            ]);
+        }
+
+        $job->status = 1;
+        $job->save();
+
+        session()->flash('success', 'Job unblocked successfully!');
 
         return response()->json([
             'status' => true

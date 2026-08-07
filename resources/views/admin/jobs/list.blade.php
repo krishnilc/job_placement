@@ -8,7 +8,7 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Jobs</li>
+                            <li class="breadcrumb-item active">Manage Jobs</li>
                         </ol>
                     </nav>
                 </div>
@@ -23,7 +23,7 @@
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h3 class="fs-4 mb-1">Jobs</h3>
+                                    <h3 class="fs-4 mb-1">Manage Jobs</h3>
                                 </div>
 
                             </div>
@@ -36,8 +36,8 @@
                                             <th scope="col">Date Created</th>
                                             <th scope="col">Closing Date</th>
                                             <th scope="col">Company</th>
-                                            <th scope="col">Status</th>
                                             <th scope="col">Created By</th>
+                                            <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -51,16 +51,17 @@
                                                         <p>Applicants: {{ $job->applications->count() }}</p>
                                                     </td>
                                                     <td>{{ $job->created_at->format('d-m-Y') }}</td>
-                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}</td>
+                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}
+                                                    </td>
                                                     <td>{{ $job->company_name }}</td>
+                                                    <td>{{ $job->user->name }}</td>
                                                     <td>
                                                         <span
                                                             class="badge bg-{{ $job->status == 1 ? 'success' : 'danger' }}">
                                                             {{ $job->status == 1 ? 'Active' : 'Blocked' }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ $job->user->name }}</td>
-                                                   
+
                                                     <td>
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
@@ -68,6 +69,10 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('jobDetail', $job->id) }}"> <i
+                                                                            class="fa fa-eye" aria-hidden="true"></i>
+                                                                        View</a></li>
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.jobs.edit', $job->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
@@ -79,7 +84,6 @@
                                                             </ul>
                                                         </div>
                                                     </td>
-
                                                 </tr>
                                             @endforeach
                                         @else

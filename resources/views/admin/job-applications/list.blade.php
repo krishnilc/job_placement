@@ -121,7 +121,7 @@
                                                     <td>{{ $application->applied_at->format('Y-m-d') }}</td>
 
                                                     <td>
-                                                        <div class="action-dots">
+                                                        <div class="action-dots float-end">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
                                                                 aria-expanded="false">
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
@@ -141,7 +141,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="8" class="text-center">No jobs found.</td>
+                                                <td colspan="8" class="text-center">No job applications found.</td>
                                             </tr>
                                         @endif
                                     </tbody>

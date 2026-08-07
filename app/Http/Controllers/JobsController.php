@@ -86,17 +86,21 @@ class JobsController extends Controller
 
       $count = 0; // Initialize the count variable to 0
 
+      $isOwner = false;
+
       if (Auth::user()){
          $count = SavedJob::where([
             'job_id' => $id, 
             'user_id' => Auth::id()
          ])->count(); // Check if the currently authenticated user has already saved the job by counting the number of saved job records that match the job ID and user ID
+
+         $isOwner = Auth::id() === $job->user_id;
       }
 
       //fetch applications count for the job
       $applications = JobApplication::where('job_id', $id)->with('user')->get(); //
      
-      return view('front.job_detail', ['job' => $job, 'count' => $count, 'applications' => $applications]); // Pass the job data and save count to the job detail view
+      return view('front.job_detail', ['job' => $job, 'count' => $count, 'applications' => $applications, 'isOwner' => $isOwner]); // Pass the job data and save count to the job detail view
    }
 
    public function applyJob(Request $request)
@@ -123,6 +127,15 @@ class JobsController extends Controller
          return response()->json([
             'status' => false,
             'message' => 'You cannot apply for your own job'
+         ]);
+      }
+
+      if (in_array(Auth::user()->role, ['admin', 'employer'])) {
+         session()->flash('error', 'Admins and employers cannot apply for jobs');
+
+         return response()->json([
+            'status' => false,
+            'message' => 'Admins and employers cannot apply for jobs'
          ]);
       }
 
@@ -299,6 +312,15 @@ class JobsController extends Controller
             'status' => false,
             'message' => 'You have already saved this job'
          ]); // Return a JSON response indicating that the user has already saved the job
+      }
+
+      if (in_array(Auth::user()->role, ['admin', 'employer'])) {
+         session()->flash('error', 'Admins and employers cannot save jobs');
+
+         return response()->json([
+            'status' => false,
+            'message' => 'Admins and employers cannot save jobs'
+         ]);
       }
 
       $savedJob = new SavedJob();

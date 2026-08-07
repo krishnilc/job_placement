@@ -13,14 +13,14 @@
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                             @endif
                             {{-- <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Home</a></li> --}}
-                            <li class="breadcrumb-item active">My Job Applications</li>
+                            <li class="breadcrumb-item active">My Jobs</li>
                         </ol>
                     </nav>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                  @if (auth()->user()->role == 'admin')
+                    @if (auth()->user()->role == 'admin')
                         @include('admin.sidebar')
                     @elseif (auth()->user()->role == 'employer')
                         @include('employer.sidebar')
@@ -63,8 +63,10 @@
                                                         </div>
                                                     </td>
                                                     <td>{{ $job->created_at->format('d M, Y') }}</td>
-                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d M, Y') : 'Not set' }}</td>
-                                                    <td>{{ $job->applications->count() }} Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
+                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d M, Y') : 'Not set' }}
+                                                    </td>
+                                                    <td>{{ $job->applications->count() }}
+                                                        Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">
                                                             {{ $job->status == 1 ? 'active' : 'inactive' }}
@@ -72,29 +74,48 @@
                                                     </td>
 
                                                     <td>
-                                                        <div class="action-dots float-end">
+                                                        <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
                                                                 aria-expanded="false">
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="{{ route('jobDetail', $job->id) }}"> <i
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('jobDetail', $job->id) }}"> <i
                                                                             class="fa fa-eye" aria-hidden="true"></i>
                                                                         View</a></li>
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('account.editJob', $job->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="#"
-                                                                        onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"
-                                                                            aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if (auth()->user()->role == 'admin')
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            onclick="deleteJob({{ $job->id }})"><i
+                                                                                class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @elseif (auth()->user()->role == 'employer')
+                                                                    @if ($job->status == 1)
+                                                                        <li><a class="dropdown-item" href="#"
+                                                                                onclick="blockJob({{ $job->id }})"><i
+                                                                                    class="fa fa-ban" aria-hidden="true"></i>
+                                                                                Block</a></li>
+                                                                    @else
+                                                                        <li><a class="dropdown-item" href="#"
+                                                                                onclick="unblockJob({{ $job->id }})"><i
+                                                                                    class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                                Unblock</a></li>
+                                                                    @endif
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             @endforeach
-                                        @endif
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">No jobs found.</td>
+                                            </tr>
+                                        @endif                                     
                                     </tbody>
                                 </table>
                             </div>
@@ -118,17 +139,62 @@
                     url: "{{ route('account.deleteJob') }}",
                     type: "POST",
                     dataType: "json",
-                    data: { jobId: jobId },
-
-                    success: function (response) {                       
-                        window.location.href = "{{ route('account.myJobs') }}"; // Redirect to the My Jobs page after deletion
+                    data: {
+                        jobId: jobId
                     },
 
-                    error: function (xhr, status, error) {
+                    success: function(response) {
+                        window.location.href =
+                        "{{ route('account.myJobs') }}"; // Redirect to the My Jobs page after deletion
+                    },
+
+                    error: function(xhr, status, error) {
                         alert('An error occurred while deleting the job. Please try again.');
                     }
                 });
             }
-        }            
+        }
+
+        function blockJob(jobId) {
+            if (confirm('Are you sure you want to block this job?')) {
+                $.ajax({
+                    url: "{{ route('account.blockJob') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        jobId: jobId
+                    },
+
+                    success: function(response) {
+                        window.location.href = "{{ route('account.myJobs') }}";
+                    },
+
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while blocking the job. Please try again.');
+                    }
+                });
+            }
+        }
+
+        function unblockJob(jobId) {
+            if (confirm('Are you sure you want to unblock this job?')) {
+                $.ajax({
+                    url: "{{ route('account.unblockJob') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        jobId: jobId
+                    },
+
+                    success: function(response) {
+                        window.location.href = "{{ route('account.myJobs') }}";
+                    },
+
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while unblocking the job. Please try again.');
+                    }
+                });
+            }
+        }
     </script>
 @endsection
