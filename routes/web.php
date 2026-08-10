@@ -52,7 +52,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
 });
 
 Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
-    Route::get('/home', [EmployerController::class, 'index'])->name('employer.dashboard');   
+    Route::get('/home', [EmployerController::class, 'index'])->name('employer.dashboard');
 });
 
 
@@ -67,8 +67,10 @@ Route::group(['prefix' => 'account'], function () {
 
     //Authenticated user routes
     Route::group(['middleware' => 'auth'], function () {
-        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('student.dashboard');       
-        Route::get('/profile', [AccountController::class, 'profile'])->name('account.profile');
+        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('student.dashboard');
+        Route::get('/edit-profile', [AccountController::class, 'profile'])->name('account.editProfile');
+        Route::get('/edit-password', [AccountController::class, 'editPassword'])->name('account.editPassword');
+        Route::post('/update-password', [AccountController::class, 'updatePassword'])->name('account.updatePassword');
         Route::put('/update-profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
         Route::get('/logout', [AccountController::class, 'logout'])->name('account.logout');
         Route::post('/update-profile-pic', [AccountController::class, 'updateProfilePic'])->name('account.updateProfilePic');
@@ -84,6 +86,5 @@ Route::group(['prefix' => 'account'], function () {
         Route::post('/remove-job-application', [AccountController::class, 'removeJobApplication'])->name('account.removeJobApplication');
         Route::get('/saved-jobs', [AccountController::class, 'savedJobs'])->name('account.savedJobs');
         Route::post('/remove-saved-job', [AccountController::class, 'removeSavedJob'])->name('account.removeSavedJob');
-        Route::post('/update-password', [AccountController::class, 'updatePassword'])->name('account.updatePassword');
     });
 });

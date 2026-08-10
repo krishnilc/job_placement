@@ -11,11 +11,10 @@
         <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
         <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
         <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->role }}</p>
-        @if (request()->routeIs('account.profile'))
+        @if (request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
             <div class="d-flex justify-content-center mb-2">
                 <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                    class="btn btn-primary">Change
-                    Profile Picture</button>
+                    class="btn btn-primary">Change Profile Picture</button>
             </div>
         @endif
     </div>
@@ -23,23 +22,33 @@
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
-                    <a href="{{ route('account.createJob') }}">
-                        <i class="fa fa-arrow-right"></i> Create Job
+            @if (request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('account.editProfile') }}"> <i class="fa fa-arrow-right"></i> My Profile
+                        Update</a>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
+                </li>
+            @else
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
+                        <a href="{{ route('account.createJob') }}">
+                            <i class="fa fa-arrow-right"></i> Create Job
+                        </a>
+                    @endif
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('account.myJobs') }}">
+                        <i class="fa fa-arrow-right"></i> My Jobs
                     </a>
-                @endif
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('account.myJobs') }}">
-                    <i class="fa fa-arrow-right"></i> My Jobs
-                </a>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                <a href="{{ route('admin.jobApplications') }}">
-                    <i class="fa fa-arrow-right"></i> Review Applications
-                </a>
-            </li>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('admin.jobApplications') }}">
+                        <i class="fa fa-arrow-right"></i> Review Applications
+                    </a>
+                </li>
+            @endif
         </ul>
     </div>
 </div>

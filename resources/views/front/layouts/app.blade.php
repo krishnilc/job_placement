@@ -17,9 +17,23 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}" />
     <style>
         /* Keep navbar fixed at top and prevent content overlap */
-        .navbar.fixed-top { position: fixed; top: 0; left: 0; right: 0; z-index: 1030; }
-        body { padding-top: 80px; }
-        @media (max-width: 576px) { body { padding-top: 110px; } }
+        .navbar.fixed-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+
+        body {
+            padding-top: 80px;
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding-top: 110px;
+            }
+        }
     </style>
     <!-- Fav Icon -->
     <link rel="shortcut icon" type="image/x-icon" href="#" />
@@ -47,13 +61,13 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
-                        </li>                       
+                        </li>
                     </ul>
-                
+
                     @if (Auth::check())
                         <div class="dropdown ms-lg-3">
-                            <button class="btn btn-primary dropdown-toggle px-4 py-2 fw-semibold rounded-pill" type="button"
-                                id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-primary dropdown-toggle px-4 py-2 fw-semibold rounded-pill"
+                                type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ Auth::user()->name ?? 'Account' }}
                             </button>
 
@@ -74,18 +88,25 @@
                                     </li>
                                 @endif
 
-                                 @if (Auth::user()->role == 'student')
+                                @if (Auth::user()->role == 'student')
                                     <li>
                                         <a class="dropdown-item py-2" href="{{ route('student.dashboard') }}">
                                             Student Dashboard
                                         </a>
                                     </li>
                                 @endif
-                              
+
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-
+                                <li>
+                                    <a class="dropdown-item py-2" href="{{ route('account.editProfile') }}">
+                                        Account Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li>
                                     <a class="dropdown-item py-2 text-danger" href="{{ route('account.logout') }}">
                                         Logout
@@ -94,7 +115,8 @@
                             </ul>
                         </div>
                     @else
-                        <a class="btn btn-primary px-4 py-2 fw-semibold rounded-pill" href="{{ route('account.login') }}">
+                        <a class="btn btn-primary px-4 py-2 fw-semibold rounded-pill"
+                            href="{{ route('account.login') }}">
                             Login
                         </a>
 
@@ -153,7 +175,8 @@
                     <a class="text-white d-block" href="{{ route('front.contact') }}">Contact Us</a>
                 </div>
             </div> -->
-            <p class="text-center text-white pt-3 fw-bold fs-6 mb-0">© 2026 Fiji National University, all right reserved</p>
+            <p class="text-center text-white pt-3 fw-bold fs-6 mb-0">© 2026 Fiji National University, all right
+                reserved</p>
         </div>
     </footer>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
@@ -175,7 +198,7 @@
             }
         });
 
-        $('#profilePicForm').submit(function (e) {
+        $('#profilePicForm').submit(function(e) {
             e.preventDefault();
             var formData = new FormData(this);
 
@@ -187,7 +210,7 @@
                 contentType: false,
                 processData: false,
 
-                success: function (response) {
+                success: function(response) {
                     if (response.status == false) {
                         var errors = response.errors;
 

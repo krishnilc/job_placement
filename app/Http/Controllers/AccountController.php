@@ -28,7 +28,7 @@ class AccountController extends Controller
         $savedJobsCount = SavedJob::where('user_id', Auth::user()->id)->count();
 
         // Total applications submitted by logged-in user
-        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count(); 
+        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count();
 
         // Available jobs count (exclude already applied jobs)
         $availableJobs = max(0, $totalJobs - $appliedJobsCount);
@@ -37,7 +37,7 @@ class AccountController extends Controller
         $latestJobs = Job::where('status', 1)
             ->whereDoesntHave('applications', function ($query) {
                 $query->where('user_id', Auth::user()->id);
-            }) 
+            })
             ->with(['jobType'])
             ->orderBy('created_at', 'desc')
             ->take(6)
@@ -52,7 +52,7 @@ class AccountController extends Controller
         ]);
     }
 
-   
+
     //This method will show user registration form
     public function registration()
     {
@@ -154,7 +154,7 @@ class AccountController extends Controller
         $user = User::find($id);
         //dd($user); // Debugging statement to check if the user data is being retrieved correctly
 
-        return view('front.account.profile', [
+        return view('front.account.edit-profile', [
             'user' => $user
         ]);
     }
@@ -560,6 +560,12 @@ class AccountController extends Controller
         return response()->json([
             'status' => true
         ]);
+    }
+
+    // This method will handle the password update request
+    public function editPassword()
+    {
+        return view('front.account.edit-password');
     }
 
     public function updatePassword(Request $request)

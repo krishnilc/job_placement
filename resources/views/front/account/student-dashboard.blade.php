@@ -40,7 +40,7 @@
                                                 Saved Jobs
                                             </a>
 
-                                            <a href="{{ route('account.profile') }}"
+                                            <a href="{{ route('account.editProfile') }}"
                                                 class="btn btn-outline-dark px-4 py-2 rounded-pill">
                                                 My Profile
                                             </a>
