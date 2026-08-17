@@ -55,12 +55,31 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                @php
+                                    $isClosed = false;
+                                    if (!empty($job->closing_date)) {
+                                        $isClosed = \Carbon\Carbon::parse($job->closing_date)->lt(\Carbon\Carbon::today());
+                                    }
+                                @endphp
                                 @if (Auth::check() && !$isOwner && !in_array(Auth::user()->role, ['admin', 'employer']))
-                                    <div class="jobs_right">
-                                        <div class="apply_now {{ $count == 1 ? 'saved-job' : '' }}">
-                                            <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i
-                                                    class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                    @php
+                                        $myApplication = $applications->firstWhere('user_id', Auth::id()) ?? null;
+                                        $isSaved = isset($count) && $count == 1;
+                                    @endphp
+                                    <div class="jobs_right text-end">
+                                        <div class="apply_now {{ $isSaved ? 'saved-job' : '' }}">
+                                            @if($isSaved)
+                                                <span class="badge bg-info">You saved this job</span>
+                                            @else
+                                                <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                            @endif
                                         </div>
+                                        @if($myApplication)
+                                            <div class="mt-1"><span class="badge bg-success">You applied on {{ optional($myApplication->applied_at)->format('d M, Y') }}</span></div>
+                                        @elseif($isClosed)
+                                            <div class="mt-1"><span class="badge bg-danger">Applications closed</span></div>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -89,157 +108,36 @@
 
                             <div class="border-bottom"></div>
                             @if (!$isOwner && !in_array(Auth::user()->role ?? null, ['admin', 'employer']))
+                                
+
                                 <div class="pt-3 text-end">
                                     @if (Auth::check())
-                                        <a href="#" onclick="saveJob({{ $job->id }})"
-                                            class="btn btn-secondary">Save</a>
+                                        @if($isSaved)
+                                            <button class="btn btn-secondary" disabled>Saved</button>
+                                        @else
+                                            <a href="#" onclick="saveJob({{ $job->id }})" class="btn btn-secondary">Save</a>
+                                        @endif
                                     @else
                                         <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
                                     @endif
-                                    <!-- apply if user is logged in -->
-                                    @if (Auth::check())
-                                        <a href="#" class="btn btn-primary"
-                                            onclick="openApplyModal({{ $job->id }})">Apply</a>
+                                    <!-- apply if user is logged in or closed -->
+                                    @if(!empty($isClosed) && $isClosed)
+                                        <button class="btn btn-danger" disabled>Closed</button>
                                     @else
-                                        <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
+                                        @if (Auth::check())
+                                            @if ($myApplication)
+                                                <button class="btn btn-success" disabled>Applied</button>
+                                            @else
+                                                <a href="#" class="btn btn-primary" onclick="openApplyModal({{ $job->id }})">Apply</a>
+                                            @endif
+                                        @else
+                                            <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
+                                        @endif
                                     @endif
                                 </div>
                             @endif
                         </div>
                     </div>
-                    {{-- @if (Auth::user() && Auth::user()->id == $job->user_id)
-                        <div class="card shadow border-0 mt-4">
-                            <div class="job_details_header">
-                                <div class="single_jobs white-bg d-flex justify-content-between">
-                                    <div class="jobs_left d-flex align-items-center">
-
-                                        <div class="jobs_conetent">
-                                            <h4>Applicants</h4>
-                                        </div>
-                                    </div>
-                                    <div class="jobs_right"> </div>
-                                </div>
-                            </div>
-
-                            <div class="descript_wrap white-bg">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Mobile</th>
-                                            <th>Application</th>
-                                            <th>Resume</th>
-                                            <th>Certificates</th>
-                                            <th>Applied Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if ($applications->isNotEmpty())
-                                            @foreach ($applications as $application)
-                                                <tr>
-                                                    <td>{{ $application->user->name }}</td>
-                                                    <td>{{ $application->user->email }}</td>
-                                                    <td>{{ $application->user->mobile ?? 'N/A' }}</td>
-                                                    <td>
-                                                        @if (!empty($application->application_file))
-                                                            @php
-                                                                $path = $application->application_file;
-                                                                $disk = Storage::disk('applications')->exists($path)
-                                                                    ? 'applications'
-                                                                    : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                $size = 0;
-                                                                try {
-                                                                    $size = Storage::disk($disk)->size($path);
-                                                                } catch (Exception $e) {
-                                                                    $size = 0;
-                                                                }
-                                                                if ($size >= 1048576) {
-                                                                    $sizeText = round($size / 1048576, 2) . ' MB';
-                                                                } elseif ($size >= 1024) {
-                                                                    $sizeText = round($size / 1024, 2) . ' KB';
-                                                                } else {
-                                                                    $sizeText = $size . ' B';
-                                                                }
-                                                            @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" target="_blank" download>
-                                                                <i class="fa fa-file" aria-hidden="true"></i> {{ $ext }} ({{ $sizeText }})
-                                                            </a>
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!empty($application->resume_file))
-                                                            @php
-                                                                $path = $application->resume_file;
-                                                                $disk = Storage::disk('applications')->exists($path)
-                                                                    ? 'applications'
-                                                                    : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                $size = 0;
-                                                                try {
-                                                                    $size = Storage::disk($disk)->size($path);
-                                                                } catch (Exception $e) {
-                                                                    $size = 0;
-                                                                }
-                                                                if ($size >= 1048576) {
-                                                                    $sizeText = round($size / 1048576, 2) . ' MB';
-                                                                } elseif ($size >= 1024) {
-                                                                    $sizeText = round($size / 1024, 2) . ' KB';
-                                                                } else {
-                                                                    $sizeText = $size . ' B';
-                                                                }
-                                                            @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" target="_blank" download>
-                                                                <i class="fa fa-file" aria-hidden="true"></i> {{ $ext }} ({{ $sizeText }})
-                                                            </a>
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!empty($application->certificates_file))
-                                                            @php $certs = json_decode($application->certificates_file, true) ?? []; @endphp
-                                                            @if (!empty($certs))
-                                                                @foreach ($certs as $cert)
-                                                                    @php
-                                                                        $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
-                                                                        $disk = Storage::disk('applications')->exists($cert)
-                                                                            ? 'applications'
-                                                                            : (Storage::disk('public')->exists($cert) ? 'public' : 'applications');
-                                                                        $certSize = 0;
-                                                                        try { $certSize = Storage::disk($disk)->size($cert); } catch (Exception $e) { $certSize = 0; }
-                                                                        if ($certSize >= 1048576) { $certSizeText = round($certSize / 1048576, 2) . ' MB'; }
-                                                                        elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
-                                                                        else { $certSizeText = $certSize . ' B'; }
-                                                                    @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" target="_blank" download>
-                                                                        <i class="fa fa-file" aria-hidden="true"></i> {{ $certExt }} ({{ $certSizeText }})
-                                                                    </a>@if (!$loop->last), @endif
-                                                                @endforeach
-                                                            @else
-                                                                N/A
-                                                            @endif
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ optional($application->applied_at)->format('d M, Y') }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td colspan="7" class="text-center">No applicants found.</td>
-                                            </tr>
-                                        @endif
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    @endif --}}
                 </div>
                 <div class="col-md-4">
                     <div class="card shadow border-0">
@@ -327,8 +225,14 @@
 @endsection
 
 @section('customJS')
-    <script type="text/javascript">
+        <script type="text/javascript">
         function openApplyModal(jobId) {
+            var jobIsClosed = {{ json_encode($isClosed ?? false) }};
+            if (jobIsClosed) {
+                let alertBox = `<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">Applications are closed for this job.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                $(".col-md-8").prepend(alertBox);
+                return;
+            }
             $('#applyJobId').val(jobId);
             $('#applyModal').modal('show');
         }

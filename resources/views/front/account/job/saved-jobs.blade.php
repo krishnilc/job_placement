@@ -15,7 +15,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                    @include('front.account.sidebar')
+                    @include('front.account.student-sidebar')
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
@@ -36,6 +36,7 @@
                                             <!-- <th scope="col">Saved Date</th> -->
                                             <th scope="col">Employer</th>
                                             <th scope="col">Applicants</th>
+                                            <th scope="col">Closing Date</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -47,8 +48,8 @@
                                                 @php $hasSavedJobs = true; @endphp
                                                 <tr class="active">
                                                     <td>
-                                                        <div class="job-name fw-500">{{ $savedJob->job->title }}</div>
-                                                        <div class="info1">{{ $savedJob->job->jobType->name }}.
+                                                        <div class="info1 job-name fw-500">{{ $savedJob->job->title }}</div>
+                                                        <div class="">{{ $savedJob->job->jobType->name }}.
                                                             {{ $savedJob->job->location }}
                                                         </div>
                                                     </td>
@@ -58,7 +59,8 @@
                                                         </div>
                                                     </td>
                                                     <!-- <td>{{ $savedJob->created_at->format('d M, Y') }}</td> -->
-                                                    <td>{{ $savedJob->job->applications->count() }} Applications</td>
+                                                    <td>{{ $savedJob->job->applications->count() }} </td>
+                                                    <td>{{ !empty($savedJob->job->closing_date) ? \Carbon\Carbon::parse($savedJob->job->closing_date)->format('d M, Y') : 'Not set' }}</td>
                                                     <td>
                                                         <div class="job-status text-capitalize">
                                                             {{ $savedJob->job->status == 1 ? 'active' : 'inactive' }}
