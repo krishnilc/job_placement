@@ -164,10 +164,15 @@ class AccountController extends Controller
         $id = Auth::user()->id;
 
         // Validation rules for profile update
+        $role = Auth::user()->role;
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:5|max:20',
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
             'mobile' => 'required|digits:7',
+            'designation' => in_array($role, ['admin', 'employer'], true)
+                ? 'required|string|max:100'
+                : 'required|in:Full-time Student,Part-time Student,Alumni',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
         ]);

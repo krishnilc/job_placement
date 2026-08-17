@@ -50,58 +50,43 @@
                                                             {{ $jobApplication->job->location }}
                                                         </div>
                                                         @if(!empty($jobApplication->application_file) || !empty($jobApplication->resume_file) || !empty($jobApplication->certificates_file))
-                                                            <div class="mt-2 small">
+                                                            <div class="mt-2 d-flex flex-column gap-2 small">
                                                                 @if(!empty($jobApplication->application_file))
                                                                     @php
                                                                         $path = $jobApplication->application_file;
-                                                                        $disk = Storage::disk('applications')->exists($path)
-                                                                            ? 'applications'
-                                                                            : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                        $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                        $size = 0;
-                                                                        try { $size = Storage::disk($disk)->size($path); } catch (Exception $e) { $size = 0; }
-                                                                        if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
-                                                                        elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
-                                                                        else { $sizeText = $size . ' B'; }
+                                                                        $fileLabel = $jobApplication->application_file_label ?? basename($path);
                                                                     @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'application']) }}" download class="me-2"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'application']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                        <i class="fa fa-file text-primary"></i>
+                                                                        <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                    </a>
                                                                 @endif
 
                                                                 @if(!empty($jobApplication->resume_file))
                                                                     @php
                                                                         $path = $jobApplication->resume_file;
-                                                                        $disk = Storage::disk('applications')->exists($path)
-                                                                            ? 'applications'
-                                                                            : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                        $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                        $size = 0;
-                                                                        try { $size = Storage::disk($disk)->size($path); } catch (Exception $e) { $size = 0; }
-                                                                        if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
-                                                                        elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
-                                                                        else { $sizeText = $size . ' B'; }
+                                                                        $fileLabel = $jobApplication->resume_file_label ?? basename($path);
                                                                     @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'resume']) }}" download class="me-2"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'resume']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                        <i class="fa fa-file text-info"></i>
+                                                                        <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                    </a>
                                                                 @endif
 
                                                                 @if(!empty($jobApplication->certificates_file))
-                                                                    @php $certs = json_decode($jobApplication->certificates_file, true) ?? []; @endphp
+                                                                    @php $certs = json_decode($jobApplication->certificates_file, true) ?? []; $certLabels = $jobApplication->certificate_file_labels; @endphp
                                                                     @if(!empty($certs))
                                                                         @foreach($certs as $cert)
                                                                             @php
-                                                                                $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
-                                                                                $disk = Storage::disk('applications')->exists($cert)
-                                                                                    ? 'applications'
-                                                                                    : (Storage::disk('public')->exists($cert) ? 'public' : 'applications');
-                                                                                $certSize = 0;
-                                                                                try { $certSize = Storage::disk($disk)->size($cert); } catch (Exception $e) { $certSize = 0; }
-                                                                                if ($certSize >= 1048576) { $certSizeText = round($certSize / 1048576, 2) . ' MB'; }
-                                                                                elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
-                                                                                else { $certSizeText = $certSize . ' B'; }
+                                                                                $certLabel = $certLabels[$loop->index] ?? basename($cert);
                                                                             @endphp
-                                                                            <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download class="me-2"><i class="fa fa-file"></i> {{ $certExt }} ({{ $certSizeText }})</a>@if(!$loop->last), @endif
+                                                                            <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                                <i class="fa fa-file text-warning"></i>
+                                                                                <span class="text-truncate">{{ $certLabel }}</span>
+                                                                            </a>
                                                                         @endforeach
                                                                     @else
-                                                                        <span>N/A</span>
+                                                                        <span class="text-muted">N/A</span>
                                                                     @endif
                                                                 @endif
                                                             </div>

@@ -55,13 +55,26 @@
                                         value="{{ $user->mobile }}">
                                     <p class="text-danger" id="mobileError"></p>
                                 </div>
-                                <!-- <div class="mb-4">
+
+                                @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
+                                    <div class="mb-4">
                                         <label for="designation" class="mb-2">Designation*</label>
                                         <input type="text" name="designation" id="designation" class="form-control"
-                                            value="{{ $user->designation }}">
+                                            value="{{ $user->designation }}" placeholder="e.g. CEO, Manager, HR Specialist">
                                         <p class="text-danger" id="designationError"></p>
-                                    </div> -->
-
+                                    </div>
+                                @elseif (auth()->user()->role === 'student')
+                                    <div class="mb-4">
+                                        <label for="designation" class="mb-2">Student Status*</label>
+                                        <select name="designation" id="designation" class="form-control">
+                                            <option value="">Select your status</option>
+                                            <option value="Full-time Student" {{ $user->designation == 'Full-time Student' ? 'selected' : '' }}>Full-time Student</option>
+                                            <option value="Part-time Student" {{ $user->designation == 'Part-time Student' ? 'selected' : '' }}>Part-time Student</option>
+                                            <option value="Alumni" {{ $user->designation == 'Alumni' ? 'selected' : '' }}>Alumni</option>
+                                        </select>
+                                        <p class="text-danger" id="designationError"></p>
+                                    </div>
+                                @endif
 
                             </div>
                             <div class="card-footer  p-4">

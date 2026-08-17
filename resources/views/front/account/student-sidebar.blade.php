@@ -9,6 +9,7 @@
         @endif
 
         <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
+         <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
         <p class="text-muted mb-1 fs-6">Student Id: {{ Auth::user()->student_id }}</p>
         @if (request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
             <div class="d-flex justify-content-center mb-2">

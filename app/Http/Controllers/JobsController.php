@@ -176,29 +176,36 @@ class JobsController extends Controller
 
       // Store single application file
       if ($request->hasFile('application')) {
-         $fileName = 'application_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $request->file('application')->getClientOriginalExtension();
-         $path = $request->file('application')->storeAs('', $fileName, 'applications');
+         $file = $request->file('application');
+         $fileName = 'application_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+         $path = $file->storeAs('', $fileName, 'applications');
          $application->application_file = $path;
+         $application->application_file_name = $file->getClientOriginalName();
       }
 
       // Store resume
       if ($request->hasFile('resume')) {
-         $fileName = 'resume_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $request->file('resume')->getClientOriginalExtension();
-         $path = $request->file('resume')->storeAs('', $fileName, 'applications');
+         $file = $request->file('resume');
+         $fileName = 'resume_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+         $path = $file->storeAs('', $fileName, 'applications');
          $application->resume_file = $path;
+         $application->resume_file_name = $file->getClientOriginalName();
       }
 
       // Store certificates (allow multiple)
       $certificatePaths = [];
+      $certificateNames = [];
       if ($request->hasFile('certificates')) {
          foreach ($request->file('certificates') as $file) {
             $fileName = 'certificate_' . Auth::user()->id . '_' . $id . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $certificatePaths[] = $file->storeAs('', $fileName, 'applications');
+            $certificateNames[] = $file->getClientOriginalName();
          }
       }
 
       if (!empty($certificatePaths)) {
          $application->certificates_file = json_encode($certificatePaths);
+         $application->certificates_file_names = json_encode($certificateNames);
       }
 
       $application->save(); // Save the application to the database

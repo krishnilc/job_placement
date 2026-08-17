@@ -59,17 +59,12 @@
                                                         @if(!empty($application->application_file))
                                                             @php
                                                                 $path = $application->application_file;
-                                                                $disk = Storage::disk('applications')->exists($path)
-                                                                    ? 'applications'
-                                                                    : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                $size = 0;
-                                                                try { $size = Storage::disk($disk)->size($path); } catch (Exception $e) { $size = 0; }
-                                                                if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
-                                                                elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
-                                                                else { $sizeText = $size . ' B'; }
+                                                                $fileLabel = $application->application_file_label ?? basename($path);
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" download="application-{{ $application->id }}.{{ strtolower(pathinfo($path, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" download="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                <i class="fa fa-file bg-primary"></i>
+                                                                <span class="text-truncate">{{ $fileLabel }}</span>
+                                                            </a>
                                                         @else
                                                             N/A
                                                         @endif
@@ -78,39 +73,31 @@
                                                         @if(!empty($application->resume_file))
                                                             @php
                                                                 $path = $application->resume_file;
-                                                                $disk = Storage::disk('applications')->exists($path)
-                                                                    ? 'applications'
-                                                                    : (Storage::disk('public')->exists($path) ? 'public' : 'applications');
-                                                                $ext = strtoupper(pathinfo($path, PATHINFO_EXTENSION));
-                                                                $size = 0;
-                                                                try { $size = Storage::disk($disk)->size($path); } catch (Exception $e) { $size = 0; }
-                                                                if ($size >= 1048576) { $sizeText = round($size / 1048576, 2) . ' MB'; }
-                                                                elseif ($size >= 1024) { $sizeText = round($size / 1024, 2) . ' KB'; }
-                                                                else { $sizeText = $size . ' B'; }
+                                                                $fileLabel = $application->resume_file_label ?? basename($path);
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" download="resume-{{ $application->id }}.{{ strtolower(pathinfo($path, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $ext }} ({{ $sizeText }})</a>
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" download="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                <i class="fa fa-file text-success"></i>
+                                                                <span class="text-truncate">{{ $fileLabel }}</span>
+                                                            </a>
                                                         @else
                                                             N/A
                                                         @endif
                                                     </td>
                                                     <td>
                                                         @if(!empty($application->certificates_file))
-                                                            @php $certs = json_decode($application->certificates_file, true) ?? []; @endphp
+                                                            @php $certs = json_decode($application->certificates_file, true) ?? []; $certLabels = $application->certificate_file_labels; @endphp
                                                             @if(!empty($certs))
-                                                                @foreach($certs as $cert)
-                                                                    @php
-                                                                        $certExt = strtoupper(pathinfo($cert, PATHINFO_EXTENSION));
-                                                                        $disk = Storage::disk('applications')->exists($cert)
-                                                                            ? 'applications'
-                                                                            : (Storage::disk('public')->exists($cert) ? 'public' : 'applications');
-                                                                        $certSize = 0;
-                                                                        try { $certSize = Storage::disk($disk)->size($cert); } catch (Exception $e) { $certSize = 0; }
-                                                                        if ($certSize >= 1048576) { $certSizeText = round($certSize / 1048576, 2) . ' MB'; }
-                                                                        elseif ($certSize >= 1024) { $certSizeText = round($certSize / 1024, 2) . ' KB'; }
-                                                                        else { $certSizeText = $certSize . ' B'; }
-                                                                    @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="certificate-{{ $application->id }}-{{ $loop->index }}.{{ strtolower(pathinfo($cert, PATHINFO_EXTENSION)) }}"><i class="fa fa-file"></i> {{ $certExt }} ({{ $certSizeText }})</a>@if(!$loop->last), @endif
-                                                                @endforeach
+                                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                                    @foreach($certs as $cert)
+                                                                        @php
+                                                                            $certLabel = $certLabels[$loop->index] ?? basename($cert);
+                                                                        @endphp
+                                                                        <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                            <i class="fa fa-file text-warning"></i>
+                                                                            <span class="text-truncate">{{ $certLabel }}</span>
+                                                                        </a>
+                                                                    @endforeach
+                                                                </div>
                                                             @else
                                                                 N/A
                                                             @endif
