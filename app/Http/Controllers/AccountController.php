@@ -283,6 +283,7 @@ class AccountController extends Controller
             'description' => 'required',
             'company_name' => 'required|min:3|max:75',
             'closing_date' => 'nullable|date',
+            'experience' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -306,10 +307,15 @@ class AccountController extends Controller
             $job->company_name = $request->company_name;
             $job->company_location = $request->company_location;
             $job->company_website = $request->company_website;
+            $job->status = Auth::user()->role === 'employer' ? 0 : 1;
 
             $job->save();
 
-            session()->flash('success', 'Job created successfully!');
+            $message = Auth::user()->role === 'employer'
+                ? 'Job submitted successfully and is awaiting admin approval.'
+                : 'Job created successfully!';
+
+            session()->flash('success', $message);
             return response()->json([
                 'status' => true,
                 'errors' => []

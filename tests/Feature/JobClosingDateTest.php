@@ -32,9 +32,11 @@ class JobClosingDateTest extends TestCase
             'description' => 'Build great products.',
             'company_name' => 'Acme Tech',
             'closing_date' => '2026-09-15',
+            'experience' => '5',
         ]);
         $request->setUserResolver(fn () => $user);
         Auth::shouldReceive('id')->andReturn($user->id);
+        Auth::shouldReceive('user')->andReturn($user);
 
         $response = $controller->saveJob($request);
 
@@ -44,5 +46,37 @@ class JobClosingDateTest extends TestCase
 
         $this->assertNotNull($job);
         $this->assertSame('2026-09-15', $job->closing_date);
+    }
+
+    public function test_employer_job_requires_admin_approval_before_public_visibility(): void
+    {
+        $user = User::factory()->create(['role' => 'employer']);
+        $category = Category::factory()->create();
+        $jobType = JobType::factory()->create();
+
+        $controller = new AccountController();
+        $request = Request::create(route('account.saveJob'), 'POST', [
+            'title' => 'Junior PHP Developer',
+            'category' => $category->id,
+            'job_type' => $jobType->id,
+            'vacancy' => 1,
+            'location' => 'Remote',
+            'description' => 'Build APIs and features.',
+            'company_name' => 'BrightWork Ltd',
+            'experience' => '2',
+        ]);
+        $request->setUserResolver(fn () => $user);
+        Auth::shouldReceive('id')->andReturn($user->id);
+        Auth::shouldReceive('user')->andReturn($user);
+
+        $response = $controller->saveJob($request);
+
+        $this->assertTrue($response->getData()->status);
+
+        $job = Job::latest()->first();
+
+        $this->assertNotNull($job);
+        $this->assertSame(0, $job->status);
+        $this->assertSame(0, Job::where('status', 1)->count());
     }
 }
