@@ -23,7 +23,7 @@ class JobsController extends Controller
       $categories = Category::where('status', 1)->get(); // Retrieve active categories to display in the jobs listing page
       $jobTypes = JobType::where('status', 1)->get(); // Retrieve active job types to display in the jobs listing page
 
-      $jobs = Job::where('status', 1); // Start building the query to retrieve active jobs
+      $jobs = Job::where('status', 1); // Only active jobs are public
 
       //Search using keywords
       if (!empty($request->keywords)) {
@@ -78,15 +78,20 @@ class JobsController extends Controller
    //this method will show job detail page
    public function detail($id)
    {
-      $job = Job::where(['id' => $id, 'status' => 1])->with(['jobType', 'category'])->first(); // Retrieve the job with the specified ID and ensure it is active, along with its associated job type and category
+      $job = Job::with(['jobType', 'category'])->find($id);
 
       if (!$job) {
          abort(404);
       }
 
-      $count = 0; // Initialize the count variable to 0
+      $isOwner = Auth::check() && Auth::id() === $job->user_id;
+      $isAdmin = Auth::check() && Auth::user()->role === 'admin';
 
-      $isOwner = false;
+      if ($job->status !== 1 && !$isOwner && !$isAdmin) {
+         abort(404);
+      }
+
+      $count = 0; // Initialize the count variable to 0
 
       if (Auth::user()){
          $count = SavedJob::where([
@@ -107,7 +112,7 @@ class JobsController extends Controller
    {
       $id = $request->job_id; // Get the job ID from the request input
 
-      $job = Job::where('id', $id)->where('status', 1)->first(); // Retrieve the job with the specified ID and ensure it is active
+      $job = Job::where('id', $id)->where('status', 1)->first(); // Retrieve only active jobs
 
       if ($job == null) {
          session()->flash('error', 'Job not found'); // Flash an error message to the session if the job is not found
@@ -295,7 +300,7 @@ class JobsController extends Controller
    public function saveJob(Request $request)
    {
       $id = $request->id; // Get the job ID from the request input
-      $job = Job::find($id); // Retrieve the job with the specified ID
+      $job = Job::where(['id' => $id, 'status' => 1])->first(); // Only public jobs can be saved
 
       if ($job == null) {
          session()->flash('error', 'Job not found'); // Flash an error message to the session if the job is not found

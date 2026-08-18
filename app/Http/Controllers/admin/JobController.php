@@ -12,12 +12,40 @@ use session;
 
 class JobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = Job::orderBy('created_at', 'desc')->with('user', 'applications')->paginate(10);
+        $sortableColumns = [
+            'id' => 'jobs.id',
+            'title' => 'jobs.title',
+            'created_at' => 'jobs.created_at',
+            'closing_date' => 'jobs.closing_date',
+            'company_name' => 'jobs.company_name',
+            'created_by' => 'users.name',
+            'status' => 'jobs.status',
+            'featured' => 'jobs.isFeatured',
+        ];
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        if (!array_key_exists($sort, $sortableColumns)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $jobs = Job::select('jobs.*')
+            ->leftJoin('users', 'users.id', '=', 'jobs.user_id')
+            ->with('user', 'applications')
+            ->orderBy($sortableColumns[$sort], $direction)
+            ->paginate(10)
+            ->withQueryString();
 
         return view('admin.jobs.list', [
-            'jobs' => $jobs
+            'jobs' => $jobs,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -45,6 +73,7 @@ class JobController extends Controller
             'description' => 'required',
             'company_name' => 'required|min:3|max:75',
             'closing_date' => 'nullable|date',
+            'job_status' => 'required|in:pending,active,blocked',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -68,7 +97,11 @@ class JobController extends Controller
             $job->company_location = $request->company_location;
             $job->company_website = $request->company_website;
             $job->isFeatured = $request->has('isFeatured') ? 1 : 0;
-            $job->status = $request->status;
+            $job->status = match ($request->job_status) {
+                'pending' => 0,
+                'active' => 1,
+                'blocked' => 2,
+            };
 
             $job->save();
 

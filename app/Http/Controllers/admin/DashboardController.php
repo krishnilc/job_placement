@@ -15,6 +15,9 @@ class DashboardController extends Controller
         // Get statistics
         $totalUsers = User::count();
         $totalJobs = Job::count();
+        $pendingJobs = Job::where('status', 0)->count();
+        $blockedJobs = Job::where('status', 2)->count();
+        $featuredJobs = Job::where('isFeatured', 1)->count();
         $totalApplications = JobApplication::count();
         $pendingApplications = JobApplication::whereNull('status')->count();
         
@@ -35,6 +38,9 @@ class DashboardController extends Controller
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'totalJobs' => $totalJobs,
+            'pendingJobs' => $pendingJobs,
+            'blockedJobs' => $blockedJobs,
+            'featuredJobs' => $featuredJobs,
             'totalApplications' => $totalApplications,
             'pendingApplications' => $pendingApplications,
             'recentApplications' => $recentApplications,

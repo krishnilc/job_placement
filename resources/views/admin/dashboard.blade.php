@@ -19,25 +19,9 @@
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
-                    
+
                     <!-- Statistics Cards -->
                     <div class="row mb-4">
-                        <!-- Total Users Card -->
-                        <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="card border-0 shadow h-100">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h7 class="text-muted mb-1">Total Users</h7>
-                                            <h2 class="text-primary mb-0">{{ $totalUsers }}</h2>
-                                        </div>
-                                        <div class="text-primary" style="font-size: 2rem;">
-                                            <i class="fa fa-users"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Total Jobs Card -->
                         <div class="col-md-6 col-lg-3 mb-3">
@@ -50,6 +34,74 @@
                                         </div>
                                         <div class="text-success" style="font-size: 2rem;">
                                             <i class="fa fa-briefcase"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- Approval Pending Jobs Card -->
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h7 class="text-muted mb-1">Approval Pending </h7>
+                                            <h2 class="text-warning mb-0">{{ $pendingJobs }}</h2>
+                                        </div>
+                                        <div class="text-warning" style="font-size: 2rem;">
+                                            <i class="fa fa-hourglass-half"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Featured Jobs Card -->
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h7 class="text-muted mb-1">Featured Jobs</h7>
+                                            <h2 class="text-primary mb-0">{{ $featuredJobs }}</h2>
+                                        </div>
+                                        <div class="text-primary" style="font-size: 2rem;">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Blocked Jobs Card -->
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h7 class="text-muted mb-1">Blocked Jobs</h7>
+                                            <h2 class="text-danger mb-0">{{ $blockedJobs }}</h2>
+                                        </div>
+                                        <div class="text-danger" style="font-size: 2rem;">
+                                            <i class="fa fa-ban"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Users Card -->
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h7 class="text-muted mb-1">Total Users</h7>
+                                            <h2 class="text-primary mb-0">{{ $totalUsers }}</h2>
+                                        </div>
+                                        <div class="text-primary" style="font-size: 2rem;">
+                                            <i class="fa fa-users"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -89,6 +141,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
 
                     <!-- Recent Applications Section -->

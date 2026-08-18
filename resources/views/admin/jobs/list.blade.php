@@ -28,16 +28,65 @@
 
                             </div>
                             <div class="table-responsive ">
+                                @php
+                                    $sortUrl = function ($column) use ($sort, $direction) {
+                                        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+
+                                        return request()->fullUrlWithQuery([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => null,
+                                        ]);
+                                    };
+                                    $sortIcon = function ($column) use ($sort, $direction) {
+                                        if ($sort !== $column) {
+                                            return 'fa-sort';
+                                        }
+
+                                        return $direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+                                    };
+                                @endphp
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Title</th>
-                                            <th scope="col">Date Created</th>
-                                            <th scope="col">Closing Date</th>
-                                            <th scope="col">Company</th>
-                                            <th scope="col">Created By</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col"><a href="{{ $sortUrl('id') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by ID">ID <i class="fa {{ $sortIcon('id') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('title') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('company_name') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by company">Company <i
+                                                        class="fa {{ $sortIcon('company_name') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                                        <th scope="col"><a href="{{ $sortUrl('created_by') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by creator">Created By <i
+                                                        class="fa {{ $sortIcon('created_by') }}" aria-hidden="true"></i></a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $sortUrl('created_at') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by date created">Created On <i
+                                                        class="fa {{ $sortIcon('created_at') }}" aria-hidden="true"></i></a>                                            </th>
+                                            <th scope="col"><a href="{{ $sortUrl('closing_date') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by closing date">Closing Date <i
+                                                        class="fa {{ $sortIcon('closing_date') }}"
+                                                        aria-hidden="true"></i></a></th>
+
+                                            <th scope="col"><a href="{{ $sortUrl('status') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by status">Status <i
+                                                        class="fa {{ $sortIcon('status') }}" aria-hidden="true"></i></a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $sortUrl('featured') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by featured status">Featured <i
+                                                        class="fa {{ $sortIcon('featured') }}" aria-hidden="true"></i></a>
+                                            </th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -50,15 +99,21 @@
                                                         <p>{{ $job->title }}</p>
                                                         <p>Applicants: {{ $job->applications->count() }}</p>
                                                     </td>
+
+                                                    <td>{{ $job->company_name }}</td>
+                                                    <td>{{ $job->user->name }}</td>
                                                     <td>{{ $job->created_at->format('d-m-Y') }}</td>
                                                     <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}
                                                     </td>
-                                                    <td>{{ $job->company_name }}</td>
-                                                    <td>{{ $job->user->name }}</td>
                                                     <td>
                                                         <span
-                                                            class="badge bg-{{ $job->status == 1 ? 'success' : 'danger' }}">
-                                                            {{ $job->status == 1 ? 'Active' : 'Blocked' }}
+                                                            class="badge bg-{{ $job->status == 2 ? 'danger' : ($job->status == 1 ? 'success' : 'warning') }}">
+                                                            {{ $job->status == 2 ? 'Blocked' : ($job->status == 1 ? 'Active' : 'Approval pending') }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-{{ $job->isFeatured ? 'success' : 'secondary' }}">
+                                                            {{ $job->isFeatured ? 'Yes' : 'No' }}
                                                         </span>
                                                     </td>
 
@@ -78,8 +133,8 @@
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
                                                                 <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteJob({{ $job->id }})"><i
-                                                                            class="fa fa-trash" aria-hidden="true"></i>
+                                                                        onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"
+                                                                            aria-hidden="true"></i>
                                                                         Delete</a></li>
                                                             </ul>
                                                         </div>
@@ -88,7 +143,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No jobs found.</td>
+                                                <td colspan="9" class="text-center">No jobs found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
@@ -118,12 +173,12 @@
                         id: id
                     },
 
-                    success: function(response) {
+                    success: function (response) {
                         window.location.href =
                             "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
                     },
 
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         alert('An error occurred while deleting the job. Please try again.');
                     }
                 });

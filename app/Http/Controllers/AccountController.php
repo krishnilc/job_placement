@@ -463,7 +463,7 @@ class AccountController extends Controller
             ]);
         }
 
-        $job->status = 0;
+        $job->status = 2;
         $job->save();
 
         session()->flash('success', 'Job blocked successfully!');

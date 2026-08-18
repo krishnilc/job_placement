@@ -2,8 +2,8 @@
     <div class="s-body text-center mt-3">
 
         @if (Auth::user()->image != '')
-            <img src="{{ asset('profile_pic/thumb/' . Auth::user()->image) }}" alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;">
+            <img src="{{ asset('profile_pic/thumb/' . Auth::user()->image) }}" alt="avatar" class="rounded-circle img-fluid"
+                style="width: 150px;">
         @else
             <img src="assets/images/avatar7.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
         @endif
@@ -11,10 +11,9 @@
         <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
         <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
         <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->role }}</p>
-         @if (request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
+        @if (request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
             <div class="d-flex justify-content-center mb-2">
-                <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                    class="btn btn-primary">Change
+                <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" class="btn btn-primary">Change
                     Profile Picture</button>
             </div>
         @endif
@@ -32,6 +31,12 @@
                     <a href="{{ route('account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
                 </li>
             @else
+
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('admin.jobs') }}">
+                        <i class="fa fa-arrow-right"></i> Manage Jobs
+                    </a>
+                </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                         <a href="{{ route('account.createJob') }}">
@@ -42,11 +47,6 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('account.myJobs') }}">
                         <i class="fa fa-arrow-right"></i> My Jobs
-                    </a>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('admin.jobs') }}">
-                        <i class="fa fa-arrow-right"></i> Manage Jobs
                     </a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">

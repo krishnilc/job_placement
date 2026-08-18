@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
-                    <div class="card border-0 shadow mb-4 p-3">
+                    <div class="card border-0 shadow mb-4">
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
                                 <div>
@@ -46,31 +46,39 @@
                                     <thead class="bg-light">
                                         <tr>
                                             <th scope="col">Title</th>
-                                            <th scope="col">Job Created</th>
+                                            <th scope="col">Company</th>
+                                            <th scope="col">Created On</th>
                                             <th scope="col">Closing Date</th>
                                             <th scope="col">Applicants</th>
                                             <th scope="col">Status</th>
+                                            <th scope="col">Featured</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
                                         @if ($jobs->isNotEmpty())
                                             @foreach ($jobs as $job)
-                                                <tr class="active">
+                                                <tr>
                                                     <td>
-                                                        <div class="job-name fw-500">{{ $job->title }}</div>
-                                                        <div class="info1">{{ $job->jobType->name }}. {{ $job->location }}
-                                                        </div>
+                                                        <p>{{ $job->title }}</p>
+                                                        <p>Applicants: {{ $job->applications->count() }}</p>
                                                     </td>
-                                                    <td>{{ $job->created_at->format('d M, Y') }}</td>
-                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d M, Y') : 'Not set' }}
+                                                    <td>{{ $job->company_name }}</td>
+                                                    <td>{{ $job->created_at->format('d-m-Y') }}</td>
+                                                    <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}
                                                     </td>
                                                     <td>{{ $job->applications->count() }}
                                                         Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
                                                     <td>
-                                                        <div class="job-status text-capitalize">
-                                                            {{ $job->status == 1 ? 'active' : 'inactive' }}
-                                                        </div>
+                                                        <span
+                                                            class="badge bg-{{ $job->status == 2 ? 'danger' : ($job->status == 1 ? 'success' : 'warning') }}">
+                                                            {{ $job->status == 2 ? 'Blocked' : ($job->status == 1 ? 'Active' : 'Approval pending') }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-{{ $job->isFeatured ? 'success' : 'secondary' }}">
+                                                            {{ $job->isFeatured ? 'Yes' : 'No' }}
+                                                        </span>
                                                     </td>
 
                                                     <td>
@@ -99,7 +107,7 @@
                                                                                 onclick="blockJob({{ $job->id }})"><i
                                                                                     class="fa fa-ban" aria-hidden="true"></i>
                                                                                 Block</a></li>
-                                                                    @else
+                                                                    @elseif ($job->status == 2)
                                                                         <li><a class="dropdown-item" href="#"
                                                                                 onclick="unblockJob({{ $job->id }})"><i
                                                                                     class="fa fa-check-circle" aria-hidden="true"></i>
@@ -113,7 +121,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No jobs found.</td>
+                                                <td colspan="8" class="text-center">No jobs found.</td>
                                             </tr>
                                         @endif                                     
                                     </tbody>
