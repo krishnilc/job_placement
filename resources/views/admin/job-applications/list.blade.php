@@ -36,13 +36,13 @@
                                     <thead class="bg-light">
                                         <tr>
                                             <th scope="col">Title</th>
-                                            <th scope="col">Applicant</th>
-                                            <th scope="col">Company</th>
-                                            <th scope="col">Application</th>
-                                            <th scope="col">Resume</th>
-                                            <th scope="col">Certificates</th>
-                                            <th scope="col">Application Date</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col" class="fw-semibold">Applicant</th>
+                                            <th scope="col" class="fw-semibold">Company</th>
+                                            <th scope="col" class="fw-semibold">Application</th>
+                                            <th scope="col" class="fw-semibold">Resume</th>
+                                            <th scope="col" class="fw-semibold">Certificates</th>
+                                            <th scope="col" class="fw-semibold">Application Date</th>
+                                            <th scope="col" class="fw-semibold">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
@@ -60,10 +60,11 @@
                                                             @php
                                                                 $path = $application->application_file;
                                                                 $fileLabel = $application->application_file_label ?? basename($path);
+                                                                $shortFileLabel = \Illuminate\Support\Str::limit($fileLabel, 18);
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" download="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}" download="{{ $fileLabel }}" title="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="max-width: 130px; font-size: 0.76rem;">
                                                                 <i class="fa fa-file bg-primary"></i>
-                                                                <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                <span class="d-inline-block text-truncate" style="max-width: 80px;">{{ $shortFileLabel }}</span>
                                                             </a>
                                                         @else
                                                             N/A
@@ -74,10 +75,11 @@
                                                             @php
                                                                 $path = $application->resume_file;
                                                                 $fileLabel = $application->resume_file_label ?? basename($path);
+                                                                $shortFileLabel = \Illuminate\Support\Str::limit($fileLabel, 18);
                                                             @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" download="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}" download="{{ $fileLabel }}" title="{{ $fileLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="max-width: 130px; font-size: 0.76rem;">
                                                                 <i class="fa fa-file text-success"></i>
-                                                                <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                <span class="d-inline-block text-truncate" style="max-width: 80px;">{{ $shortFileLabel }}</span>
                                                             </a>
                                                         @else
                                                             N/A
@@ -87,14 +89,15 @@
                                                         @if(!empty($application->certificates_file))
                                                             @php $certs = json_decode($application->certificates_file, true) ?? []; $certLabels = $application->certificate_file_labels; @endphp
                                                             @if(!empty($certs))
-                                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                                <div class="d-flex flex-wrap align-items-center gap-2" style="max-width: 220px;">
                                                                     @foreach($certs as $cert)
                                                                         @php
                                                                             $certLabel = $certLabels[$loop->index] ?? basename($cert);
+                                                                            $shortCertLabel = \Illuminate\Support\Str::limit($certLabel, 16);
                                                                         @endphp
-                                                                        <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
+                                                                        <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" title="{{ $certLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="max-width: 105px; font-size: 0.72rem;">
                                                                             <i class="fa fa-file text-warning"></i>
-                                                                            <span class="text-truncate">{{ $certLabel }}</span>
+                                                                            <span class="d-inline-block text-truncate" style="max-width: 60px;">{{ $shortCertLabel }}</span>
                                                                         </a>
                                                                     @endforeach
                                                                 </div>
@@ -105,7 +108,7 @@
                                                             N/A
                                                         @endif
                                                     </td>
-                                                    <td>{{ $application->applied_at->format('Y-m-d') }}</td>
+                                                    <td>{{ $application->applied_at->format('d-m-Y') }}</td>
 
                                                     <td>
                                                         <div class="action-dots float-end">

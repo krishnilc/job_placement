@@ -63,7 +63,7 @@
                                             <p class="text-danger" id="jobTypeError"></p>
                                     </div>
                                     <div class="col-md-6  mb-4">
-                                        <label for="" class="mb-2">No. of Vacancy<span class="req">*</span></label>
+                                        <label for="" class="mb-2">No. of Vacancies<span class="req">*</span></label>
                                         <input type="number" min="1" placeholder="No. of Job Openings" id="vacancy"
                                             name="vacancy" class="form-control">
                                             <p class="text-danger" id="vacancyError"></p>
