@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // First, expand the enum to include both 'student' and 'user'
         DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'user', 'student', 'employer') NOT NULL DEFAULT 'student'");
 
@@ -27,6 +31,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Expand the enum to include both 'student' and 'user'
         DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'user', 'student', 'employer') NOT NULL DEFAULT 'user'");
 

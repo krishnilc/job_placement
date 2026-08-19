@@ -179,14 +179,28 @@ class AccountController extends Controller
         $role = Auth::user()->role;
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|min:5|max:20',
-            'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
+            'name' => 'required|min:5|max:50',
+            'email' => 'required|email|unique:users,email,' . $id . ',id',
             'mobile' => 'required|digits:7',
             'designation' => in_array($role, ['admin', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
-            // 'password' => 'nullable|min:5|same:confirm_password',
-            // 'confirm_password' => 'nullable|same:password',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'university' => 'nullable|string|max:255',
+            'degree' => 'nullable|string|max:255',
+            'major' => 'nullable|string|max:255',
+            'graduation_year' => 'nullable|string|max:10',
+            'cgpa' => 'nullable|numeric|min:0|max:4',
+            'skills' => 'nullable|string|max:1000',
+            'bio' => 'nullable|string|max:1000',
+            'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'github_url' => ['nullable', 'url', 'max:255'],
+            'portfolio_url' => ['nullable', 'url', 'max:255'],
+            'availability' => 'nullable|string|max:255',
         ]);
 
         if ($validator->passes()) {
@@ -196,6 +210,22 @@ class AccountController extends Controller
             $user->email = $request->email;
             $user->mobile = $request->mobile;
             $user->designation = $request->designation;
+            $user->date_of_birth = $request->date_of_birth;
+            $user->gender = $request->gender;
+            $user->address = $request->address;
+            $user->city = $request->city;
+            $user->country = $request->country;
+            $user->university = $request->university;
+            $user->degree = $request->degree;
+            $user->major = $request->major;
+            $user->graduation_year = $request->graduation_year;
+            $user->cgpa = $request->cgpa;
+            $user->skills = $request->skills;
+            $user->bio = $request->bio;
+            $user->linkedin_url = $request->linkedin_url;
+            $user->github_url = $request->github_url;
+            $user->portfolio_url = $request->portfolio_url;
+            $user->availability = $request->availability;
 
             $user->save();
 
