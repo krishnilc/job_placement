@@ -44,19 +44,17 @@
                                 Your Job Statistics
                             </h3>
                             <div class="row g-4 mb-4">
-                                <div class="col-md-4">
-                                    <a href="{{ route('account.myJobs') }}">
-                                        <div class="card border-0 shadow-sm rounded-4 h-100">
-                                            <div class="card-body text-center p-4">
-                                                <h3 class="fw-bold text-primary">
-                                                    {{ $totalJobs ?? 0 }}
-                                                </h3>
-                                                <p class="mb-0 text-muted">
-                                                    Total Jobs Posted
-                                                </p>
-                                            </div>
+                                 <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                                        <div class="card-body text-center p-4">
+                                            <h3 class="fw-bold text-info">
+                                                {{ $studentUsers ?? 0 }}
+                                            </h3>
+                                            <p class="mb-0 text-muted">
+                                                Student Users
+                                            </p>
                                         </div>
-                                    </a>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-4">
@@ -89,18 +87,70 @@
                                     </a>
                                 </div>
                             </div>
+
+                            <h3 class="fs-4 mb-3">
+                                Additional Statistics
+                            </h3>
+                            <div class="row g-4">
+                                 <div class="col-md-4">
+                                    <a href="{{ route('account.myJobs') }}">
+                                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                                            <div class="card-body text-center p-4">
+                                                <h3 class="fw-bold text-primary">
+                                                    {{ $totalJobs ?? 0 }}
+                                                </h3>
+                                                <p class="mb-0 text-muted">
+                                                    Total Jobs Posted
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                              
+
+                                <div class="col-md-4">
+                                    <a href="{{ route('account.myJobs') }}">
+                                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                                            <div class="card-body text-center p-4">
+                                                <h3 class="fw-bold text-danger">
+                                                    {{ $blockedJobs ?? 0 }}
+                                                </h3>
+                                                <p class="mb-0 text-muted">
+                                                    Blocked Jobs
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <a href="{{ route('account.myJobs') }}">
+                                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                                            <div class="card-body text-center p-4">
+                                                <h3 class="fw-bold text-primary">
+                                                    {{ $featuredJobs ?? 0 }}
+                                                </h3>
+                                                <p class="mb-0 text-muted">
+                                                    Featured Jobs
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Recent Applications -->
-                    @if(count($recentApplications) > 0)
+                    @if (count($recentApplications) > 0)
                         <div class="card border-0 shadow mb-4">
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h3 class="fs-4 mb-0">
                                         Recent Applications
                                     </h3>
-                                    <a href="{{ route('account.myJobApplications') }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <a href="{{ route('account.myJobApplications') }}"
+                                        class="btn btn-sm btn-outline-primary rounded-pill">
                                         View All
                                     </a>
                                 </div>
@@ -121,17 +171,20 @@
                                                     <td class="fw-bold">{{ $application->user->name ?? 'N/A' }}</td>
                                                     <td>{{ $application->job->title ?? 'N/A' }}</td>
                                                     <td>
-                                                        @if($application->status == 'pending')
+                                                        @if ($application->status == 'pending')
                                                             <span class="badge bg-warning text-dark">Pending</span>
                                                         @elseif($application->status == 'accepted')
                                                             <span class="badge bg-success">Accepted</span>
                                                         @elseif($application->status == 'rejected')
                                                             <span class="badge bg-danger">Rejected</span>
                                                         @else
-                                                            <span class="badge bg-secondary">{{ ucfirst($application->status) }}</span>
+                                                            <span
+                                                                class="badge bg-secondary">{{ ucfirst($application->status) }}</span>
                                                         @endif
                                                     </td>
-                                                    <td><small class="text-muted">{{ \Carbon\Carbon::parse($application->created_at)->format('M d, Y') }}</small></td>
+                                                    <td><small
+                                                            class="text-muted">{{ \Carbon\Carbon::parse($application->created_at)->format('M d, Y') }}</small>
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -154,7 +207,7 @@
                                 <h3 class="fs-4 mb-0">
                                     Your Latest Job Postings
                                 </h3>
-                                @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
+                                @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                                     <a href="{{ route('account.createJob') }}" class="btn btn-sm btn-primary rounded-pill">
                                         + New Job
                                     </a>
@@ -203,8 +256,9 @@
                                     <div class="col-12">
                                         <div class="alert alert-info rounded-4">
                                             You haven't posted any jobs yet.
-                                            @if(in_array(auth()->user()->role, ['admin', 'employer'], true))
-                                                <a href="{{ route('account.createJob') }}">Create your first job posting</a>
+                                            @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
+                                                <a href="{{ route('account.createJob') }}">Create your first job
+                                                    posting</a>
                                             @endif
                                         </div>
                                     </div>

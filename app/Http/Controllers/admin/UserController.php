@@ -56,8 +56,10 @@ class UserController extends Controller
 
         if ($listType === 'students') {
             $allowedSorts[] = 'student_id';
+            $allowedSorts[] = 'status';
         } elseif ($listType === 'employers') {
             $allowedSorts[] = 'designation';
+            $allowedSorts[] = 'status';
         }
 
         $sort = $request->query('sort', 'created_at');
@@ -89,6 +91,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
             'mobile' => 'required|digits:7',
             'role' => 'required|in:admin,student,employer,user',
+            'status' => 'nullable|in:pending,active,blocked',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
         ]);
@@ -102,6 +105,11 @@ class UserController extends Controller
             $user->mobile = $request->mobile;
             $user->designation = $request->designation;
             $user->role = $normalizedRole;
+            if (in_array($normalizedRole, ['student', 'employer'], true)) {
+                $user->status = $request->status ?? $user->status ?? 'pending';
+            } elseif ($user->status !== 'active') {
+                $user->status = 'active';
+            }
 
             $user->save();
 

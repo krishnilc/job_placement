@@ -74,6 +74,18 @@
                                             <p class="text-danger" id="roleError"></p>
                                         </div>
 
+                                        @if (in_array($user->role, ['user', 'student', 'employer'], true))
+                                            <div class="mb-4">
+                                                <label for="status" class="mb-2">Account Status*</label>
+                                                <select name="status" id="status" class="form-control">
+                                                    <option value="pending" {{ $user->status === 'pending' ? 'selected' : '' }}>Pending Approval</option>
+                                                    <option value="active" {{ $user->status === 'active' ? 'selected' : '' }}>Active</option>
+                                                    <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }}>Blocked</option>
+                                                </select>
+                                                <p class="text-danger" id="statusError"></p>
+                                            </div>
+                                        @endif
+
                                         <input type="hidden" name="list_type" value="{{ $list_type ?? request()->query('list_type', 'all') }}">
                                     </div>
                                     <div class="card-footer  p-4">
@@ -120,6 +132,7 @@
                     $("#mobileError").text('');
                     $("#designationError").text('');
                     $("#roleError").text('');
+                    $("#statusError").text('');
 
                     if (response.status == true) {
                         window.location.href = redirectRoute;
@@ -140,6 +153,9 @@
                         }
                         if (errors.role) {
                             $("#roleError").text(errors.role[0]);
+                        }
+                        if (errors.status) {
+                            $("#statusError").text(errors.status[0]);
                         }
                     }
                 },

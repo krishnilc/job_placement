@@ -83,6 +83,7 @@ class AccountController extends Controller
             $user->password = Hash::make($request->password); // Hash the password before saving
             // Set the role based on the selected option in the radio button (student or employer)
             $user->role = $role;
+            $user->status = 'pending';
             if ($role === 'student') {
                 $user->student_id = $request->student_id;
             } else {
@@ -90,7 +91,7 @@ class AccountController extends Controller
             }
             $user->save();
 
-            session()->flash('success', 'Registration successful! ');
+            session()->flash('success', 'Registration successful! Your account is pending administrator approval.');
 
             return response()->json([
                 'status' => true,
@@ -121,6 +122,17 @@ class AccountController extends Controller
 
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                if (in_array(Auth::user()->role, ['student', 'employer'], true) && Auth::user()->status !== 'active') {
+                    $status = Auth::user()->status;
+                    Auth::logout();
+
+                    $message = $status === 'blocked'
+                        ? 'Your account has been blocked. Please contact the administrator.'
+                        : 'Your account is pending administrator approval.';
+
+                    return redirect()->route('account.login')->with('error', $message);
+                }
+
                 // Authentication passed...
                 // Check user role and redirect accordingly
                 if (Auth::user()->role === 'admin') {
@@ -330,11 +342,35 @@ class AccountController extends Controller
 
     public function myJobs(Request $request)
     {
-        $jobs = Job::where('user_id', Auth::user()->id)->with('jobType')->orderBy('created_at', 'desc')->paginate(10); // Retrieve jobs posted by the authenticated user
+        $sortableColumns = [
+            'title' => 'title',
+            'company_name' => 'company_name',
+            'created_at' => 'created_at',
+            'closing_date' => 'closing_date',
+            'status' => 'status',
+            'featured' => 'isFeatured',
+        ];
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
 
-        // Logic to retrieve and display the jobs posted by the authenticated user will go here
+        if (!array_key_exists($sort, $sortableColumns)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $jobs = Job::where('user_id', Auth::id())
+            ->with(['jobType', 'applications'])
+            ->orderBy($sortableColumns[$sort], $direction)
+            ->paginate(10)
+            ->withQueryString();
+
         return view('front.account.job.my_jobs', [
-            'jobs' => $jobs
+            'jobs' => $jobs,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -544,13 +580,36 @@ class AccountController extends Controller
 
     public function savedJobs(Request $request)
     {
-        $savedJobs = SavedJob::where([
-            'user_id' => Auth::user()->id
-        ])->with(['job', 'job.jobType', 'job.applications'])->orderBy('created_at', 'desc')->paginate(10); // Retrieve saved jobs by the authenticated user
+        $sortableColumns = [
+            'title' => 'jobs.title',
+            'company_name' => 'jobs.company_name',
+            'closing_date' => 'jobs.closing_date',
+            'status' => 'jobs.status',
+        ];
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
 
-        // dd($savedJobs); // Debugging statement to check if the saved jobs are being retrieved correctly
+        if (!array_key_exists($sort, $sortableColumns)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $sortColumn = $sortableColumns[$sort] ?? 'saved_jobs.created_at';
+        $savedJobs = SavedJob::select('saved_jobs.*')
+            ->leftJoin('jobs', 'jobs.id', '=', 'saved_jobs.job_id')
+            ->where('saved_jobs.user_id', Auth::id())
+            ->with(['job', 'job.jobType', 'job.applications'])
+            ->orderBy($sortColumn, $direction)
+            ->paginate(10)
+            ->withQueryString();
+
         return view('front.account.job.saved-jobs', [
-            'savedJobs' => $savedJobs
+            'savedJobs' => $savedJobs,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

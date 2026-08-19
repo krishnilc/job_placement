@@ -29,15 +29,48 @@
                             </div>
 
                             <div class="table-responsive">
+                                @php
+                                    $sortUrl = function ($column) use ($sort, $direction) {
+                                        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+
+                                        return request()->fullUrlWithQuery([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => null,
+                                        ]);
+                                    };
+                                    $sortIcon = function ($column) use ($sort, $direction) {
+                                        if ($sort !== $column) {
+                                            return 'fa-sort';
+                                        }
+
+                                        return $direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+                                    };
+                                @endphp
                                 <table class="table ">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Title</th>
+                                            <th scope="col"><a href="{{ $sortUrl('title') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <!-- <th scope="col">Saved Date</th> -->
-                                            <th scope="col">Employer</th>
+                                            <th scope="col"><a href="{{ $sortUrl('company_name') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by employer">Employer <i
+                                                        class="fa {{ $sortIcon('company_name') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col">Applicants</th>
-                                            <th scope="col">Closing Date</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col"><a href="{{ $sortUrl('closing_date') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by closing date">Closing Date <i
+                                                        class="fa {{ $sortIcon('closing_date') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('status') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by status">Status <i
+                                                        class="fa {{ $sortIcon('status') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>

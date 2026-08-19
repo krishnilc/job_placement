@@ -8,30 +8,47 @@ use Illuminate\Http\Request;
 
 class JobApplicationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $sortableColumns = [
+            'title' => 'jobs.title',
+            'applicant' => 'users.name',
+            'company_name' => 'jobs.company_name',
+            'applied_at' => 'job_applications.applied_at',
+        ];
+        $sort = $request->input('sort', 'applied_at');
+        $direction = $request->input('direction', 'desc');
 
-        if ($user->role === 'admin') {
-            $applications = JobApplication::orderBy('job_id', 'asc')
-                ->with('job', 'user', 'employer')
-                ->paginate(10);
-        } elseif ($user->role === 'employer') {
-            $applications = JobApplication::whereHas('job', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-                ->with('job', 'user', 'employer')
-                ->orderBy('job_id', 'asc')
-                ->paginate(10);
-        } else {
-            $applications = JobApplication::where('user_id', $user->id)
-                ->with('job', 'user', 'employer')
-                ->orderBy('job_id', 'asc')
-                ->paginate(10);
+        if (!array_key_exists($sort, $sortableColumns)) {
+            $sort = 'applied_at';
         }
 
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $applicationsQuery = JobApplication::select('job_applications.*')
+            ->leftJoin('jobs', 'jobs.id', '=', 'job_applications.job_id')
+            ->leftJoin('users', 'users.id', '=', 'job_applications.user_id');
+
+        if ($user->role === 'admin') {
+        } elseif ($user->role === 'employer') {
+            $applicationsQuery->where('jobs.user_id', $user->id);
+        } else {
+            $applicationsQuery->where('job_applications.user_id', $user->id);
+        }
+
+        $applications = $applicationsQuery
+            ->with('job', 'user', 'employer')
+            ->orderBy($sortableColumns[$sort], $direction)
+            ->paginate(10)
+            ->withQueryString();
+
         return view('admin.job-applications.list', [
-            'applications' => $applications
+            'applications' => $applications,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

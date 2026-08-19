@@ -5,6 +5,7 @@ namespace App\Http\Controllers\employer;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\JobApplication;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,10 @@ class EmployerController extends Controller
 
         // Total jobs posted by the employer
         $totalJobs = Job::where('user_id', $userId)->count();
+
+        $studentUsers = User::where('role', 'student')->count();
+        $blockedJobs = Job::where('user_id', $userId)->where('status', 2)->count();
+        $featuredJobs = Job::where('user_id', $userId)->where('isFeatured', 1)->count();
 
         // Total job applications received
         $totalApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
@@ -46,6 +51,9 @@ class EmployerController extends Controller
 
         return view('employer.employer-dashboard', [
             'totalJobs' => $totalJobs,
+            'studentUsers' => $studentUsers,
+            'blockedJobs' => $blockedJobs,
+            'featuredJobs' => $featuredJobs,
             'totalApplications' => $totalApplications,
             'pendingApplications' => $pendingApplications,
             'recentApplications' => $recentApplications,

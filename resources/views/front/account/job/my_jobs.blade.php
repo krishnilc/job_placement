@@ -42,16 +42,57 @@
 
                             </div>
                             <div class="table-responsive">
+                                @php
+                                    $sortUrl = function ($column) use ($sort, $direction) {
+                                        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+
+                                        return request()->fullUrlWithQuery([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => null,
+                                        ]);
+                                    };
+                                    $sortIcon = function ($column) use ($sort, $direction) {
+                                        if ($sort !== $column) {
+                                            return 'fa-sort';
+                                        }
+
+                                        return $direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+                                    };
+                                @endphp
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Title</th>
-                                            <th scope="col">Company</th>
-                                            <th scope="col">Created On</th>
-                                            <th scope="col">Closing Date</th>
+                                            <th scope="col"><a href="{{ $sortUrl('title') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('company_name') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by company">Company <i
+                                                        class="fa {{ $sortIcon('company_name') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('created_at') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by date created">Created On <i
+                                                        class="fa {{ $sortIcon('created_at') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('closing_date') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by closing date">Closing Date <i
+                                                        class="fa {{ $sortIcon('closing_date') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col">Applicants</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Featured</th>
+                                            <th scope="col"><a href="{{ $sortUrl('status') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by status">Status <i
+                                                        class="fa {{ $sortIcon('status') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col"><a href="{{ $sortUrl('featured') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by featured status">Featured <i
+                                                        class="fa {{ $sortIcon('featured') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -68,7 +109,7 @@
                                                     <td>{{ !empty($job->closing_date) ? \Carbon\Carbon::parse($job->closing_date)->format('d-m-Y') : 'Not set' }}
                                                     </td>
                                                     <td>{{ $job->applications->count() }}
-                                                        Application{{ $job->applications->count() == 1 ? '' : 's' }}</td>
+                                                        {{-- Application{{ $job->applications->count() == 1 ? '' : 's' }}</td> --}}
                                                     <td>
                                                         <span
                                                             class="badge bg-{{ $job->status == 2 ? 'danger' : ($job->status == 1 ? 'success' : 'warning') }}">

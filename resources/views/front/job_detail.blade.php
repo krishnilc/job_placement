@@ -178,7 +178,7 @@
                                         <li>Location: <span>{{ $job->company_location }}</span></li>
                                     @endif
                                     @if (!empty($job->company_website))
-                                        <li>Company Website: <span> <a href="{{ $job->company_website }}"
+                                        <li>Website: <span> <a href="{{ $job->company_website }}"
                                                     target="_blank">{{ $job->company_website }}</a></span></li>
                                     @endif
                                 </ul>

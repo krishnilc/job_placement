@@ -32,16 +32,49 @@
 
                             </div>
                             <div class="table-responsive">
+                                @php
+                                    $sortUrl = function ($column) use ($sort, $direction) {
+                                        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+
+                                        return request()->fullUrlWithQuery([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => null,
+                                        ]);
+                                    };
+                                    $sortIcon = function ($column) use ($sort, $direction) {
+                                        if ($sort !== $column) {
+                                            return 'fa-sort';
+                                        }
+
+                                        return $direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+                                    };
+                                @endphp
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Title</th>
-                                            <th scope="col" class="fw-semibold">Applicant</th>
-                                            <th scope="col" class="fw-semibold">Company</th>
+                                            <th scope="col"><a href="{{ $sortUrl('title') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col" class="fw-semibold"><a href="{{ $sortUrl('applicant') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by applicant">Applicant <i
+                                                        class="fa {{ $sortIcon('applicant') }}"
+                                                        aria-hidden="true"></i></a></th>
+                                            <th scope="col" class="fw-semibold"><a href="{{ $sortUrl('company_name') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by company">Company <i
+                                                        class="fa {{ $sortIcon('company_name') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col" class="fw-semibold">Application</th>
                                             <th scope="col" class="fw-semibold">Resume</th>
                                             <th scope="col" class="fw-semibold">Certificates</th>
-                                            <th scope="col" class="fw-semibold">Application Date</th>
+                                            <th scope="col" class="fw-semibold"><a href="{{ $sortUrl('applied_at') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by application date">Application Date <i
+                                                        class="fa {{ $sortIcon('applied_at') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col" class="fw-semibold">Action</th>
                                         </tr>
                                     </thead>
@@ -85,20 +118,22 @@
                                                             N/A
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    <td style="min-width: 121px; white-space: normal;">
                                                         @if(!empty($application->certificates_file))
                                                             @php $certs = json_decode($application->certificates_file, true) ?? []; $certLabels = $application->certificate_file_labels; @endphp
                                                             @if(!empty($certs))
-                                                                <div class="d-flex flex-wrap align-items-center gap-2" style="max-width: 220px;">
+                                                                <div style="width: 105px;">
                                                                     @foreach($certs as $cert)
                                                                         @php
                                                                             $certLabel = $certLabels[$loop->index] ?? basename($cert);
                                                                             $shortCertLabel = \Illuminate\Support\Str::limit($certLabel, 16);
                                                                         @endphp
-                                                                        <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" title="{{ $certLabel }}" class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="max-width: 105px; font-size: 0.72rem;">
-                                                                            <i class="fa fa-file text-warning"></i>
-                                                                            <span class="d-inline-block text-truncate" style="max-width: 60px;">{{ $shortCertLabel }}</span>
-                                                                        </a>
+                                                                        <div style="height: 31px; @if (!$loop->last) margin-bottom: 0.5rem; @endif">
+                                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" title="{{ $certLabel }}" class="d-block text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm text-truncate" style="width: 105px; white-space: nowrap; font-size: 0.72rem; line-height: 18px;">
+                                                                                <i class="fa fa-file text-warning"></i>
+                                                                                <span>{{ $shortCertLabel }}</span>
+                                                                            </a>
+                                                                        </div>
                                                                     @endforeach
                                                                 </div>
                                                             @else

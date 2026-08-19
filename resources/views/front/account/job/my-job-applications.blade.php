@@ -58,7 +58,7 @@
                                                                     @endphp
                                                                     <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'application']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
                                                                         <i class="fa fa-file text-primary"></i>
-                                                                        <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                        <span class="text-truncate" style="font-size: 0.85rem;">{{ $fileLabel }}</span>
                                                                     </a>
                                                                 @endif
 
@@ -69,7 +69,7 @@
                                                                     @endphp
                                                                     <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'resume']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
                                                                         <i class="fa fa-file text-info"></i>
-                                                                        <span class="text-truncate">{{ $fileLabel }}</span>
+                                                                        <span class="text-truncate" style="font-size: 0.85rem;">{{ $fileLabel }}</span>
                                                                     </a>
                                                                 @endif
 
@@ -82,7 +82,7 @@
                                                                             @endphp
                                                                             <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
                                                                                 <i class="fa fa-file text-warning"></i>
-                                                                                <span class="text-truncate">{{ $certLabel }}</span>
+                                                                                <span class="text-truncate" style="font-size: 0.85rem;">{{ $certLabel }}</span>
                                                                             </a>
                                                                         @endforeach
                                                                     @else
