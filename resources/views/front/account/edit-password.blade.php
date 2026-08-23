@@ -5,17 +5,16 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col">
-                    <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
+                    <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            @if (auth()->user()->role == 'user')
-                                <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
-                            @elseif (auth()->user()->role == 'admin')
+                            @if (auth()->user()->role == 'admin')
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            @elseif (auth()->user()->role == 'employer')
+                                <li class="breadcrumb-item"><a href="{{ route('employer.dashboard') }}">Home</a></li>
+                            @else
+                                <li class="breadcrumb-item"><a href="{{ route('student.dashboard') }}">Home</a></li>
                             @endif
-
-                            <li class="breadcrumb-item active"><a href="{{ route('account.editProfile') }}">Account
-                                    Settings</a>
-                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Change Password</li>
                         </ol>
                     </nav>
                 </div>

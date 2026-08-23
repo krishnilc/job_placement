@@ -100,7 +100,7 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <a class="dropdown-item py-2" href="{{ route('account.editProfile') }}">
+                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
                                         Account Settings
                                     </a>
                                 </li>

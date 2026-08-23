@@ -171,6 +171,13 @@ class AccountController extends Controller
         ]);
     }
 
+    public function viewProfile()
+    {
+        return view('front.account.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
     public function updateProfile(Request $request)
     {
         $id = Auth::user()->id;
@@ -182,24 +189,27 @@ class AccountController extends Controller
             'name' => 'required|min:5|max:50',
             'email' => 'required|email|unique:users,email,' . $id . ',id',
             'mobile' => 'required|digits:7',
+            'email_2' => 'nullable|email|max:255',
+            'mobile_2' => 'nullable|digits:7',
             'designation' => in_array($role, ['admin', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
+            'residential_address' => 'nullable|string|max:255',
+            'postal_address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
+            'high_school' => 'nullable|string|max:255',
+            'high_school_graduation_year' => 'nullable|string|max:10',
             'university' => 'nullable|string|max:255',
             'degree' => 'nullable|string|max:255',
             'major' => 'nullable|string|max:255',
             'graduation_year' => 'nullable|string|max:10',
-            'cgpa' => 'nullable|numeric|min:0|max:4',
             'skills' => 'nullable|string|max:1000',
             'bio' => 'nullable|string|max:1000',
             'linkedin_url' => ['nullable', 'url', 'max:255'],
-            'github_url' => ['nullable', 'url', 'max:255'],
-            'portfolio_url' => ['nullable', 'url', 'max:255'],
+            'facebook_url' => ['nullable', 'url', 'max:255'],
             'availability' => 'nullable|string|max:255',
         ]);
 
@@ -209,22 +219,25 @@ class AccountController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->mobile = $request->mobile;
+            $user->email_2 = $request->email_2;
+            $user->mobile_2 = $request->mobile_2;
             $user->designation = $request->designation;
             $user->date_of_birth = $request->date_of_birth;
             $user->gender = $request->gender;
-            $user->address = $request->address;
+            $user->residential_address = $request->residential_address;
+            $user->postal_address = $request->postal_address;
             $user->city = $request->city;
             $user->country = $request->country;
+            $user->high_school = $request->high_school;
+            $user->high_school_graduation_year = $request->high_school_graduation_year;
             $user->university = $request->university;
             $user->degree = $request->degree;
             $user->major = $request->major;
             $user->graduation_year = $request->graduation_year;
-            $user->cgpa = $request->cgpa;
             $user->skills = $request->skills;
             $user->bio = $request->bio;
             $user->linkedin_url = $request->linkedin_url;
-            $user->github_url = $request->github_url;
-            $user->portfolio_url = $request->portfolio_url;
+            $user->facebook_url = $request->facebook_url;
             $user->availability = $request->availability;
 
             $user->save();

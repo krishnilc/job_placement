@@ -120,6 +120,12 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
+                                                                @if (($list_type ?? 'all') === 'students')
+                                                                    <li><a class="dropdown-item"
+                                                                            href="{{ route('admin.users.profile', $user->id) }}"><i
+                                                                                class="fa fa-user" aria-hidden="true"></i>
+                                                                            View Profile</a></li>
+                                                                @endif
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.users.edit', $user->id) }}?list_type={{ $list_type ?? 'all' }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>

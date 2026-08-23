@@ -40,6 +40,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::get('/users/students', [UserController::class, 'students'])->name('admin.users.students');
     Route::get('/users/employers', [UserController::class, 'employers'])->name('admin.users.employers');
+    Route::get('/users/profile/{id}', [UserController::class, 'profile'])->name('admin.users.profile');
     Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
@@ -68,6 +69,7 @@ Route::group(['prefix' => 'account'], function () {
     //Authenticated user routes
     Route::group(['middleware' => 'auth'], function () {
         Route::get('/student-dashboard', [AccountController::class, 'index'])->name('student.dashboard');
+        Route::get('/profile', [AccountController::class, 'viewProfile'])->name('account.profile');
         Route::get('/edit-profile', [AccountController::class, 'profile'])->name('account.editProfile');
         Route::get('/edit-password', [AccountController::class, 'editPassword'])->name('account.editPassword');
         Route::post('/update-password', [AccountController::class, 'updatePassword'])->name('account.updatePassword');

@@ -81,6 +81,15 @@ class UserController extends Controller
         ]);
     }
 
+    public function profile($id)
+    {
+        $user = User::where('role', 'student')->findOrFail($id);
+
+        return view('admin.users.profile', [
+            'user' => $user,
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         // $id = Auth::user()->id;
