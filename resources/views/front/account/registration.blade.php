@@ -25,6 +25,13 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="mobile" class="mb-2">Mobile Number*</label>
+                                <input type="text" name="mobile" id="mobile" class="form-control"
+                                    placeholder="Enter 7-digit mobile number" required>
+                                <p class="text-danger" id="mobileError"></p>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="" class="mb-2">Password*</label>
                                 <input type="password" name="password" id="password" class="form-control"
                                     placeholder="Enter Password" required>
@@ -63,6 +70,21 @@
                                 <p class="text-danger" id="studentIdError"></p>
                             </div>
 
+                            <div id="employerFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="designation" class="mb-2">Designation*</label>
+                                    <input type="text" name="designation" id="designation" class="form-control"
+                                        placeholder="e.g. HR Manager">
+                                    <p class="text-danger" id="designationError"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="company_name" class="mb-2">Company Name*</label>
+                                    <input type="text" name="company_name" id="company_name" class="form-control"
+                                        placeholder="Enter company name">
+                                    <p class="text-danger" id="companyNameError"></p>
+                                </div>
+                            </div>
+
                             <button class="btn btn-primary mt-2">Register</button>
                         </form>
                     </div>
@@ -82,10 +104,14 @@
                 if ($('#student_role').is(':checked')) {
                     $('#studentIdGroup').show();
                     $('#student_id').attr('required', true);
+                    $('#employerFields').hide();
+                    $('#designation, #company_name').removeAttr('required');
                 } else {
                     $('#studentIdGroup').hide();
                     $('#student_id').removeAttr('required');
                     $('#studentIdError').text('');
+                    $('#employerFields').show();
+                    $('#designation, #company_name').attr('required', true);
                 }
             }
 
@@ -111,6 +137,9 @@
                         $("#passwordError").text('');
                         $("#confirmPasswordError").text('');
                         $("#studentIdError").text('');
+                        $("#mobileError").text('');
+                        $("#designationError").text('');
+                        $("#companyNameError").text('');
 
                         if (response.status == false) {
                             var errors = response.errors;
@@ -128,6 +157,15 @@
                             }
                             if (errors.student_id) {
                                 $("#studentIdError").text(errors.student_id[0]);
+                            }
+                            if (errors.mobile) {
+                                $("#mobileError").text(errors.mobile[0]);
+                            }
+                            if (errors.designation) {
+                                $("#designationError").text(errors.designation[0]);
+                            }
+                            if (errors.company_name) {
+                                $("#companyNameError").text(errors.company_name[0]);
                             }
                         } else {
                             window.location.href = "{{ route('account.login') }}";

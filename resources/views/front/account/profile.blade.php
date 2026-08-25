@@ -45,10 +45,10 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <p class="profile-eyebrow mb-1">Personal profile</p>
+                                    <p class="profile-eyebrow mb-1">Student profile</p>
                                     <h1 class="profile-name mb-1">{{ $user->name }}</h1>
                                     <p class="profile-student-id mb-1">Student ID: {{ $user->student_id }}</p>
-                                    <p class="profile-role mb-0">{{ $user->designation ?: 'Member' }}</p>
+                                    <p class="profile-role mb-0">{{ $user->designation ?: 'Status Not Provided' }}</p>
                                 </div>
                             </div>
                             <a href="{{ route('account.editProfile') }}" class="btn btn-light profile-edit-button">

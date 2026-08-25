@@ -17,9 +17,12 @@ class EmployerRegistrationTest extends TestCase
         $response = $this->post('/account/process-registration', [
             'name' => 'Employer One',
             'email' => 'employer@example.com',
+            'mobile' => '1234567',
             'password' => 'secret123',
             'confirm_password' => 'secret123',
             'role' => 'employer',
+            'designation' => 'HR Manager',
+            'company_name' => 'Example Company',
         ]);
 
         $response->assertJson(['status' => true]);

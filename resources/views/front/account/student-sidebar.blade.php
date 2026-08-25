@@ -62,6 +62,12 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('account.savedJobs') }}"> <i class="fa fa-arrow-right"></i> Saved Jobs</a>
                 </li>
+             
+               <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('account.profile') }}">
+                        <i class="fa fa-arrow-right"></i> Account Settings
+                    </a>
+                </li> 
             @endif
 
             {{-- <li class="list-group-item d-flex justify-content-between align-items-center p-3">

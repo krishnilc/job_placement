@@ -1,3 +1,4 @@
+@unless (request()->routeIs('employer.account.*'))
 <div class="card border-0 shadow mb-4 p-3">
     <div class="s-body text-center mt-3">
 
@@ -10,9 +11,11 @@
 
         <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
         <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
+        <p class="text-muted mb-1 fs-6">{{ Auth::user()->company_name }}</p>
         <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->role }}</p>
     </div>
 </div>
+@endunless
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
@@ -34,11 +37,11 @@
                     <a href="{{ route('employer.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
                 </li>
             @else
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                {{-- <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('employer.account.profile') }}">
                         <i class="fa fa-arrow-right"></i> Account Settings
                     </a>
-                </li>
+                </li> --}}
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                         <a href="{{ route('account.createJob') }}">

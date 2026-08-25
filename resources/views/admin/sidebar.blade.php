@@ -1,3 +1,4 @@
+@unless (request()->routeIs('admin.account.*'))
 <div class="card border-0 shadow mb-4 p-3">
     <div class="s-body text-center mt-3">
 
@@ -13,6 +14,7 @@
         <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->role }}</p>
     </div>
 </div>
+@endunless
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
@@ -35,11 +37,11 @@
                 </li>
             @else
 
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                {{-- <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('admin.account.profile') }}">
                         <i class="fa fa-arrow-right"></i> Account Settings
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('admin.jobs') }}">

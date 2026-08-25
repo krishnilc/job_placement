@@ -67,10 +67,13 @@ class AccountController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
+            'mobile' => 'required|digits:7',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
             'role' => 'required|in:student,employer',
             'student_id' => $role === 'student' ? 'required|string|max:9|unique:users,student_id' : 'nullable|string|max:9',
+            'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
+            'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
         ], [
             'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
@@ -80,6 +83,7 @@ class AccountController extends Controller
 
             $user->name = $request->name;
             $user->email = $request->email;
+            $user->mobile = $request->mobile;
             $user->password = Hash::make($request->password); // Hash the password before saving
             // Set the role based on the selected option in the radio button (student or employer)
             $user->role = $role;
@@ -88,6 +92,8 @@ class AccountController extends Controller
                 $user->student_id = $request->student_id;
             } else {
                 $user->student_id = null;
+                $user->designation = $request->designation;
+                $user->company_name = $request->company_name;
             }
             $user->save();
 
