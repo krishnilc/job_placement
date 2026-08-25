@@ -59,6 +59,7 @@ class UserController extends Controller
             $allowedSorts[] = 'status';
         } elseif ($listType === 'employers') {
             $allowedSorts[] = 'designation';
+            $allowedSorts[] = 'company_name';
             $allowedSorts[] = 'status';
         }
 
@@ -83,7 +84,7 @@ class UserController extends Controller
 
     public function profile($id)
     {
-        $user = User::where('role', 'student')->findOrFail($id);
+        $user = User::whereIn('role', ['student', 'employer'])->findOrFail($id);
 
         return view('admin.users.profile', [
             'user' => $user,
@@ -95,6 +96,7 @@ class UserController extends Controller
         // $id = Auth::user()->id;
         $user = User::findOrFail($id);
         $isStudent = in_array($user->role, ['user', 'student'], true);
+        $willBeEmployer = $user->role === 'employer' || $request->input('role') === 'employer';
 
         // Validation rules for profile update
         $validator = Validator::make($request->all(), [
@@ -104,6 +106,7 @@ class UserController extends Controller
             'role' => $isStudent ? 'nullable' : 'required|in:admin,student,employer,user',
             'student_id' => $isStudent ? 'required|string|max:9|unique:users,student_id,' . $id . ',id' : 'nullable',
             'designation' => $isStudent ? 'nullable' : 'nullable|string|max:100',
+            'company_name' => $willBeEmployer ? 'required|string|max:255' : 'nullable',
             'status' => 'nullable|in:pending,active,blocked',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
@@ -122,6 +125,7 @@ class UserController extends Controller
             if (!$isStudent) {
                 $user->designation = $request->designation;
             }
+            $user->company_name = $normalizedRole === 'employer' ? $request->company_name : null;
             if (in_array($normalizedRole, ['student', 'employer'], true)) {
                 $user->status = $request->status ?? $user->status ?? 'pending';
             } elseif ($user->status !== 'active') {

@@ -41,42 +41,113 @@
                             <div class="table-responsive">
                                 @php
                                     $currentSort = request()->query('sort', 'created_at');
-                                    $currentDirection = strtolower(request()->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+                                    $currentDirection =
+                                        strtolower(request()->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
                                     $listType = $list_type ?? 'all';
                                     $baseRoute = match ($listType) {
                                         'students' => route('admin.users.students'),
                                         'employers' => route('admin.users.employers'),
                                         default => route('admin.users'),
                                     };
-                                    $buildSortUrl = function ($column) use ($baseRoute, $currentSort, $currentDirection) {
-                                        $nextDirection = ($currentSort === $column && $currentDirection === 'asc') ? 'desc' : 'asc';
+                                    $buildSortUrl = function ($column) use (
+                                        $baseRoute,
+                                        $currentSort,
+                                        $currentDirection,
+                                    ) {
+                                        $nextDirection =
+                                            $currentSort === $column && $currentDirection === 'asc' ? 'desc' : 'asc';
 
-                                        return $baseRoute . '?' . http_build_query([
-                                            'sort' => $column,
-                                            'direction' => $nextDirection,
-                                            'page' => 1,
-                                        ]);
+                                        return $baseRoute .
+                                            '?' .
+                                            http_build_query([
+                                                'sort' => $column,
+                                                'direction' => $nextDirection,
+                                                'page' => 1,
+                                            ]);
                                     };
                                 @endphp
 
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col"><a href="{{ $buildSortUrl('id') }}" class="text-decoration-none text-dark">ID @if ($currentSort === 'id')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
-                                            <th scope="col"><a href="{{ $buildSortUrl('name') }}" class="text-decoration-none text-dark">Name @if ($currentSort === 'name')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('id') }}"
+                                                    class="text-decoration-none text-dark">ID @if ($currentSort === 'id')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('name') }}"
+                                                    class="text-decoration-none text-dark">Name @if ($currentSort === 'name')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
                                             @if ($listType === 'employers')
-                                                <th scope="col"><a href="{{ $buildSortUrl('designation') }}" class="text-decoration-none text-dark">Designation @if ($currentSort === 'designation')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
-                                            @endif
-                                             @if ($listType === 'students')
-                                                 <th scope="col"><a href="{{ $buildSortUrl('student_id') }}" class="text-decoration-none text-dark">Student ID @if ($currentSort === 'student_id')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
-                                            @endif
-                                            <th scope="col"><a href="{{ $buildSortUrl('email') }}" class="text-decoration-none text-dark">Email @if ($currentSort === 'email')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
-                                            <th scope="col"><a href="{{ $buildSortUrl('mobile') }}" class="text-decoration-none text-dark">Mobile @if ($currentSort === 'mobile')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>                                           
-                                            @if ($listType === 'employers')
-                                                <th scope="col"><a href="{{ $buildSortUrl('status') }}" class="text-decoration-none text-dark">Status @if ($currentSort === 'status')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                                <th scope="col"><a href="{{ $buildSortUrl('designation') }}"
+                                                        class="text-decoration-none text-dark">Designation @if ($currentSort === 'designation')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a>
+                                                </th>
+                                                <th scope="col"><a href="{{ $buildSortUrl('company_name') }}"
+                                                        class="text-decoration-none text-dark">Company Name @if ($currentSort === 'company_name')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a>
+                                                </th>
                                             @endif
                                             @if ($listType === 'students')
-                                                <th scope="col"><a href="{{ $buildSortUrl('status') }}" class="text-decoration-none text-dark">Status @if ($currentSort === 'status')<i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i class="fa fa-sort text-muted ms-1"></i>@endif</a></th>
+                                                <th scope="col"><a href="{{ $buildSortUrl('student_id') }}"
+                                                        class="text-decoration-none text-dark">Student ID @if ($currentSort === 'student_id')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a>
+                                                </th>
+                                            @endif
+                                            <th scope="col"><a href="{{ $buildSortUrl('email') }}"
+                                                    class="text-decoration-none text-dark">Email @if ($currentSort === 'email')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('mobile') }}"
+                                                    class="text-decoration-none text-dark">Mobile @if ($currentSort === 'mobile')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            @if ($listType === 'employers')
+                                                <th scope="col"><a href="{{ $buildSortUrl('status') }}"
+                                                        class="text-decoration-none text-dark">Status @if ($currentSort === 'status')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a>
+                                                </th>
+                                            @endif
+                                            @if ($listType === 'students')
+                                                <th scope="col"><a href="{{ $buildSortUrl('status') }}"
+                                                        class="text-decoration-none text-dark">Status @if ($currentSort === 'status')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a></th>
                                             @endif
                                             {{-- <th scope="col">Role</th> --}}
                                             <th scope="col">Action</th>
@@ -88,25 +159,28 @@
                                                 <tr class="active">
                                                     <td> {{ $user->id }} </td>
                                                     <td>{{ $user->name }}</td>
-                                                                                                        @if (($list_type ?? 'all') === 'employers')
-                                                                                                                <td>{{ $user->designation }}</td>
-                                                                                                        @endif
-                                                      @if (($list_type ?? 'all') === 'students')
+                                                    @if (($list_type ?? 'all') === 'employers')
+                                                        <td>{{ $user->designation }}</td>
+                                                        <td>{{ $user->company_name ?? '-' }}</td>
+                                                    @endif
+                                                    @if (($list_type ?? 'all') === 'students')
                                                         <td>{{ $user->student_id }}</td>
                                                     @endif
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
-                                                  
+
                                                     @if (($list_type ?? 'all') === 'employers')
                                                         <td>
-                                                            <span class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
+                                                            <span
+                                                                class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
                                                                 {{ $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status) }}
                                                             </span>
                                                         </td>
                                                     @endif
                                                     @if (($list_type ?? 'all') === 'students')
                                                         <td>
-                                                            <span class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
+                                                            <span
+                                                                class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
                                                                 {{ $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status) }}
                                                             </span>
                                                         </td>
@@ -120,7 +194,7 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                @if (($list_type ?? 'all') === 'students')
+                                                                @if (in_array(($list_type ?? 'all'), ['students', 'employers'], true))
                                                                     <li><a class="dropdown-item"
                                                                             href="{{ route('admin.users.profile', $user->id) }}"><i
                                                                                 class="fa fa-user" aria-hidden="true"></i>
@@ -139,7 +213,7 @@
                                                     </td>
                                                 </tr>
                                             @endforeach
-                                           @else
+                                        @else
                                             <tr>
                                                 <td colspan="6" class="text-center">No users found.</td>
                                             </tr>

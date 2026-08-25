@@ -54,6 +54,43 @@
                                         <p class="text-danger" id="mobile2Error"></p>
                                     </div>
                                 </div>
+                                <div class="border-top mt-4 pt-4">
+                                    <h4 class="fs-5 mb-3">Company Details</h4>
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label for="company_name" class="mb-2">Company Name*</label>
+                                            <input type="text" name="company_name" id="company_name" class="form-control"
+                                                value="{{ old('company_name', $user->company_name) }}" required>
+                                            <p class="text-danger" id="companynameError"></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="website_url" class="mb-2">Website</label>
+                                            <input type="url" name="website_url" id="website_url" class="form-control"
+                                                value="{{ old('website_url', $user->website_url) }}" placeholder="https://example.com">
+                                            <p class="text-danger" id="websiteurlError"></p>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="company_address" class="mb-2">Company Address*</label>
+                                            <textarea name="company_address" id="company_address" rows="3" class="form-control" required>{{ old('company_address', $user->company_address) }}</textarea>
+                                            <p class="text-danger" id="companyaddressError"></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="linkedin_url" class="mb-2">LinkedIn Page</label>
+                                            <input type="url" name="linkedin_url" id="linkedin_url" class="form-control"
+                                                value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="https://www.linkedin.com/company/..."><p class="text-danger" id="linkedinurlError"></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="facebook_url" class="mb-2">Facebook Page</label>
+                                            <input type="url" name="facebook_url" id="facebook_url" class="form-control"
+                                                value="{{ old('facebook_url', $user->facebook_url) }}" placeholder="https://www.facebook.com/..."><p class="text-danger" id="facebookurlError"></p>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="company_description" class="mb-2">Company Description*</label>
+                                            <textarea name="company_description" id="company_description" rows="5" class="form-control" placeholder="Tell candidates about your company" required>{{ old('company_description', $user->company_description) }}</textarea>
+                                            <p class="text-danger" id="companydescriptionError"></p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-footer p-4">
                                 <button type="submit" class="btn btn-primary">Update Profile</button>

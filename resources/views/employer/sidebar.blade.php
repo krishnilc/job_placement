@@ -24,7 +24,7 @@
                     <a href="{{ route('employer.account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('employer.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> My Profile
+                    <a href="{{ route('employer.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> Profile
                         Update</a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">

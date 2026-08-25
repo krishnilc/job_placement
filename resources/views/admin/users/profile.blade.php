@@ -1,6 +1,7 @@
 @extends('front.layouts.app')
 
 @section('main')
+    @php($isEmployer = $user->role === 'employer')
     <section class="section-5 bg-2">
         <div class="container py-5">
             <div class="row">
@@ -8,7 +9,9 @@
                     <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.users.students') }}">Students</a></li>
+                            <li class="breadcrumb-item"><a
+                                    href="{{ $isEmployer ? route('admin.users.employers') : route('admin.users.students') }}">{{ $isEmployer ? 'Employers' : 'Students' }}</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">View Profile</li>
                         </ol>
                     </nav>
@@ -21,7 +24,7 @@
                 </div>
                 <div class="col-lg-9">
                     <div class="admin-student-profile card border-0 shadow mb-4">
-                        <div class="student-profile-header">
+                        <div class="student-profile-header {{ $isEmployer ? 'student-profile-header-employer' : '' }}">
                             <div class="student-profile-avatar">
                                 @if ($user->image)
                                     <button type="button" class="student-profile-avatar-button" data-bs-toggle="modal"
@@ -35,10 +38,20 @@
                                 @endif
                             </div>
                             <div>
-                                <p class="student-profile-eyebrow mb-1">Student profile</p>
+                                <p class="student-profile-eyebrow mb-1">
+                                    {{ $isEmployer ? 'Employer profile' : 'Student profile' }}</p>
                                 <h1 class="student-profile-name mb-1">{{ $user->name }}</h1>
-                                <p class="student-profile-meta mb-0">Student ID: {{ $user->student_id ?: 'Not provided' }}</p>
-                                <p class="student-profile-meta mb-0">{{ $user->designation ?: 'Status Not Provided' }}</p>
+                                @if ($isEmployer)
+                                    <p class="student-profile-meta mb-0">
+                                        {{ $user->designation ?: 'Designation not provided' }}</p>
+                                    <p class="student-profile-meta mb-0">{{ $user->company_name ?: 'Company not provided' }}
+                                    </p>
+                                @else
+                                    <p class="student-profile-meta mb-0">Student ID:
+                                        {{ $user->student_id ?: 'Not provided' }}</p>
+                                    <p class="student-profile-meta mb-0">{{ $user->designation ?: 'Status Not Provided' }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
 
@@ -46,22 +59,29 @@
                             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                                 <div>
                                     <h2 class="fs-4 mb-1">Profile details</h2>
-                                    <p class="text-muted mb-0">Student information submitted to the placement portal.</p>
+                                    @if ($isEmployer)
+                                        <p class="text-muted mb-0">Employer information submitted to the placement portal.
+                                        </p>
+                                    @else
+                                        <p class="text-muted mb-0">Student information submitted to the placement portal.
+                                        </p>
+                                    @endif
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.users.students') }}" class="btn btn-outline-secondary">Back to
-                                        Students</a>
-                                    <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => 'students']) }}"
-                                        class="btn btn-primary">Edit Student</a>
+                                    <a href="{{ $isEmployer ? route('admin.users.employers') : route('admin.users.students') }}"
+                                        class="btn btn-outline-secondary">Back to
+                                        {{ $isEmployer ? 'Employers' : 'Students' }}</a>
+                                    <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isEmployer ? 'employers' : 'students']) }}"
+                                        class="btn btn-primary">Edit {{ $isEmployer ? 'Employer' : 'Student' }}</a>
                                 </div>
                             </div>
 
                             <div class="row g-3">
-                                @include('admin.users.profile-field', [
+                                {{-- @include('admin.users.profile-field', [
                                     'label' => 'Status',
                                     'value' =>
                                         $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status),
-                                ])
+                                ]) --}}
                                 @include('admin.users.profile-field', [
                                     'label' => 'Email',
                                     'value' => $user->email,
@@ -78,105 +98,139 @@
                                     'label' => 'Additional Mobile',
                                     'value' => $user->mobile_2,
                                 ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Student Status',
-                                    'value' => $user->designation,
-                                ])
+                                @if ($isEmployer)
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Company Name',
+                                        'value' => $user->company_name,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Company Address',
+                                        'value' => $user->company_address,
+                                        'wide' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Website',
+                                        'value' => $user->website_url,
+                                        'link' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'LinkedIn Page',
+                                        'value' => $user->linkedin_url,
+                                        'link' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Facebook Page',
+                                        'value' => $user->facebook_url,
+                                        'link' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Company Description',
+                                        'value' => $user->company_description,
+                                        'wide' => true,
+                                    ])
+                                @else
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Student Status',
+                                        'value' => $user->designation,
+                                    ])
+                                @endif
                             </div>
 
-                            <div class="profile-divider">
-                                <h3>Personal details</h3>
-                            </div>
-                            <div class="row g-3">
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Date of Birth',
-                                    'value' => $user->date_of_birth
-                                        ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y')
-                                        : 'Not provided',
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Gender',
-                                    'value' => $user->gender,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Residential Address',
-                                    'value' => $user->residential_address,
-                                    'wide' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Postal Address',
-                                    'value' => $user->postal_address,
-                                    'wide' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'City',
-                                    'value' => $user->city,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Country',
-                                    'value' => $user->country,
-                                ])
-                            </div>
+                            @if (!$isEmployer)
+                                <div class="profile-divider">
+                                    <h3>Personal details</h3>
+                                </div>
+                                <div class="row g-3">
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Date of Birth',
+                                        'value' => $user->date_of_birth
+                                            ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y')
+                                            : 'Not provided',
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Gender',
+                                        'value' => $user->gender,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Residential Address',
+                                        'value' => $user->residential_address,
+                                        'wide' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Postal Address',
+                                        'value' => $user->postal_address,
+                                        'wide' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'City',
+                                        'value' => $user->city,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Country',
+                                        'value' => $user->country,
+                                    ])
+                                </div>
 
-                            <div class="profile-divider">
-                                <h3>Education</h3>
-                            </div>
-                            <div class="row g-3">
-                                @include('admin.users.profile-field', [
-                                    'label' => 'High School',
-                                    'value' => $user->high_school,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'High School Graduation Year',
-                                    'value' => $user->high_school_graduation_year,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'University',
-                                    'value' => $user->university,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Degree / Program',
-                                    'value' => $user->degree,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Major / Specialization',
-                                    'value' => $user->major,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Graduation Year',
-                                    'value' => $user->graduation_year,
-                                ])
-                            </div>
+                                <div class="profile-divider">
+                                    <h3>Education</h3>
+                                </div>
+                                <div class="row g-3">
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'High School',
+                                        'value' => $user->high_school,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'High School Graduation Year',
+                                        'value' => $user->high_school_graduation_year,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'University',
+                                        'value' => $user->university,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Degree / Program',
+                                        'value' => $user->degree,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Major / Specialization',
+                                        'value' => $user->major,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Graduation Year',
+                                        'value' => $user->graduation_year,
+                                    ])
+                                </div>
 
-                            <div class="profile-divider">
-                                <h3>About and links</h3>
-                            </div>
-                            <div class="row g-3">
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Skills',
-                                    'value' => $user->skills,
-                                    'wide' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Short Bio',
-                                    'value' => $user->bio,
-                                    'wide' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'LinkedIn',
-                                    'value' => $user->linkedin_url,
-                                    'link' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Facebook',
-                                    'value' => $user->facebook_url,
-                                    'link' => true,
-                                ])
-                                @include('admin.users.profile-field', [
-                                    'label' => 'Availability',
-                                    'value' => $user->availability,
-                                ])
-                            </div>
+                                <div class="profile-divider">
+                                    <h3>About and links</h3>
+                                </div>
+                                <div class="row g-3">
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Skills',
+                                        'value' => $user->skills,
+                                        'wide' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Short Bio',
+                                        'value' => $user->bio,
+                                        'wide' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'LinkedIn',
+                                        'value' => $user->linkedin_url,
+                                        'link' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Facebook',
+                                        'value' => $user->facebook_url,
+                                        'link' => true,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Availability',
+                                        'value' => $user->availability,
+                                    ])
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -213,6 +267,10 @@
             padding: 1.5rem;
             color: #fff;
             background: linear-gradient(120deg, #174a68, #237d83);
+        }
+
+        .student-profile-header-employer {
+            background: linear-gradient(120deg, #7a4b20, #b8782e);
         }
 
         .student-profile-avatar {

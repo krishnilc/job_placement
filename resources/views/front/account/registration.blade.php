@@ -83,6 +83,12 @@
                                         placeholder="Enter company name">
                                     <p class="text-danger" id="companyNameError"></p>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="company_address" class="mb-2">Company Address*</label>
+                                    <textarea name="company_address" id="company_address" class="form-control"
+                                        placeholder="Enter company address" rows="3"></textarea>
+                                    <p class="text-danger" id="companyAddressError"></p>
+                                </div>
                             </div>
 
                             <button class="btn btn-primary mt-2">Register</button>
@@ -105,13 +111,13 @@
                     $('#studentIdGroup').show();
                     $('#student_id').attr('required', true);
                     $('#employerFields').hide();
-                    $('#designation, #company_name').removeAttr('required');
+                    $('#designation, #company_name, #company_address').removeAttr('required');
                 } else {
                     $('#studentIdGroup').hide();
                     $('#student_id').removeAttr('required');
                     $('#studentIdError').text('');
                     $('#employerFields').show();
-                    $('#designation, #company_name').attr('required', true);
+                    $('#designation, #company_name, #company_address').attr('required', true);
                 }
             }
 
@@ -140,6 +146,7 @@
                         $("#mobileError").text('');
                         $("#designationError").text('');
                         $("#companyNameError").text('');
+                            $("#companyAddressError").text('');
 
                         if (response.status == false) {
                             var errors = response.errors;
@@ -166,6 +173,9 @@
                             }
                             if (errors.company_name) {
                                 $("#companyNameError").text(errors.company_name[0]);
+                            }
+                            if (errors.company_address) {
+                                $("#companyAddressError").text(errors.company_address[0]);
                             }
                         } else {
                             window.location.href = "{{ route('account.login') }}";

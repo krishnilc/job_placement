@@ -65,6 +65,14 @@
                                                     value="{{ $user->designation }}">
                                                 <p class="text-danger" id="designationError"></p>
                                             </div>
+                                            @if ($user->role === 'employer')
+                                                <div class="mb-4">
+                                                    <label for="company_name" class="mb-2">Company Name*</label>
+                                                    <input type="text" name="company_name" id="company_name" class="form-control"
+                                                        value="{{ $user->company_name }}">
+                                                    <p class="text-danger" id="company_nameError"></p>
+                                                </div>
+                                            @endif
                                         @endif
                                         @if (!in_array($user->role, ['user', 'student'], true))
                                             <div class="mb-4">
@@ -142,6 +150,7 @@
                     $("#mobileError").text('');
                     $("#student_idError").text('');
                     $("#designationError").text('');
+                    $("#company_nameError").text('');
                     $("#roleError").text('');
                     $("#statusError").text('');
 
@@ -158,6 +167,9 @@
                         }
                         if (errors.designation) {
                             $("#designationError").text(errors.designation[0]);
+                        }
+                        if (errors.company_name) {
+                            $("#company_nameError").text(errors.company_name[0]);
                         }
                         if (errors.mobile) {
                             $("#mobileError").text(errors.mobile[0]);

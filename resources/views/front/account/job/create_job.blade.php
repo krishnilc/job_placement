@@ -142,21 +142,24 @@
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Name<span class="req">*</span></label>
                                         <input type="text" placeholder="Company Name" id="company_name"
-                                            name="company_name" class="form-control">
+                                            name="company_name" class="form-control"
+                                            value="{{ old('company_name', auth()->user()->role === 'employer' ? auth()->user()->company_name : '') }}">
                                             <p class="text-danger" id="companyNameError"></p>
                                     </div>
 
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location</label>
                                         <input type="text" placeholder="Company Location" id="company_location" name="company_location"
-                                            class="form-control">
+                                            class="form-control"
+                                            value="{{ old('company_location', auth()->user()->role === 'employer' ? auth()->user()->company_address : '') }}">
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Company Website</label>
                                     <input type="text" placeholder="Company Website (including http://)" id="company_website" name="company_website"
-                                        class="form-control">
+                                        class="form-control"
+                                        value="{{ old('company_website', auth()->user()->role === 'employer' ? auth()->user()->website_url : '') }}">
                                 </div>
                             </div>
                             <div class="card-footer  p-4">

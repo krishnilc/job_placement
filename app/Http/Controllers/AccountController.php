@@ -74,6 +74,7 @@ class AccountController extends Controller
             'student_id' => $role === 'student' ? 'required|string|max:9|unique:users,student_id' : 'nullable|string|max:9',
             'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
             'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
+            'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
         ], [
             'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
@@ -94,6 +95,7 @@ class AccountController extends Controller
                 $user->student_id = null;
                 $user->designation = $request->designation;
                 $user->company_name = $request->company_name;
+                $user->company_address = $request->company_address;
             }
             $user->save();
 
@@ -228,6 +230,10 @@ class AccountController extends Controller
             'designation' => in_array($role, ['admin', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
+            'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
+            'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
+            'website_url' => $role === 'employer' ? 'nullable|url|max:255' : 'nullable',
+            'company_description' => $role === 'employer' ? 'required|string|max:2000' : 'nullable',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|string|max:20',
             'residential_address' => 'nullable|string|max:255',
@@ -256,6 +262,12 @@ class AccountController extends Controller
             $user->email_2 = $request->email_2;
             $user->mobile_2 = $request->mobile_2;
             $user->designation = $request->designation;
+            if ($role === 'employer') {
+                $user->company_name = $request->company_name;
+                $user->company_address = $request->company_address;
+                $user->website_url = $request->website_url;
+                $user->company_description = $request->company_description;
+            }
             $user->date_of_birth = $request->date_of_birth;
             $user->gender = $request->gender;
             $user->residential_address = $request->residential_address;

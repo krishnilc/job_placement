@@ -15,7 +15,7 @@
             </div>
             <div class="col-lg-9">
                 <div class="profile-page">
-                    <div class="profile-hero mb-4">
+                    <div class="profile-hero {{ $isEmployer ? 'profile-hero-employer' : ($isAdmin ? 'profile-hero-admin' : '') }} mb-4">
                         <div class="profile-hero-content">
                             <div class="profile-avatar">
                                 @if ($user->image)
@@ -54,6 +54,11 @@
                         <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-building-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Company information</h2><p class="profile-section-caption">Your employer account details</p></div></div><div class="row g-3">
                             @include('front.account.profile-field', ['icon' => 'building-o', 'label' => 'Company Name', 'value' => $user->company_name])
                             @include('front.account.profile-field', ['icon' => 'briefcase', 'label' => 'Designation', 'value' => $user->designation])
+                            @include('front.account.profile-field', ['icon' => 'map-marker', 'label' => 'Company Address', 'value' => $user->company_address, 'wide' => true])
+                            @include('front.account.profile-field', ['icon' => 'globe', 'label' => 'Website', 'value' => $user->website_url, 'link' => true])
+                            @include('front.account.profile-field', ['icon' => 'linkedin', 'label' => 'LinkedIn Page', 'value' => $user->linkedin_url, 'link' => true])
+                            @include('front.account.profile-field', ['icon' => 'facebook', 'label' => 'Facebook Page', 'value' => $user->facebook_url, 'link' => true])
+                            @include('front.account.profile-field', ['icon' => 'file-text-o', 'label' => 'Company Description', 'value' => $user->company_description, 'wide' => true])
                         </div></div>
                     @elseif ($isAdmin)
                         <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-shield" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Account information</h2><p class="profile-section-caption">Your administrator access details</p></div></div><div class="row g-3">
@@ -83,6 +88,8 @@
 <style>
     .profile-page { --profile-ink: #183b56; --profile-muted: #6f8291; --profile-line: #e5edf1; --profile-soft: #f5f9fa; }
     .profile-hero { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 2rem; color: #fff; background: linear-gradient(120deg, #174a68 0%, #237d83 100%); border-radius: .75rem; box-shadow: 0 .5rem 1.5rem rgba(24, 59, 86, .16); }
+    .profile-hero-employer { background: linear-gradient(120deg, #7a4b20 0%, #b8782e 100%); box-shadow: 0 .5rem 1.5rem rgba(122, 75, 32, .18); }
+    .profile-hero-admin { background: linear-gradient(120deg, #263d73 0%, #3568a8 100%); box-shadow: 0 .5rem 1.5rem rgba(38, 61, 115, .18); }
     .profile-hero-content { display: flex; align-items: center; gap: 1rem; min-width: 0; }
     .profile-avatar { display: flex; align-items: center; justify-content: center; width: 84px; height: 84px; flex: 0 0 84px; overflow: hidden; color: #237d83; font-size: 2rem; background: #fff; border: 4px solid rgba(255, 255, 255, .35); border-radius: 50%; }
     .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
