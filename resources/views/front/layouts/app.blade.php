@@ -100,7 +100,8 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <a class="dropdown-item py-2" href="{{ route('account.profile') }}">
+                                    <a class="dropdown-item py-2"
+                                        href="{{ Auth::user()->role == 'admin' ? route('admin.account.profile') : (Auth::user()->role == 'employer' ? route('employer.account.profile') : route('account.profile')) }}">
                                         Account Settings
                                     </a>
                                 </li>

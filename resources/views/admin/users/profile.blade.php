@@ -36,6 +36,7 @@
                                 <p class="student-profile-eyebrow mb-1">Student profile</p>
                                 <h1 class="student-profile-name mb-1">{{ $user->name }}</h1>
                                 <p class="student-profile-meta mb-0">Student ID: {{ $user->student_id ?: 'Not provided' }}</p>
+                                <p class="profile-role mb-0">{{ $user->designation}}</p>
                             </div>
                         </div>
 

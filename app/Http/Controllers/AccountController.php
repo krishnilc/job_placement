@@ -178,6 +178,34 @@ class AccountController extends Controller
         ]);
     }
 
+    public function employerProfile()
+    {
+        return view('employer.account.edit-profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function employerViewProfile()
+    {
+        return view('employer.account.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function adminProfile()
+    {
+        return view('admin.account.edit-profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function adminViewProfile()
+    {
+        return view('admin.account.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
     public function updateProfile(Request $request)
     {
         $id = Auth::user()->id;
@@ -679,6 +707,16 @@ class AccountController extends Controller
     public function editPassword()
     {
         return view('front.account.edit-password');
+    }
+
+    public function employerEditPassword()
+    {
+        return view('employer.account.edit-password');
+    }
+
+    public function adminEditPassword()
+    {
+        return view('admin.account.edit-password');
     }
 
     public function updatePassword(Request $request)

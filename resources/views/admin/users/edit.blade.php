@@ -51,28 +51,38 @@
                                                 value="{{ $user->email }}">
                                             <p class="text-danger" id="emailError"></p>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="mobile" class="mb-2">Mobile*</label>
-                                            <input type="text" name="mobile" id="mobile" class="form-control"
-                                                value="{{ $user->mobile }}">
-                                            <p class="text-danger" id="mobileError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="designation" class="mb-2">Designation*</label>
-                                            <input type="text" name="designation" id="designation" class="form-control"
-                                                value="{{ $user->designation }}">
-                                            <p class="text-danger" id="designationError"></p>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <label for="role" class="mb-2">Role*</label>
-                                            <select name="role" id="role" class="form-control">
-                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                                <option value="student" {{ in_array($user->role, ['user', 'student'], true) ? 'selected' : '' }}>Student</option>
-                                                <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
-                                            </select>
-                                            <p class="text-danger" id="roleError"></p>
-                                        </div>
+                                        @if (in_array($user->role, ['user', 'student'], true))
+                                            <div class="mb-4">
+                                                <label for="student_id" class="mb-2">Student ID*</label>
+                                                <input type="text" name="student_id" id="student_id" class="form-control"
+                                                    value="{{ $user->student_id }}" maxlength="9">
+                                                <p class="text-danger" id="student_idError"></p>
+                                            </div>
+                                        @else
+                                            <div class="mb-4">
+                                                <label for="designation" class="mb-2">Designation*</label>
+                                                <input type="text" name="designation" id="designation" class="form-control"
+                                                    value="{{ $user->designation }}">
+                                                <p class="text-danger" id="designationError"></p>
+                                            </div>
+                                        @endif
+                                        @if (!in_array($user->role, ['user', 'student'], true))
+                                            <div class="mb-4">
+                                                <label for="mobile" class="mb-2">Mobile*</label>
+                                                <input type="text" name="mobile" id="mobile" class="form-control"
+                                                    value="{{ $user->mobile }}">
+                                                <p class="text-danger" id="mobileError"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="role" class="mb-2">Role*</label>
+                                                <select name="role" id="role" class="form-control">
+                                                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                                    <option value="student" {{ in_array($user->role, ['user', 'student'], true) ? 'selected' : '' }}>Student</option>
+                                                    <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
+                                                </select>
+                                                <p class="text-danger" id="roleError"></p>
+                                            </div>
+                                        @endif
 
                                         @if (in_array($user->role, ['user', 'student', 'employer'], true))
                                             <div class="mb-4">
@@ -130,6 +140,7 @@
                     $("#passwordError").text('');
                     $("#confirmPasswordError").text('');
                     $("#mobileError").text('');
+                    $("#student_idError").text('');
                     $("#designationError").text('');
                     $("#roleError").text('');
                     $("#statusError").text('');
@@ -150,6 +161,9 @@
                         }
                         if (errors.mobile) {
                             $("#mobileError").text(errors.mobile[0]);
+                        }
+                        if (errors.student_id) {
+                            $("#student_idError").text(errors.student_id[0]);
                         }
                         if (errors.role) {
                             $("#roleError").text(errors.role[0]);

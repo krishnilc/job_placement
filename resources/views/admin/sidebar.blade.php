@@ -16,12 +16,12 @@
 <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
-            @if (request()->routeIs('account.profile') || request()->routeIs('account.editProfile') || request()->routeIs('account.editPassword'))
+            @if (request()->routeIs('admin.account.*'))
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
+                    <a href="{{ route('admin.account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.editProfile') }}"> <i class="fa fa-arrow-right"></i> My Profile
+                    <a href="{{ route('admin.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> My Profile
                         Update</a>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
@@ -31,9 +31,15 @@
                     </button>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                    <a href="{{ route('account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
+                    <a href="{{ route('admin.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
                 </li>
             @else
+
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <a href="{{ route('admin.account.profile') }}">
+                        <i class="fa fa-arrow-right"></i> Account Settings
+                    </a>
+                </li>
 
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                     <a href="{{ route('admin.jobs') }}">

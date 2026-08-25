@@ -37,6 +37,12 @@ Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->na
 
 Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::middleware('auth')->prefix('account')->name('admin.account.')->group(function () {
+        Route::get('/profile', [AccountController::class, 'adminViewProfile'])->name('profile');
+        Route::get('/edit-profile', [AccountController::class, 'adminProfile'])->name('editProfile');
+        Route::get('/edit-password', [AccountController::class, 'adminEditPassword'])->name('editPassword');
+    });
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::get('/users/students', [UserController::class, 'students'])->name('admin.users.students');
     Route::get('/users/employers', [UserController::class, 'employers'])->name('admin.users.employers');
@@ -54,6 +60,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
 
 Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
     Route::get('/home', [EmployerController::class, 'index'])->name('employer.dashboard');
+
+    Route::middleware('auth')->prefix('account')->name('employer.account.')->group(function () {
+        Route::get('/profile', [AccountController::class, 'employerViewProfile'])->name('profile');
+        Route::get('/edit-profile', [AccountController::class, 'employerProfile'])->name('editProfile');
+        Route::get('/edit-password', [AccountController::class, 'employerEditPassword'])->name('editPassword');
+    });
 });
 
 

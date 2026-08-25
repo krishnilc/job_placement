@@ -93,27 +93,35 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         // $id = Auth::user()->id;
+        $user = User::findOrFail($id);
+        $isStudent = in_array($user->role, ['user', 'student'], true);
 
         // Validation rules for profile update
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:5|max:20',
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
-            'mobile' => 'required|digits:7',
-            'role' => 'required|in:admin,student,employer,user',
+            'mobile' => $isStudent ? 'nullable' : 'required|digits:7',
+            'role' => $isStudent ? 'nullable' : 'required|in:admin,student,employer,user',
+            'student_id' => $isStudent ? 'required|string|max:9|unique:users,student_id,' . $id . ',id' : 'nullable',
+            'designation' => $isStudent ? 'nullable' : 'nullable|string|max:100',
             'status' => 'nullable|in:pending,active,blocked',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
         ]);
 
         if ($validator->passes()) {
-            $user = User::find($id);
-            $normalizedRole = $request->role === 'user' ? 'student' : $request->role;
+            $normalizedRole = $isStudent ? 'student' : ($request->role === 'user' ? 'student' : $request->role);
 
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->designation = $request->designation;
+            if (!$isStudent) {
+                $user->mobile = $request->mobile;
+            }
             $user->role = $normalizedRole;
+            $user->student_id = $normalizedRole === 'student' ? $request->student_id : null;
+            if (!$isStudent) {
+                $user->designation = $request->designation;
+            }
             if (in_array($normalizedRole, ['student', 'employer'], true)) {
                 $user->status = $request->status ?? $user->status ?? 'pending';
             } elseif ($user->status !== 'active') {
