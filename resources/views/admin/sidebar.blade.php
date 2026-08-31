@@ -19,10 +19,10 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             @if (request()->routeIs('admin.account.*'))
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.profile')])>
                     <a href="{{ route('admin.account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.editProfile')])>
                     <a href="{{ route('admin.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> Profile
                         Update</a>
                 </li>
@@ -32,7 +32,7 @@
                         <i class="fa fa-camera"></i> Change Profile Picture
                     </button>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.editPassword')])>
                     <a href="{{ route('admin.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
                 </li>
             @else
@@ -43,35 +43,35 @@
                     </a>
                 </li> --}}
 
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.jobs', 'admin.jobs.edit')])>
                     <a href="{{ route('admin.jobs') }}">
                         <i class="fa fa-arrow-right"></i> Manage Jobs
                     </a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('account.createJob')])>
                     @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                         <a href="{{ route('account.createJob') }}">
                             <i class="fa fa-arrow-right"></i> Create Job
                         </a>
                     @endif
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('account.myJobs', 'account.editJob')])>
                     <a href="{{ route('account.myJobs') }}">
                         <i class="fa fa-arrow-right"></i> My Jobs
                     </a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.jobApplications')])>
                     <a href="{{ route('admin.jobApplications') }}">
                         <i class="fa fa-arrow-right"></i> Review Applications
                     </a>
                 </li>
 
-                <li class="list-group-item d-flex justify-content-between p-3">
+                <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.students') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && $user->role !== 'employer')])>
                     <a href="{{ route('admin.users.students') }}">
                         <i class="fa fa-arrow-right"></i> Manage Students
                     </a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between p-3">
+                <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.employers') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && $user->role === 'employer')])>
                     <a href="{{ route('admin.users.employers') }}">
                         <i class="fa fa-arrow-right"></i> Manage Employers
                     </a>

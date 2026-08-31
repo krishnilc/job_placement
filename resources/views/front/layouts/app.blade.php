@@ -54,13 +54,13 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-0 ms-sm-0 me-auto mb-2 mb-lg-0 ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('home') }}">Home</a>
+                            <a @class(['nav-link', 'main-nav-active' => request()->routeIs('home')]) aria-current="page" href="{{ route('home') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('front.jobs') }}">Find Jobs</a>
+                            <a @class(['nav-link', 'main-nav-active' => request()->routeIs('front.jobs', 'jobDetail')]) aria-current="page" href="{{ route('front.jobs') }}">Find Jobs</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
+                            <a @class(['nav-link', 'main-nav-active' => request()->routeIs('front.contact')]) aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
                         </li>
                     </ul>
 
@@ -75,14 +75,14 @@
                                 aria-labelledby="accountDropdown">
                                 @if (Auth::user()->role == 'admin')
                                     <li>
-                                        <a class="dropdown-item py-2" href="{{ route('admin.dashboard') }}">
+                                        <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('admin.dashboard')]) href="{{ route('admin.dashboard') }}">
                                             Admin Dashboard
                                         </a>
                                     </li>
                                 @endif
                                 @if (Auth::user()->role == 'employer')
                                     <li>
-                                        <a class="dropdown-item py-2" href="{{ route('employer.dashboard') }}">
+                                        <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('employer.dashboard')]) href="{{ route('employer.dashboard') }}">
                                             Employer Dashboard
                                         </a>
                                     </li>
@@ -90,7 +90,7 @@
 
                                 @if (Auth::user()->role == 'student')
                                     <li>
-                                        <a class="dropdown-item py-2" href="{{ route('student.dashboard') }}">
+                                        <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('student.dashboard')]) href="{{ route('student.dashboard') }}">
                                             Student Dashboard
                                         </a>
                                     </li>
@@ -100,7 +100,7 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
-                                    <a class="dropdown-item py-2"
+                                    <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('admin.account.*', 'employer.account.*', 'account.profile', 'account.editProfile', 'account.editPassword')])
                                         href="{{ Auth::user()->role == 'admin' ? route('admin.account.profile') : (Auth::user()->role == 'employer' ? route('employer.account.profile') : route('account.profile')) }}">
                                         Account Settings
                                     </a>

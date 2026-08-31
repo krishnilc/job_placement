@@ -20,10 +20,10 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             @if (request()->routeIs('employer.account.*'))
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('employer.account.profile')])>
                     <a href="{{ route('employer.account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('employer.account.editProfile')])>
                     <a href="{{ route('employer.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> Profile
                         Update</a>
                 </li>
@@ -33,7 +33,7 @@
                         <i class="fa fa-camera"></i> Change Profile Picture
                     </button>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('employer.account.editPassword')])>
                     <a href="{{ route('employer.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
                 </li>
             @else
@@ -42,19 +42,19 @@
                         <i class="fa fa-arrow-right"></i> Account Settings
                     </a>
                 </li> --}}
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('account.createJob')])>
                     @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                         <a href="{{ route('account.createJob') }}">
                             <i class="fa fa-arrow-right"></i> Create Job
                         </a>
                     @endif
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('account.myJobs', 'account.editJob')])>
                     <a href="{{ route('account.myJobs') }}">
                         <i class="fa fa-arrow-right"></i> My Jobs
                     </a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.jobApplications')])>
                     <a href="{{ route('admin.jobApplications') }}">
                         <i class="fa fa-arrow-right"></i> Review Applications
                     </a>

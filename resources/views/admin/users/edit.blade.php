@@ -96,9 +96,9 @@
                                             <div class="mb-4">
                                                 <label for="status" class="mb-2">Account Status*</label>
                                                 <select name="status" id="status" class="form-control">
-                                                    <option value="pending" {{ $user->status === 'pending' ? 'selected' : '' }}>Pending Approval</option>
-                                                    <option value="active" {{ $user->status === 'active' ? 'selected' : '' }}>Active</option>
-                                                    <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }}>Blocked</option>
+                                                    <option value="pending" {{ $user->status === 'pending' ? 'selected' : '' }} class="text-warning">Pending Approval</option>
+                                                    <option value="active" {{ $user->status === 'active' ? 'selected' : '' }} class="text-success">Active</option>
+                                                    <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }} class="text-danger">Blocked</option>
                                                 </select>
                                                 <p class="text-danger" id="statusError"></p>
                                             </div>
