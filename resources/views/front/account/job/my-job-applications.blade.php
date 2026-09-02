@@ -102,7 +102,7 @@
                                                     </td> --}}
                                                     <td>
                                                         <div class="application-status text-capitalize">
-                                                            {{ $jobApplication->status == 1 ? 'shortlisted' : 'in progress' }}
+                                                            {{ $jobApplication->applicationStatus?->name ?? 'Submitted' }}
                                                         </div>
                                                     </td>
                                                     <td>

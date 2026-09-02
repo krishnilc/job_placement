@@ -171,16 +171,7 @@
                                                     <td class="fw-bold">{{ $application->user->name ?? 'N/A' }}</td>
                                                     <td>{{ $application->job->title ?? 'N/A' }}</td>
                                                     <td>
-                                                        @if ($application->status == 'pending')
-                                                            <span class="badge bg-warning text-dark">Pending</span>
-                                                        @elseif($application->status == 'accepted')
-                                                            <span class="badge bg-success">Accepted</span>
-                                                        @elseif($application->status == 'rejected')
-                                                            <span class="badge bg-danger">Rejected</span>
-                                                        @else
-                                                            <span
-                                                                class="badge bg-secondary">{{ ucfirst($application->status) }}</span>
-                                                        @endif
+                                                        <span class="badge bg-secondary">{{ $application->applicationStatus?->name ?? 'Submitted' }}</span>
                                                     </td>
                                                     <td><small
                                                             class="text-muted">{{ \Carbon\Carbon::parse($application->created_at)->format('M d, Y') }}</small>

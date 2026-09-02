@@ -145,6 +145,69 @@
 
                     </div>
 
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Application Status Reports</h5>
+                            <a href="{{ route('admin.jobApplications') }}" class="btn btn-sm btn-outline-primary">Review Applications</a>
+                        </div>
+
+                        <div class="row mb-3">
+                            @foreach($applicationStatusCategoryReports as $report)
+                                @php
+                                    $categoryClass = match ($report['category']) {
+                                        'Successful' => 'success',
+                                        'Unsuccessful' => 'danger',
+                                        'Withdrawn' => 'secondary',
+                                        default => 'warning',
+                                    };
+                                @endphp
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <div class="card border-0 shadow h-100">
+                                        <div class="card-body">
+                                            <p class="text-muted mb-1">{{ $report['category'] }}</p>
+                                            <h3 class="text-{{ $categoryClass }} mb-0">{{ $report['application_count'] }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="card border-0 shadow">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Category</th>
+                                            <th class="text-end">Applications</th>
+                                            <th style="min-width: 170px;">Share of Applications</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($applicationStatusReports as $report)
+                                            @php
+                                                $percentage = $totalApplications > 0 ? round(($report->application_count / $totalApplications) * 100) : 0;
+                                            @endphp
+                                            <tr>
+                                                <td class="fw-semibold">{{ $report->name }}</td>
+                                                <td><span class="badge bg-light text-dark border">{{ $report->category }}</span></td>
+                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                        <small class="text-muted text-nowrap">{{ $percentage }}%</small>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Recent Applications Section -->
                     <div class="card border-0 shadow">
                         <div class="card-header bg-light">
@@ -159,6 +222,7 @@
                                                 <th>Job Title</th>
                                                 <th>Applicant</th>
                                                 <th>Employer</th>
+                                                <th>Status</th>
                                                 <th>Applied Date</th>
                                                 {{-- <th>Action</th> --}}
                                             </tr>
@@ -171,6 +235,7 @@
                                                     </td>
                                                     <td>{{ $application->user->name ?? 'N/A' }}</td>
                                                     <td>{{ $application->job->company_name ?? 'N/A' }}</td>
+                                                    <td>{{ $application->applicationStatus?->name ?? 'Submitted' }}</td>
                                                     <td>
                                                         {{ $application->created_at->format('M d, Y') }}
                                                     </td>

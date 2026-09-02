@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\employer;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApplicationStatus;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\User;
@@ -29,15 +30,24 @@ class EmployerController extends Controller
         })->count();
 
         // Pending applications
+        $pendingStatusIds = ApplicationStatus::whereIn('name', ['Submitted', 'Under Review'])->pluck('id');
         $pendingApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->where('status', 'pending')->count();
+        })->where(function ($query) use ($pendingStatusIds) {
+            $query->whereIn('application_status_id', $pendingStatusIds)
+                ->orWhere(function ($legacyQuery) {
+                    $legacyQuery->whereNull('application_status_id')
+                        ->where(function ($statusQuery) {
+                            $statusQuery->whereNull('status')->orWhere('status', 'pending');
+                        });
+                });
+        })->count();
 
         // Recent job applications
         $recentApplications = JobApplication::whereHas('job', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })
-            ->with(['user', 'job'])
+            ->with(['user', 'job', 'applicationStatus'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

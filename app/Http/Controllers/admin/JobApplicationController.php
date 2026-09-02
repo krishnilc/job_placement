@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApplicationStatus;
 use App\Models\JobApplication;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class JobApplicationController extends Controller
 {
@@ -40,16 +43,45 @@ class JobApplicationController extends Controller
         }
 
         $applications = $applicationsQuery
-            ->with('job', 'user', 'employer')
+            ->with('job', 'user', 'employer', 'applicationStatus')
             ->orderBy($sortableColumns[$sort], $direction)
             ->paginate(10)
             ->withQueryString();
 
         return view('admin.job-applications.list', [
             'applications' => $applications,
+            'applicationStatuses' => ApplicationStatus::orderBy('sort_order')->get(),
             'sort' => $sort,
             'direction' => $direction,
         ]);
+    }
+
+    public function updateStatus(Request $request, JobApplication $application)
+    {
+        $request->validate([
+            'application_status_id' => ['required', 'integer', Rule::exists('application_statuses', 'id')],
+        ]);
+
+        $user = $request->user();
+        if ($user->role === 'employer' && !$application->job()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $statusId = (int) $request->input('application_status_id');
+        if ((int) $application->application_status_id !== $statusId) {
+            DB::transaction(function () use ($application, $statusId, $user) {
+                $application->update(['application_status_id' => $statusId]);
+
+                DB::table('application_status_history')->insert([
+                    'job_application_id' => $application->id,
+                    'application_status_id' => $statusId,
+                    'changed_by' => $user->id,
+                    'created_at' => now(),
+                ]);
+            });
+        }
+
+        return back()->with('success', 'Application status updated successfully.');
     }
 
     public function destroy(Request $request)

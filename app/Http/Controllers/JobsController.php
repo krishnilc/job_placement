@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Mail\JobNotificationEmail;
 use App\Models\Category;
+use App\Models\ApplicationStatus;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
@@ -178,6 +179,8 @@ class JobsController extends Controller
       $application->user_id = Auth::user()->id; // Set the user ID on the application to the currently authenticated user's ID
       $application->employer_id = $employer_id; // Set the employer ID on the application to the employer ID associated with the job
       $application->applied_at = now(); // Set the application date to the current date and time
+      $application->status = 'pending';
+      $application->application_status_id = ApplicationStatus::where('name', 'Submitted')->value('id');
 
       // Store single application file
       if ($request->hasFile('application')) {

@@ -634,7 +634,7 @@ class AccountController extends Controller
     public function myJobApplications(Request $request)
     {
         $jobApplications = JobApplication::where('user_id', Auth::user()->id)
-            ->with(['job', 'job.JobType', 'job.applications'])
+            ->with(['job', 'job.JobType', 'job.applications', 'applicationStatus'])
             ->orderBy('created_at', 'desc')
             ->paginate(10); // Retrieve job applications submitted by the authenticated user
 
