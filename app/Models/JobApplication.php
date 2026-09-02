@@ -21,6 +21,7 @@ class JobApplication extends Model
         'certificates_file',
         'certificates_file_names',
         'status',
+        'application_status_id',
     ];
 
      protected $casts = [
@@ -63,5 +64,10 @@ class JobApplication extends Model
      public function employer()
      {
          return $this->belongsTo(User::class, 'employer_id');
+     }
+
+     public function applicationStatus()
+     {
+         return $this->belongsTo(ApplicationStatus::class);
      }
 }
