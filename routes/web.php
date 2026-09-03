@@ -37,6 +37,7 @@ Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->na
 
 Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/reports/export/{report}/{format}', [DashboardController::class, 'exportReport'])->name('admin.reports.export');
 
     Route::middleware('auth')->prefix('account')->name('admin.account.')->group(function () {
         Route::get('/profile', [AccountController::class, 'adminViewProfile'])->name('profile');

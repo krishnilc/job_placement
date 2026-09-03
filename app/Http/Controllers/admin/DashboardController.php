@@ -7,12 +7,56 @@ use App\Models\ApplicationStatus;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
+    {
+        return view('admin.dashboard', $this->buildDashboardData($request));
+    }
+
+    public function exportReport(Request $request, string $report, string $format)
+    {
+        $format = strtolower($format);
+        if (! in_array($format, ['pdf', 'excel'], true)) {
+            abort(404);
+        }
+
+        $dashboard = $this->buildDashboardData($request);
+        $rows = $this->buildExportRows($report, $dashboard);
+        $title = ucfirst(str_replace('-', ' ', $report));
+
+        if ($format === 'pdf') {
+            $html = $this->renderPdfHtml($title, $rows);
+
+            return Pdf::loadHTML($html)
+                ->setPaper('a4', 'landscape')
+                ->download(Str::slug($title) . '-report.pdf');
+        }
+
+        $csv = fopen('php://temp', 'r+');
+        $headers = array_keys($rows[0] ?? []);
+        if ($headers) {
+            fputcsv($csv, $headers);
+            foreach ($rows as $row) {
+                fputcsv($csv, array_map(fn ($value) => is_scalar($value) ? $value : json_encode($value), $row));
+            }
+        }
+
+        rewind($csv);
+        $contents = stream_get_contents($csv);
+        fclose($csv);
+
+        return response($contents, 200)
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="' . Str::slug($title) . '-report.csv"');
+    }
+
+    private function buildDashboardData(Request $request): array
     {
         // Get statistics
         $totalUsers = User::count();
@@ -62,8 +106,6 @@ class DashboardController extends Controller
         });
         $collegePlacementReports = $collegePlacementReports->sortByDesc('placement_rate')->values();
 
-        // Interview Conversion Rate: of applications that ever reached "Interview Completed" (or beyond),
-        // how many ended up "Placed". Uses the status history log since current status only reflects the latest stage.
         $interviewThresholdOrder = ApplicationStatus::where('name', 'Interview Completed')->value('sort_order');
         $interviewStatusIds = $interviewThresholdOrder !== null
             ? ApplicationStatus::where('sort_order', '>=', $interviewThresholdOrder)->pluck('id')
@@ -101,14 +143,13 @@ class DashboardController extends Controller
         });
         $interviewConversionByProgramme = $interviewConversionByProgramme->sortByDesc('conversion_rate')->values();
 
-        // Rejection Trends: overall rate plus breakdowns by year, month, college, programme, job category, employer and opportunity type.
         $rejectedApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Rejected'))->count();
         $activeApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('category', 'Active'))->count();
         $unsuccessfulApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('category', 'Unsuccessful'))->count();
         $rejectionRate = $placementTotalApplications > 0 ? ($rejectedApplications / $placementTotalApplications) * 100 : 0;
 
-        $rejectionByYear = $this->rejectionBreakdown($applicationQuery, 'YEAR(job_applications.created_at)', 'year');
-        $rejectionByMonth = $this->rejectionBreakdown($applicationQuery, "DATE_FORMAT(job_applications.created_at, '%Y-%m')", 'month');
+        $rejectionByYear = $this->rejectionBreakdown($applicationQuery, $this->getYearExpression('job_applications.created_at'), 'year');
+        $rejectionByMonth = $this->rejectionBreakdown($applicationQuery, $this->getMonthExpression('job_applications.created_at'), 'month');
         $rejectionByCollege = $this->rejectionBreakdown(
             (clone $applicationQuery)->join('users', 'users.id', '=', 'job_applications.user_id')->whereNotNull('users.university')->where('users.university', '<>', ''),
             'users.university',
@@ -135,7 +176,6 @@ class DashboardController extends Controller
             'opportunity_type'
         );
 
-        // Yearly application funnel: Submitted -> Shortlisted -> Interviewed -> Placed, alongside Rejected/Withdrawn.
         $funnelBuckets = [
             'submitted' => ['Submitted', 'Under Review'],
             'shortlisted' => ['Shortlisted'],
@@ -147,11 +187,11 @@ class DashboardController extends Controller
         $statusCountsByYear = (clone $applicationQuery)
             ->join('application_statuses', 'application_statuses.id', '=', 'job_applications.application_status_id')
             ->select(
-                DB::raw('YEAR(job_applications.created_at) as year'),
+                DB::raw($this->getYearExpression('job_applications.created_at') . ' as year'),
                 'application_statuses.name as status_name',
                 DB::raw('COUNT(job_applications.id) as count')
             )
-            ->groupBy(DB::raw('YEAR(job_applications.created_at)'), 'application_statuses.name')
+            ->groupBy(DB::raw($this->getYearExpression('job_applications.created_at')), 'application_statuses.name')
             ->get();
         $yearlyFunnelReports = $statusCountsByYear
             ->groupBy('year')
@@ -166,7 +206,6 @@ class DashboardController extends Controller
             ->sortKeysDesc()
             ->values();
 
-        // Employer-Level Reporting: applications, interviewed, placed and rejected counts per employer.
         $employerJobsQuery = (clone $applicationQuery)
             ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
             ->join('users as employer_users', 'employer_users.id', '=', 'jobs.user_id');
@@ -196,11 +235,9 @@ class DashboardController extends Controller
         });
         $employerPerformanceReports = $employerPerformanceReports->sortByDesc('application_count')->values();
 
-        // Recruitment Funnel Reporting: how many applications ever reached each stage, and where students drop off.
         $funnelStatuses = ApplicationStatus::whereIn('category', ['Active', 'Successful'])->orderBy('sort_order')->get();
         $funnelStatusIds = $funnelStatuses->pluck('id');
         $funnelSortOrderById = $funnelStatuses->pluck('sort_order', 'id');
-
         $filteredApplicationIds = (clone $applicationQuery)->pluck('job_applications.id');
         $currentStageRows = (clone $applicationQuery)->whereIn('application_status_id', $funnelStatusIds)->pluck('application_status_id', 'id');
         $historyStageRows = DB::table('application_status_history')
@@ -238,8 +275,6 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        // Application-level vs student-level metrics: application counts can overstate outcomes since one
-        // student can submit many applications, so headline "placement rate" is tracked per-student too.
         $shortlistedFunnelCount = $funnelReports->firstWhere('name', 'Shortlisted')['count'] ?? 0;
         $acceptedFunnelCount = $funnelReports->firstWhere('name', 'Accepted')['count'] ?? 0;
         $applicationMetrics = [
@@ -276,14 +311,12 @@ class DashboardController extends Controller
                         });
                 });
         })->count();
-        
-        // Get recent job applications
+
         $recentApplications = JobApplication::with(['job', 'user', 'employer', 'applicationStatus'])
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
-        
-        // Get job statistics
+
         $jobsByCategory = Job::with('category')
             ->get()
             ->groupBy('category_id')
@@ -316,8 +349,8 @@ class DashboardController extends Controller
                 'application_count' => $statuses->sum('application_count'),
             ])
             ->values();
-        
-        return view('admin.dashboard', [
+
+        return [
             'totalUsers' => $totalUsers,
             'totalJobs' => $totalJobs,
             'pendingJobs' => $pendingJobs,
@@ -368,7 +401,72 @@ class DashboardController extends Controller
             'funnelReports' => $funnelReports,
             'applicationMetrics' => $applicationMetrics,
             'studentMetrics' => $studentMetrics,
-        ]);
+        ];
+    }
+
+    private function buildExportRows(string $report, array $dashboard): array
+    {
+        return match ($report) {
+            'placement' => [
+                ['Metric', 'Value'],
+                ['Total Applications', $dashboard['placementTotalApplications']],
+                ['Students Placed', $dashboard['placedApplications']],
+                ['Placement Rate', number_format($dashboard['placementRate'], 1) . '%'],
+                ['Interviewed Applications', $dashboard['interviewedApplications']],
+                ['Interview Conversion Rate', number_format($dashboard['interviewConversionRate'], 1) . '%'],
+            ],
+            'rejection' => [
+                ['Metric', 'Value'],
+                ['Rejected Applications', $dashboard['rejectedApplications']],
+                ['Rejection Rate', number_format($dashboard['rejectionRate'], 1) . '%'],
+                ['Active Applications', $dashboard['activeApplications']],
+                ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
+            ],
+            'employer' => collect($dashboard['employerPerformanceReports'])->map(fn ($row) => [
+                'Employer' => $row->employer_name,
+                'Applications' => $row->application_count,
+                'Interviewed' => $row->interviewed_count,
+                'Placed' => $row->placed_count,
+                'Rejected' => $row->rejected_count,
+            ])->toArray(),
+            'funnel' => collect($dashboard['funnelReports'])->map(fn ($row) => [
+                'Stage' => $row['name'],
+                'Count' => $row['count'],
+                'Drop Off' => $row['drop_off'],
+                'Drop Off Rate' => $row['drop_off_rate'] . '%',
+                'Conversion from Start' => $row['conversion_from_start'] . '%',
+            ])->toArray(),
+            default => [
+                ['Report', 'Value'],
+                ['Selected Report', $report],
+                ['Status', 'No export data available'],
+            ],
+        };
+    }
+
+    private function renderPdfHtml(string $title, array $rows): string
+    {
+        $htmlRows = '';
+        foreach ($rows as $row) {
+            $cells = collect($row)->map(fn ($value) => '<td>' . e($value) . '</td>')->implode('');
+            $htmlRows .= '<tr>' . $cells . '</tr>';
+        }
+
+        return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:12px}th{background:#f3f4f6}</style></head><body><h2>' . e($title) . ' Report</h2><table><tbody>' . $htmlRows . '</tbody></table></body></html>';
+    }
+
+    private function getYearExpression(string $column): string
+    {
+        return DB::getDriverName() === 'sqlite'
+            ? "CAST(strftime('%Y', {$column}) AS INTEGER)"
+            : "YEAR({$column})";
+    }
+
+    private function getMonthExpression(string $column): string
+    {
+        return DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m')";
     }
 
     /**

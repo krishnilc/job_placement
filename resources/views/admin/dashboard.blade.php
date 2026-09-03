@@ -201,7 +201,7 @@
                                                     <h2 class="text-danger mb-0">{{ $blockedEmployers }}</h2>
                                                 </div>
                                                 <div class="text-danger" style="font-size: 2rem;"><i
-                                                        class="fa fa-user-times"></i></div>
+                                                        class="fa fa-ban"></i></div>
                                             </div>
                                         </div>
                                     </div>
@@ -275,7 +275,7 @@
                                                     <h2 class="text-danger mb-0">{{ $blockedStudents }}</h2>
                                                 </div>
                                                 <div class="text-danger" style="font-size: 2rem;"><i
-                                                        class="fa fa-user-times"></i></div>
+                                                        class="fa fa-ban"></i></div>
                                             </div>
                                         </div>
                                     </div>
@@ -348,7 +348,7 @@
                                                     <h2 class="text-danger mb-0">{{ $unsuccessfulApplications }}</h2>
                                                 </div>
                                                 <div class="text-danger" style="font-size: 2rem;"><i
-                                                        class="fa fa-user-times"></i></div>
+                                                        class="fa fa-ban"></i></div>
                                             </div>
                                         </div>
                                     </div>
@@ -461,9 +461,11 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">Placement Rate Report</h5>
-                                        <a href="{{ route('admin.dashboard') }}"
-                                            class="btn btn-sm btn-outline-secondary">Clear
-                                            filters</a>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Clear filters</a>
+                                        </div>
                                     </div>
                                     <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
                                         <div class="col-md-6 col-lg-4">
@@ -702,7 +704,13 @@
                                         </div>
                                     </div>
 
-                                    <h6 class="mb-2">Yearly Application Funnel</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Yearly Application Funnel</h6>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                        </div>
+                                    </div>
                                     <div class="table-responsive mb-4">
                                         <table class="table table-hover align-middle mb-0">
                                             <thead>
@@ -994,8 +1002,12 @@
                         <!-- Employers & Funnel Tab -->
                         <div class="tab-pane fade" id="tab-employers" role="tabpanel">
                             <div class="card border-0 shadow mb-4">
-                                <div class="card-header bg-light">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Employer-Level Reporting</h5>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                    </div>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
@@ -1035,8 +1047,12 @@
                             </div>
 
                             <div class="card border-0 shadow">
-                                <div class="card-header bg-light">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Recruitment Funnel</h5>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     @forelse($funnelReports as $index => $stage)
