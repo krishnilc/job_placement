@@ -18,8 +18,17 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalJobs = Job::count();
         $pendingJobs = Job::where('status', 0)->count();
+        $activeJobs = Job::where('status', 1)->count();
         $blockedJobs = Job::where('status', 2)->count();
         $featuredJobs = Job::where('isFeatured', 1)->count();
+        $totalEmployers = User::where('role', 'employer')->count();
+        $activeEmployers = User::where('role', 'employer')->where('status', 'active')->count();
+        $pendingEmployers = User::where('role', 'employer')->where('status', 'pending')->count();
+        $blockedEmployers = User::where('role', 'employer')->where('status', 'blocked')->count();
+        $totalStudents = User::where('role', 'student')->count();
+        $activeStudents = User::where('role', 'student')->where('status', 'active')->count();
+        $pendingApprovalStudents = User::where('role', 'student')->where('status', 'pending')->count();
+        $blockedStudents = User::where('role', 'student')->where('status', 'blocked')->count();
         $applicationQuery = JobApplication::query();
         $applicationQuery
             ->when($request->filled('college'), fn ($query) => $query->whereHas('user', fn ($userQuery) => $userQuery->where('university', $request->college)))
@@ -94,6 +103,8 @@ class DashboardController extends Controller
 
         // Rejection Trends: overall rate plus breakdowns by year, month, college, programme, job category, employer and opportunity type.
         $rejectedApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Rejected'))->count();
+        $activeApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('category', 'Active'))->count();
+        $unsuccessfulApplications = (clone $applicationQuery)->whereHas('applicationStatus', fn ($query) => $query->where('category', 'Unsuccessful'))->count();
         $rejectionRate = $placementTotalApplications > 0 ? ($rejectedApplications / $placementTotalApplications) * 100 : 0;
 
         $rejectionByYear = $this->rejectionBreakdown($applicationQuery, 'YEAR(job_applications.created_at)', 'year');
@@ -310,8 +321,17 @@ class DashboardController extends Controller
             'totalUsers' => $totalUsers,
             'totalJobs' => $totalJobs,
             'pendingJobs' => $pendingJobs,
+            'activeJobs' => $activeJobs,
             'blockedJobs' => $blockedJobs,
             'featuredJobs' => $featuredJobs,
+            'totalEmployers' => $totalEmployers,
+            'activeEmployers' => $activeEmployers,
+            'pendingEmployers' => $pendingEmployers,
+            'blockedEmployers' => $blockedEmployers,
+            'totalStudents' => $totalStudents,
+            'activeStudents' => $activeStudents,
+            'pendingApprovalStudents' => $pendingApprovalStudents,
+            'blockedStudents' => $blockedStudents,
             'totalApplications' => JobApplication::count(),
             'placementTotalApplications' => $placementTotalApplications,
             'placedApplications' => $placedApplications,
@@ -333,6 +353,8 @@ class DashboardController extends Controller
             'applicationStatusReports' => $applicationStatusReports,
             'applicationStatusCategoryReports' => $applicationStatusCategoryReports,
             'rejectedApplications' => $rejectedApplications,
+            'activeApplications' => $activeApplications,
+            'unsuccessfulApplications' => $unsuccessfulApplications,
             'rejectionRate' => $rejectionRate,
             'rejectionByYear' => $rejectionByYear,
             'rejectionByMonth' => $rejectionByMonth,
