@@ -20,6 +20,96 @@
                 <div class="col-lg-9">
                     @include('front.message')
 
+                    <div class="card border-0 shadow mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Placement Rate Report</h5>
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Clear filters</a>
+                            </div>
+                            <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="college" class="form-label">College</label>
+                                    <select name="college" id="college" class="form-select">
+                                        <option value="">All colleges</option>
+                                        @foreach($collegeOptions as $college)
+                                            <option value="{{ $college }}" {{ request('college') === $college ? 'selected' : '' }}>{{ $college }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="programme" class="form-label">Programme</label>
+                                    <select name="programme" id="programme" class="form-select">
+                                        <option value="">All programmes</option>
+                                        @foreach($programmeOptions as $programme)
+                                            <option value="{{ $programme }}" {{ request('programme') === $programme ? 'selected' : '' }}>{{ $programme }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="employer" class="form-label">Employer</label>
+                                    <select name="employer" id="employer" class="form-select">
+                                        <option value="">All employers</option>
+                                        @foreach($employerOptions as $employer)
+                                            <option value="{{ $employer->id }}" {{ (string) request('employer') === (string) $employer->id ? 'selected' : '' }}>{{ $employer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="year" class="form-label">Year</label>
+                                    <select name="year" id="year" class="form-select">
+                                        <option value="">All years</option>
+                                        @foreach($yearOptions as $year)
+                                            <option value="{{ $year }}" {{ (string) request('year') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="opportunity_type" class="form-label">Opportunity Type</label>
+                                    <select name="opportunity_type" id="opportunity_type" class="form-select">
+                                        <option value="">All opportunity types</option>
+                                        @foreach($opportunityTypeOptions as $type)
+                                            <option value="{{ $type->id }}" {{ (string) request('opportunity_type') === (string) $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="category" class="form-label">Job Category</label>
+                                    <select name="category" id="category" class="form-select">
+                                        <option value="">All job categories</option>
+                                        @foreach($categoryOptions as $category)
+                                            <option value="{{ $category->id }}" {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Apply filters</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3"><div class="card border-0 shadow h-100"><div class="card-body"><p class="text-muted mb-1">Total Applications</p><h2 class="mb-0">{{ number_format($placementTotalApplications) }}</h2></div></div></div>
+                        <div class="col-md-4 mb-3"><div class="card border-0 shadow h-100"><div class="card-body"><p class="text-muted mb-1">Students Placed</p><h2 class="text-success mb-0">{{ number_format($placedApplications) }}</h2></div></div></div>
+                        <div class="col-md-4 mb-3"><div class="card border-0 shadow h-100"><div class="card-body"><p class="text-muted mb-1">Placement Rate</p><h2 class="text-primary mb-0">{{ number_format($placementRate, 1) }}%</h2></div></div></div>
+                    </div>
+
+                    <div class="card border-0 shadow mb-4">
+                        <div class="card-header bg-light"><h5 class="mb-0">Placement Rate by College</h5></div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>College</th><th class="text-end">Placed</th><th class="text-end">Applications</th><th class="text-end">Placement Rate</th></tr></thead>
+                                <tbody>
+                                    @forelse($collegePlacementReports as $report)
+                                        <tr><td>{{ $report->university }}</td><td class="text-end">{{ $report->placed_count }}</td><td class="text-end">{{ $report->application_count }}</td><td class="text-end fw-semibold">{{ number_format($report->placement_rate, 1) }}%</td></tr>
+                                    @empty
+                                        <tr><td colspan="4" class="text-center text-muted py-4">No placement data for the selected filters.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Statistics Cards -->
                     <div class="row mb-4">
 

@@ -184,7 +184,7 @@
                                         'value' => $user->high_school_graduation_year,
                                     ])
                                     @include('admin.users.profile-field', [
-                                        'label' => 'University',
+                                        'label' => 'College',
                                         'value' => $user->university,
                                     ])
                                     @include('admin.users.profile-field', [

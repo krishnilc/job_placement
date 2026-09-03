@@ -87,7 +87,7 @@
                                 <div class="row g-3">
                                     @include('front.account.profile-field', ['icon' => 'university', 'label' => 'High School', 'value' => $user->high_school])
                                     @include('front.account.profile-field', ['icon' => 'calendar', 'label' => 'High School Graduation Year', 'value' => $user->high_school_graduation_year])
-                                    @include('front.account.profile-field', ['icon' => 'university', 'label' => 'University', 'value' => $user->university])
+                                    @include('front.account.profile-field', ['icon' => 'university', 'label' => 'College', 'value' => $user->university])
                                     @include('front.account.profile-field', ['icon' => 'book', 'label' => 'Degree / Program', 'value' => $user->degree])
                                     @include('front.account.profile-field', ['icon' => 'bookmark', 'label' => 'Major / Specialization', 'value' => $user->major])
                                     @include('front.account.profile-field', ['icon' => 'calendar-check-o', 'label' => 'Graduation Year', 'value' => $user->graduation_year])

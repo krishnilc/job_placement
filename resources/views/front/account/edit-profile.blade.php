@@ -202,10 +202,16 @@
                                                 <p class="text-danger" id="highSchoolGraduationYearError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="university" class="mb-2">University*</label>
-                                                <input type="text" name="university" id="university" class="form-control"
-                                                    value="{{ old('university', $user->university) }}"
-                                                    placeholder="e.g. Fiji National University" required>
+                                                <label for="university" class="mb-2">College*</label>
+                                                <select name="university" id="university" class="form-control" required>
+                                                    <option value="">Select your college</option>
+                                                    <option value="College of Agriculture, Fisheries and Forestry (CAFF)" {{ old('university', $user->university) == 'College of Agriculture, Fisheries and Forestry (CAFF)' ? 'selected' : '' }}>College of Agriculture, Fisheries and Forestry (CAFF)</option>
+                                                    <option value="College of Business, Hospitality and Tourism Studies (CBHTS)" {{ old('university', $user->university) == 'College of Business, Hospitality and Tourism Studies (CBHTS)' ? 'selected' : '' }}>College of Business, Hospitality and Tourism Studies (CBHTS)</option>
+                                                    <option value="College of Engineering and Technical Vocational Education and Training (CETVET)" {{ old('university', $user->university) == 'College of Engineering and Technical Vocational Education and Training (CETVET)' ? 'selected' : '' }}>College of Engineering and Technical Vocational Education and Training (CETVET)</option>
+                                                    <option value="College of Medicine, Nursing and Health Sciences (CMNHS)" {{ old('university', $user->university) == 'College of Medicine, Nursing and Health Sciences (CMNHS)' ? 'selected' : '' }}>College of Medicine, Nursing and Health Sciences (CMNHS)</option>
+                                                    <option value="National Training and Productivity Centre (NTPC)" {{ old('university', $user->university) == 'National Training and Productivity Centre (NTPC)' ? 'selected' : '' }}>National Training and Productivity Centre (NTPC)</option>
+                                                    <option value="Pacific Centre for Maritime Studies (PCMS)" {{ old('university', $user->university) == 'Pacific Centre for Maritime Studies (PCMS)' ? 'selected' : '' }}>Pacific Centre for Maritime Studies (PCMS)</option>
+                                                </select>
                                                 <p class="text-danger" id="universityError"></p>
                                             </div>
                                             <div class="col-md-6">

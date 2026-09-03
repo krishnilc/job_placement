@@ -13,6 +13,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\File;
@@ -242,7 +243,17 @@ class AccountController extends Controller
             'country' => 'nullable|string|max:100',
             'high_school' => 'nullable|string|max:255',
             'high_school_graduation_year' => 'nullable|string|max:10',
-            'university' => 'nullable|string|max:255',
+            'university' => [
+                'nullable',
+                Rule::in([
+                    'College of Agriculture, Fisheries and Forestry (CAFF)',
+                    'College of Business, Hospitality and Tourism Studies (CBHTS)',
+                    'College of Engineering and Technical Vocational Education and Training (CETVET)',
+                    'College of Medicine, Nursing and Health Sciences (CMNHS)',
+                    'National Training and Productivity Centre (NTPC)',
+                    'Pacific Centre for Maritime Studies (PCMS)',
+                ]),
+            ],
             'degree' => 'nullable|string|max:255',
             'major' => 'nullable|string|max:255',
             'graduation_year' => 'nullable|string|max:10',
