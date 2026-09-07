@@ -174,12 +174,15 @@
                     },
 
                     success: function (response) {
-                        window.location.href =
-                            "{{ route('admin.jobs') }}"; // Redirect to the Jobs page after deletion
+                        if (response.status === true) {
+                            window.location.href = "{{ route('admin.jobs') }}";
+                        } else {
+                            alert(response.message || 'The job could not be deleted.');
+                        }
                     },
 
                     error: function (xhr, status, error) {
-                        alert('An error occurred while deleting the job. Please try again.');
+                        alert(xhr.responseJSON?.message || 'An error occurred while deleting the job. Please try again.');
                     }
                 });
             }

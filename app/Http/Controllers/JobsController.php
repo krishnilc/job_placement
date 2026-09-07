@@ -13,6 +13,7 @@ use App\Models\SavedJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use to;
@@ -217,6 +218,13 @@ class JobsController extends Controller
       }
 
       $application->save(); // Save the application to the database
+
+      DB::table('application_status_history')->insert([
+         'job_application_id' => $application->id,
+         'application_status_id' => $application->application_status_id,
+         'changed_by' => Auth::id(),
+         'created_at' => now(),
+      ]);
 
       // Send a notification email to the employer about the new job application
       $employer = User::where('id', $employer_id)->first(); // Retrieve the employer's user record based on the employer ID

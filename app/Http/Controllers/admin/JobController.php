@@ -121,6 +121,14 @@ class JobController extends Controller
         public function destroy(Request $request)
         {
             $job = Job::findOrFail($request->id); // Find the job by ID or throw a 404 error if not found
+
+            if ($job->applications()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This job cannot be deleted because applications have already been submitted.'
+                ], 409);
+            }
+
             $job->delete(); // Delete the job from the database
     
             session()->flash('success', 'Job deleted successfully!'); // Flash a success message to the session

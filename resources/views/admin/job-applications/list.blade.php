@@ -155,6 +155,11 @@
                                                                     <option value="{{ $status->id }}" @selected($application->application_status_id === $status->id)>{{ $status->name }}</option>
                                                                 @endforeach
                                                             </select>
+                                                            @if ($application->applicationStatus?->name === 'Under Review')
+                                                                <small class="d-block text-muted mt-1">
+                                                                    Changed by: {{ $application->latestStatusHistory?->changedBy?->name ?? 'Unknown' }}
+                                                                </small>
+                                                            @endif
                                                         </form>
                                                     </td>
                                                     <td>
@@ -163,6 +168,7 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusHistoryModal{{ $application->id }}"><i class="fa fa-history" aria-hidden="true"></i> View History</a></li>
                                                                 <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteApplication({{ $application->id }})"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
                                                             </ul>
                                                         </div>
@@ -177,6 +183,50 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            @foreach ($applications as $application)
+                                <div class="modal fade" id="statusHistoryModal{{ $application->id }}" tabindex="-1"
+                                    aria-labelledby="statusHistoryModalLabel{{ $application->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="statusHistoryModalLabel{{ $application->id }}">
+                                                    Status History
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="text-muted mb-3">{{ $application->job->title }} - {{ $application->user->name }}</p>
+                                                @if ($application->statusHistories->isNotEmpty())
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm align-middle mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Status</th>
+                                                                    <th>Changed by</th>
+                                                                    <th>Changed at</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($application->statusHistories as $history)
+                                                                    <tr>
+                                                                        <td>{{ $history->applicationStatus?->name ?? 'Unknown' }}</td>
+                                                                        <td>{{ $history->changedBy?->name ?? 'Unknown' }}</td>
+                                                                        <td>{{ optional($history->created_at)->format('M d, Y g:i A') ?? 'N/A' }}</td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @else
+                                                    <p class="text-muted text-center mb-0">No status history available.</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
 
                             <div>
                                 {{ $applications->links() }}

@@ -22,10 +22,15 @@
 
                     <ul class="nav nav-pills flex-nowrap overflow-auto gap-2 pb-2 mb-4" id="dashboardMainTabs"
                         role="tablist">
-                        <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link active text-nowrap"
+                        <li class="nav-item flex-shrink-0" role="presentation"><button
+                            class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'active' }} text-nowrap"
                                 id="tab-overview-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button"
                                 role="tab">Overview</button></li>
                         <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
+                                id="tab-applications-btn" data-bs-toggle="tab" data-bs-target="#tab-applications"
+                                type="button" role="tab">Applications</button></li>
+                        <li class="nav-item flex-shrink-0" role="presentation"><button
+                            class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'active' : '' }} text-nowrap"
                                 id="tab-placement-btn" data-bs-toggle="tab" data-bs-target="#tab-placement" type="button"
                                 role="tab">Placement</button></li>
                         <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
@@ -40,14 +45,12 @@
                                 id="tab-metrics-btn" data-bs-toggle="tab" data-bs-target="#tab-metrics" type="button"
                                 role="tab">Reporting
                                 Metrics</button></li>
-                        <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
-                                id="tab-applications-btn" data-bs-toggle="tab" data-bs-target="#tab-applications"
-                                type="button" role="tab">Applications</button></li>
+
                     </ul>
 
                     <div class="tab-content" id="dashboardMainTabsContent">
                         <!-- Overview Tab -->
-                        <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'show active' }}" id="tab-overview" role="tabpanel">
                             <div class="row mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">Job Report</h5>
@@ -112,7 +115,8 @@
                                                     <h7 class="text-muted mb-1">Blocked Jobs</h7>
                                                     <h2 class="text-danger mb-0">{{ $blockedJobs }}</h2>
                                                 </div>
-                                                <div class="text-danger" style="font-size: 2rem;"><i class="fa fa-ban"></i>
+                                                <div class="text-danger" style="font-size: 2rem;"><i
+                                                        class="fa fa-ban"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -282,7 +286,7 @@
                                 </div>
                             </div>
 
-                             <div class="row mb-4"> <!-- Start of new row -->
+                            <div class="row mb-4"> <!-- Start of new row -->
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">Application Report</h5>
                                     <div class="d-flex gap-2">
@@ -355,60 +359,6 @@
                                 </div>
                             </div>
 
-                            <!-- Application Status Reports -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="mb-0">Application Status Reports</h5>
-                                    <a href="{{ route('admin.jobApplications') }}"
-                                        class="btn btn-sm btn-outline-primary">Review
-                                        Applications</a>
-                                </div>
-
-                                <div class="row mb-3">
-                                   
-                                </div>
-
-                                <div class="card border-0 shadow">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th>Status</th>
-                                                    <th>Category</th>
-                                                    <th class="text-end">Applications</th>
-                                                    <th style="min-width: 170px;">Share of Applications</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($applicationStatusReports as $report)
-                                                    @php
-                                                        $percentage = $totalApplications > 0 ? round(($report->application_count / $totalApplications) * 100) : 0;
-                                                    @endphp
-                                                    <tr>
-                                                        <td class="fw-semibold">{{ $report->name }}</td>
-                                                        <td><span
-                                                                class="badge bg-light text-dark border">{{ $report->category }}</span>
-                                                        </td>
-                                                        <td class="text-end">{{ $report->application_count }}</td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <div class="progress flex-grow-1" style="height: 8px;">
-                                                                    <div class="progress-bar bg-primary" role="progressbar"
-                                                                        style="width: {{ $percentage }}%;"
-                                                                        aria-valuenow="{{ $percentage }}" aria-valuemin="0"
-                                                                        aria-valuemax="100"></div>
-                                                                </div>
-                                                                <small class="text-muted text-nowrap">{{ $percentage }}%</small>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="card border-0 shadow">
@@ -456,15 +406,18 @@
                         </div>
 
                         <!-- Placement Tab -->
-                        <div class="tab-pane fade" id="tab-placement" role="tabpanel">
+                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'show active' : '' }}" id="tab-placement" role="tabpanel">
                             <div class="card border-0 shadow mb-4">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">Placement Rate Report</h5>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
-                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
-                                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Clear filters</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                                class="btn btn-sm btn-outline-danger">PDF</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                                class="btn btn-sm btn-outline-success">Excel</a>
+                                            <a href="{{ route('admin.dashboard') }}"
+                                                class="btn btn-sm btn-outline-secondary">Clear filters</a>
                                         </div>
                                     </div>
                                     <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
@@ -472,8 +425,10 @@
                                             <label for="college" class="form-label">College</label>
                                             <select name="college" id="college" class="form-select">
                                                 <option value="">All colleges</option>
-                                                @foreach($collegeOptions as $college)
-                                                    <option value="{{ $college }}" {{ request('college') === $college ? 'selected' : '' }}>{{ $college }}</option>
+                                                @foreach ($collegeOptions as $college)
+                                                    <option value="{{ $college }}"
+                                                        {{ request('college') === $college ? 'selected' : '' }}>
+                                                        {{ $college }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -481,8 +436,10 @@
                                             <label for="programme" class="form-label">Programme</label>
                                             <select name="programme" id="programme" class="form-select">
                                                 <option value="">All programmes</option>
-                                                @foreach($programmeOptions as $programme)
-                                                    <option value="{{ $programme }}" {{ request('programme') === $programme ? 'selected' : '' }}>{{ $programme }}</option>
+                                                @foreach ($programmeOptions as $programme)
+                                                    <option value="{{ $programme }}"
+                                                        {{ request('programme') === $programme ? 'selected' : '' }}>
+                                                        {{ $programme }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -490,8 +447,9 @@
                                             <label for="employer" class="form-label">Employer</label>
                                             <select name="employer" id="employer" class="form-select">
                                                 <option value="">All employers</option>
-                                                @foreach($employerOptions as $employer)
-                                                    <option value="{{ $employer->id }}" {{ (string) request('employer') === (string) $employer->id ? 'selected' : '' }}>
+                                                @foreach ($employerOptions as $employer)
+                                                    <option value="{{ $employer->id }}"
+                                                        {{ (string) request('employer') === (string) $employer->id ? 'selected' : '' }}>
                                                         {{ $employer->name }}
                                                     </option>
                                                 @endforeach
@@ -501,8 +459,10 @@
                                             <label for="year" class="form-label">Year</label>
                                             <select name="year" id="year" class="form-select">
                                                 <option value="">All years</option>
-                                                @foreach($yearOptions as $year)
-                                                    <option value="{{ $year }}" {{ (string) request('year') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                                                @foreach ($yearOptions as $year)
+                                                    <option value="{{ $year }}"
+                                                        {{ (string) request('year') === (string) $year ? 'selected' : '' }}>
+                                                        {{ $year }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -510,8 +470,9 @@
                                             <label for="opportunity_type" class="form-label">Opportunity Type</label>
                                             <select name="opportunity_type" id="opportunity_type" class="form-select">
                                                 <option value="">All opportunity types</option>
-                                                @foreach($opportunityTypeOptions as $type)
-                                                    <option value="{{ $type->id }}" {{ (string) request('opportunity_type') === (string) $type->id ? 'selected' : '' }}>
+                                                @foreach ($opportunityTypeOptions as $type)
+                                                    <option value="{{ $type->id }}"
+                                                        {{ (string) request('opportunity_type') === (string) $type->id ? 'selected' : '' }}>
                                                         {{ $type->name }}
                                                     </option>
                                                 @endforeach
@@ -521,8 +482,9 @@
                                             <label for="category" class="form-label">Job Category</label>
                                             <select name="category" id="category" class="form-select">
                                                 <option value="">All job categories</option>
-                                                @foreach($categoryOptions as $category)
-                                                    <option value="{{ $category->id }}" {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>
+                                                @foreach ($categoryOptions as $category)
+                                                    <option value="{{ $category->id }}"
+                                                        {{ (string) request('category') === (string) $category->id ? 'selected' : '' }}>
                                                         {{ $category->name }}
                                                     </option>
                                                 @endforeach
@@ -588,7 +550,8 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="4" class="text-center text-muted py-4">No placement data
+                                                    <td colspan="4" class="text-center text-muted py-4">No placement
+                                                        data
                                                         for the selected filters.</td>
                                                 </tr>
                                             @endforelse
@@ -657,7 +620,8 @@
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="4" class="text-center text-muted py-4">No interview
+                                                        <td colspan="4" class="text-center text-muted py-4">No
+                                                            interview
                                                             data for the selected filters.</td>
                                                     </tr>
                                                 @endforelse
@@ -707,8 +671,10 @@
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6 class="mb-0">Yearly Application Funnel</h6>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
-                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                                class="btn btn-sm btn-outline-danger">PDF</a>
+                                            <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                                class="btn btn-sm btn-outline-success">Excel</a>
                                         </div>
                                     </div>
                                     <div class="table-responsive mb-4">
@@ -739,12 +705,14 @@
                                                             {{ number_format($row['rejected']) }}
                                                         </td>
                                                         <td class="text-end">{{ number_format($row['withdrawn']) }}</td>
-                                                        <td class="text-end fw-semibold">{{ number_format($row['total']) }}
+                                                        <td class="text-end fw-semibold">
+                                                            {{ number_format($row['total']) }}
                                                         </td>
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="8" class="text-center text-muted py-4">No application
+                                                        <td colspan="8" class="text-center text-muted py-4">No
+                                                            application
                                                             data for the selected filters.</td>
                                                     </tr>
                                                 @endforelse
@@ -756,15 +724,16 @@
                                         <li class="nav-item" role="presentation"><button class="nav-link active"
                                                 id="rej-year-tab" data-bs-toggle="tab" data-bs-target="#rej-year"
                                                 type="button" role="tab">Year</button></li>
-                                        <li class="nav-item" role="presentation"><button class="nav-link" id="rej-month-tab"
-                                                data-bs-toggle="tab" data-bs-target="#rej-month" type="button"
-                                                role="tab">Month</button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link"
+                                                id="rej-month-tab" data-bs-toggle="tab" data-bs-target="#rej-month"
+                                                type="button" role="tab">Month</button></li>
                                         <li class="nav-item" role="presentation"><button class="nav-link"
                                                 id="rej-college-tab" data-bs-toggle="tab" data-bs-target="#rej-college"
                                                 type="button" role="tab">College</button></li>
                                         <li class="nav-item" role="presentation"><button class="nav-link"
-                                                id="rej-programme-tab" data-bs-toggle="tab" data-bs-target="#rej-programme"
-                                                type="button" role="tab">Programme</button></li>
+                                                id="rej-programme-tab" data-bs-toggle="tab"
+                                                data-bs-target="#rej-programme" type="button"
+                                                role="tab">Programme</button></li>
                                         <li class="nav-item" role="presentation"><button class="nav-link"
                                                 id="rej-category-tab" data-bs-toggle="tab" data-bs-target="#rej-category"
                                                 type="button" role="tab">Job
@@ -772,9 +741,9 @@
                                         <li class="nav-item" role="presentation"><button class="nav-link"
                                                 id="rej-employer-tab" data-bs-toggle="tab" data-bs-target="#rej-employer"
                                                 type="button" role="tab">Employer</button></li>
-                                        <li class="nav-item" role="presentation"><button class="nav-link" id="rej-type-tab"
-                                                data-bs-toggle="tab" data-bs-target="#rej-type" type="button"
-                                                role="tab">Opportunity Type</button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link"
+                                                id="rej-type-tab" data-bs-toggle="tab" data-bs-target="#rej-type"
+                                                type="button" role="tab">Opportunity Type</button></li>
                                     </ul>
                                     <div class="tab-content border border-top-0 p-3" id="rejectionTrendsTabsContent">
                                         <div class="tab-pane fade show active" id="rej-year" role="tabpanel">
@@ -800,7 +769,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -831,7 +801,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -862,7 +833,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -893,7 +865,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -916,7 +889,8 @@
                                                         @forelse($rejectionByCategory as $report)
                                                             <tr>
                                                                 <td>{{ $report->category }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 1) }}%
@@ -924,7 +898,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -947,7 +922,8 @@
                                                         @forelse($rejectionByEmployer as $report)
                                                             <tr>
                                                                 <td>{{ $report->employer }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 1) }}%
@@ -955,7 +931,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -978,7 +955,8 @@
                                                         @forelse($rejectionByOpportunityType as $report)
                                                             <tr>
                                                                 <td>{{ $report->opportunity_type }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 1) }}%
@@ -986,7 +964,8 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-center text-muted py-4">No data
+                                                                <td colspan="4" class="text-center text-muted py-4">No
+                                                                    data
                                                                     for the selected filters.</td>
                                                             </tr>
                                                         @endforelse
@@ -1005,8 +984,10 @@
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Employer-Level Reporting</h5>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
-                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-success">Excel</a>
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -1037,7 +1018,8 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-center text-muted py-4">No employer data for
+                                                    <td colspan="5" class="text-center text-muted py-4">No employer
+                                                        data for
                                                         the selected filters.</td>
                                                 </tr>
                                             @endforelse
@@ -1050,8 +1032,10 @@
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Recruitment Funnel</h5>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-danger">PDF</a>
-                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-sm btn-outline-success">Excel</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-success">Excel</a>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -1066,11 +1050,11 @@
                                             <div class="progress" style="height: 20px;">
                                                 <div class="progress-bar bg-primary" role="progressbar"
                                                     style="width: {{ $stage['conversion_from_start'] }}%;"
-                                                    aria-valuenow="{{ $stage['conversion_from_start'] }}" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
+                                                    aria-valuenow="{{ $stage['conversion_from_start'] }}"
+                                                    aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
                                         </div>
-                                        @if(!$loop->last)
+                                        @if (!$loop->last)
                                             @php $nextStage = $funnelReports[$index + 1]; @endphp
                                             <div class="text-center text-muted small mb-2">
                                                 &darr; dropped off: {{ number_format($nextStage['drop_off']) }}
@@ -1078,7 +1062,8 @@
                                             </div>
                                         @endif
                                     @empty
-                                        <p class="text-muted text-center py-4 mb-0">No funnel data for the selected filters.
+                                        <p class="text-muted text-center py-4 mb-0">No funnel data for the selected
+                                            filters.
                                         </p>
                                     @endforelse
                                 </div>
@@ -1167,12 +1152,74 @@
 
                         <!-- Applications Tab -->
                         <div class="tab-pane fade" id="tab-applications" role="tabpanel">
-                            <div class="card border-0 shadow">
+                            <!-- Application Status Reports -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Application Status Reports</h5>
+                                    <a href="{{ route('admin.jobApplications') }}"
+                                        class="btn btn-sm btn-outline-primary">Review
+                                        Applications</a>
+                                </div>
+
+                                <div class="row mb-3">
+
+                                </div>
+
+                                <div class="card border-0 shadow">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Status</th>
+                                                    <th>Category</th>
+                                                    <th class="text-end">Applications</th>
+                                                    <th style="min-width: 170px;">Share of Applications</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($applicationStatusReports as $report)
+                                                    @php
+                                                        $percentage =
+                                                            $applicationStatusReportTotal > 0
+                                                                ? round(
+                                                                    ($report->application_count / $applicationStatusReportTotal) *
+                                                                        100,
+                                                                )
+                                                                : 0;
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="fw-semibold">{{ $report->name }}</td>
+                                                        <td><span
+                                                                class="badge bg-light text-dark border">{{ $report->category }}</span>
+                                                        </td>
+                                                        <td class="text-end">{{ $report->application_count }}</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <div class="progress flex-grow-1" style="height: 8px;">
+                                                                    <div class="progress-bar bg-primary"
+                                                                        role="progressbar"
+                                                                        style="width: {{ $percentage }}%;"
+                                                                        aria-valuenow="{{ $percentage }}"
+                                                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                <small
+                                                                    class="text-muted text-nowrap">{{ $percentage }}%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- <div class="card border-0 shadow">
                                 <div class="card-header bg-light">
                                     <h5 class="mb-0">Recent Job Applications</h5>
                                 </div>
                                 <div class="card-body">
-                                    @if($recentApplications->count() > 0)
+                                    @if ($recentApplications->count() > 0)
                                         <div class="table-responsive">
                                             <table class="table table-hover mb-0">
                                                 <thead class="bg-light">
@@ -1185,12 +1232,14 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($recentApplications as $application)
+                                                    @foreach ($recentApplications as $application)
                                                         <tr>
-                                                            <td><strong>{{ $application->job->title ?? 'N/A' }}</strong></td>
+                                                            <td><strong>{{ $application->job->title ?? 'N/A' }}</strong>
+                                                            </td>
                                                             <td>{{ $application->user->name ?? 'N/A' }}</td>
                                                             <td>{{ $application->job->company_name ?? 'N/A' }}</td>
-                                                            <td>{{ $application->applicationStatus?->name ?? 'Submitted' }}</td>
+                                                            <td>{{ $application->applicationStatus?->name ?? 'Submitted' }}
+                                                            </td>
                                                             <td>{{ $application->created_at->format('M d, Y') }}</td>
                                                         </tr>
                                                     @endforeach
@@ -1205,7 +1254,7 @@
                                     <a href="{{ route('admin.jobApplications') }}" class="btn btn-primary">View All
                                         Applications</a>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                     </div>
@@ -1218,29 +1267,31 @@
 
 @section('customJS')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        (function() {
             var filterKeys = ['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'];
             var params = new URLSearchParams(window.location.search);
-            var hasFilters = filterKeys.some(function (key) {
+            var hasFilters = filterKeys.some(function(key) {
                 return params.has(key) && params.get(key) !== '';
             });
 
-            var targetSelector = window.location.hash && document.querySelector(window.location.hash)
-                ? window.location.hash
-                : (hasFilters ? '#tab-placement' : null);
+            var targetSelector = window.location.hash && document.querySelector(window.location.hash) ?
+                window.location.hash :
+                (hasFilters ? '#tab-placement' : null);
 
             if (targetSelector) {
-                var trigger = document.querySelector('#dashboardMainTabs [data-bs-target="' + targetSelector + '"]');
+                var trigger = document.querySelector('#dashboardMainTabs [data-bs-target="' + targetSelector +
+                '"]');
                 if (trigger) {
                     new bootstrap.Tab(trigger).show();
                 }
             }
 
-            document.querySelectorAll('#dashboardMainTabs button[data-bs-toggle="tab"]').forEach(function (button) {
-                button.addEventListener('shown.bs.tab', function (event) {
-                    history.replaceState(null, '', window.location.pathname + window.location.search + event.target.getAttribute('data-bs-target'));
+            document.querySelectorAll('#dashboardMainTabs button[data-bs-toggle="tab"]').forEach(function(button) {
+                button.addEventListener('shown.bs.tab', function(event) {
+                    history.replaceState(null, '', window.location.pathname + window.location
+                        .search + event.target.getAttribute('data-bs-target'));
                 });
             });
-        });
+        })();
     </script>
 @endsection

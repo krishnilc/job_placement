@@ -43,7 +43,7 @@ class JobApplicationController extends Controller
         }
 
         $applications = $applicationsQuery
-            ->with('job', 'user', 'employer', 'applicationStatus')
+            ->with('job', 'user', 'employer', 'applicationStatus', 'latestStatusHistory.changedBy', 'statusHistories.applicationStatus', 'statusHistories.changedBy')
             ->orderBy($sortableColumns[$sort], $direction)
             ->paginate(10)
             ->withQueryString();

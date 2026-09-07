@@ -167,7 +167,7 @@ class DashboardController extends Controller
         );
         $rejectionByEmployer = $this->rejectionBreakdown(
             (clone $applicationQuery)->join('jobs', 'jobs.id', '=', 'job_applications.job_id')->join('users as employer_users', 'employer_users.id', '=', 'jobs.user_id'),
-            'employer_users.name',
+            'jobs.company_name',
             'employer'
         );
         $rejectionByOpportunityType = $this->rejectionBreakdown(
@@ -210,8 +210,8 @@ class DashboardController extends Controller
             ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
             ->join('users as employer_users', 'employer_users.id', '=', 'jobs.user_id');
         $employerPerformanceReports = (clone $employerJobsQuery)
-            ->select('employer_users.id as employer_id', 'employer_users.name as employer_name', DB::raw('COUNT(job_applications.id) as application_count'))
-            ->groupBy('employer_users.id', 'employer_users.name')
+            ->select('employer_users.id as employer_id', 'jobs.company_name as employer_name', DB::raw('COUNT(job_applications.id) as application_count'))
+            ->groupBy('employer_users.id', 'jobs.company_name')
             ->get();
         $employerInterviewedCounts = (clone $employerJobsQuery)
             ->whereIn('job_applications.id', $interviewedApplicationIds)
@@ -325,13 +325,13 @@ class DashboardController extends Controller
             });
 
         $applicationStatusReports = ApplicationStatus::query()
-            ->leftJoin('job_applications', 'job_applications.application_status_id', '=', 'application_statuses.id')
+            ->leftJoin('application_status_history', 'application_status_history.application_status_id', '=', 'application_statuses.id')
             ->select(
                 'application_statuses.id',
                 'application_statuses.name',
                 'application_statuses.category',
                 'application_statuses.sort_order',
-                DB::raw('COUNT(job_applications.id) as application_count')
+                DB::raw('COUNT(application_status_history.id) as application_count')
             )
             ->groupBy(
                 'application_statuses.id',
@@ -341,6 +341,8 @@ class DashboardController extends Controller
             )
             ->orderBy('application_statuses.sort_order')
             ->get();
+
+        $applicationStatusReportTotal = $applicationStatusReports->sum('application_count');
 
         $applicationStatusCategoryReports = $applicationStatusReports
             ->groupBy('category')
@@ -384,6 +386,7 @@ class DashboardController extends Controller
             'recentApplications' => $recentApplications,
             'jobsByCategory' => $jobsByCategory,
             'applicationStatusReports' => $applicationStatusReports,
+            'applicationStatusReportTotal' => $applicationStatusReportTotal,
             'applicationStatusCategoryReports' => $applicationStatusCategoryReports,
             'rejectedApplications' => $rejectedApplications,
             'activeApplications' => $activeApplications,

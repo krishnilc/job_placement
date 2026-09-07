@@ -70,4 +70,14 @@ class JobApplication extends Model
      {
          return $this->belongsTo(ApplicationStatus::class);
      }
+
+     public function latestStatusHistory()
+     {
+         return $this->hasOne(ApplicationStatusHistory::class)->latestOfMany();
+     }
+
+     public function statusHistories()
+     {
+         return $this->hasMany(ApplicationStatusHistory::class)->latest('created_at');
+     }
 }
