@@ -20,6 +20,16 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ApplicationStatusSeeder::class);
 
+        User::firstOrCreate([
+            'email' => 'superadmin@jobplacement.test',
+        ], [
+            'name' => 'Super Admin',
+            'password' => bcrypt('password'),
+            'role' => 'super_admin',
+            'status' => 'active',
+            'mobile' => '0000000',
+        ]);
+
         //  User::factory(10)->create();
 
         // User::factory()->create([

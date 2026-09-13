@@ -144,7 +144,7 @@ class AccountController extends Controller
 
                 // Authentication passed...
                 // Check user role and redirect accordingly
-                if (Auth::user()->role === 'admin') {
+                if (in_array(Auth::user()->role, ['admin', 'super_admin'], true)) {
                     return redirect()->route('admin.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } elseif (Auth::user()->role === 'employer') {

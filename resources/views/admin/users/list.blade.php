@@ -16,7 +16,9 @@
                                             ? 'Students'
                                             : ($listType === 'employers'
                                                 ? 'Employers'
-                                                : 'Users');
+                                                : ($listType === 'admins'
+                                                    ? 'Admins'
+                                                    : 'Users'));
                                 @endphp
                                 {{ $title }}
                             </li>
@@ -36,7 +38,13 @@
                                 <div>
                                     <h3 class="fs-4 mb-1">{{ $title }}</h3>
                                 </div>
-
+                                @if (($list_type ?? 'all') === 'admins' && auth()->user()->role === 'super_admin')
+                                    <div>
+                                        <a href="{{ route('admin.users.admins.create') }}" class="btn btn-primary">
+                                            <i class="fa fa-plus"></i> Add Admin
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                             <div class="table-responsive">
                                 @php
@@ -47,6 +55,7 @@
                                     $baseRoute = match ($listType) {
                                         'students' => route('admin.users.students'),
                                         'employers' => route('admin.users.employers'),
+                                        'admins' => route('admin.users.admins'),
                                         default => route('admin.users'),
                                     };
                                     $buildSortUrl = function ($column) use (
@@ -114,6 +123,16 @@
                                                     </a>
                                                 </th>
                                             @endif
+                                            @if ($listType === 'admins')
+                                                <th scope="col"><a href="{{ $buildSortUrl('role') }}"
+                                                        class="text-decoration-none text-dark">Role @if ($currentSort === 'role')
+                                                            <i
+                                                            class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                                class="fa fa-sort text-muted ms-1"></i>
+                                                        @endif
+                                                    </a>
+                                                </th>
+                                            @endif
                                             <th scope="col"><a href="{{ $buildSortUrl('email') }}"
                                                     class="text-decoration-none text-dark">Email @if ($currentSort === 'email')
                                                         <i
@@ -166,6 +185,9 @@
                                                     @if (($list_type ?? 'all') === 'students')
                                                         <td>{{ $user->student_id }}</td>
                                                     @endif
+                                                    @if (($list_type ?? 'all') === 'admins')
+                                                        <td>{{ $user->role === 'super_admin' ? 'Super Admin' : 'Admin' }}</td>
+                                                    @endif
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
 
@@ -204,10 +226,12 @@
                                                                         href="{{ route('admin.users.edit', $user->id) }}?list_type={{ $list_type ?? 'all' }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteUser({{ $user->id }})"><i
-                                                                            class="fa fa-trash" aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if (!(($list_type ?? 'all') === 'admins' && $user->id === auth()->id()))
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                            onclick="deleteUser({{ $user->id }})"><i
+                                                                                class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -252,6 +276,8 @@
                             redirect = "{{ route('admin.users.students') }}";
                         } else if (listType === 'employers') {
                             redirect = "{{ route('admin.users.employers') }}";
+                        } else if (listType === 'admins') {
+                            redirect = "{{ route('admin.users.admins') }}";
                         }
                         window.location.href = redirect; // Redirect after deletion
                     },

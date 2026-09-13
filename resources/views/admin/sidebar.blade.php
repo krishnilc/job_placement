@@ -76,6 +76,13 @@
                         <i class="fa fa-arrow-right"></i> Manage Employers
                     </a>
                 </li>
+                @if (Auth::user()->role === 'super_admin')
+                    <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.admins', 'admin.users.admins.create') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && in_array($user->role, ['admin', 'super_admin'], true))])>
+                        <a href="{{ route('admin.users.admins') }}">
+                            <i class="fa fa-arrow-right"></i> Manage Admins
+                        </a>
+                    </li>
+                @endif
             @endif
         </ul>
     </div>

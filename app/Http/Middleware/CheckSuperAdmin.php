@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckAdmin
+class CheckSuperAdmin
 {
     /**
      * Handle an incoming request.
@@ -18,12 +18,12 @@ class CheckAdmin
         if ($request->user() == null) {
             return redirect()->route('home');
         }
-       
-        if (!in_array($request->user()->role, ['admin', 'super_admin', 'employer'], true)) {
-            session()->flash('error', 'You do not have permission to access the admin page.');
-            return redirect()->route('student.dashboard');
+
+        if ($request->user()->role !== 'super_admin') {
+            session()->flash('error', 'You do not have permission to access this page.');
+            return redirect()->route('admin.dashboard');
         }
-        
+
         return $next($request);
     }
 }

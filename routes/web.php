@@ -47,6 +47,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::get('/users/students', [UserController::class, 'students'])->name('admin.users.students');
     Route::get('/users/employers', [UserController::class, 'employers'])->name('admin.users.employers');
+
+    Route::middleware('checkSuperAdmin')->group(function () {
+        Route::get('/users/admins', [UserController::class, 'admins'])->name('admin.users.admins');
+        Route::get('/users/admins/create', [UserController::class, 'createAdmin'])->name('admin.users.admins.create');
+        Route::post('/users/admins/store', [UserController::class, 'storeAdmin'])->name('admin.users.admins.store');
+    });
+
     Route::get('/users/profile/{id}', [UserController::class, 'profile'])->name('admin.users.profile');
     Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -42,6 +43,57 @@ class UserController extends Controller
         ]);
     }
 
+    public function admins(Request $request)
+    {
+        $users = $this->buildUserQuery($request, 'admins')->paginate(10);
+        $users->appends($request->query());
+
+        return view('admin.users.list', [
+            'users' => $users,
+            'list_type' => 'admins'
+        ]);
+    }
+
+    public function createAdmin()
+    {
+        return view('admin.users.create-admin');
+    }
+
+    public function storeAdmin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:5|max:20',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:5|same:confirm_password',
+            'confirm_password' => 'required|min:5',
+            'mobile' => 'required|digits:7',
+            'role' => 'required|in:admin,super_admin',
+        ]);
+
+        if ($validator->passes()) {
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->mobile = $request->mobile;
+            $user->role = $request->role;
+            $user->status = 'active';
+            $user->save();
+
+            session()->flash('success', 'Admin user created successfully!');
+
+            return response()->json([
+                'status' => true,
+                'errors' => []
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ]);
+    }
+
     private function buildUserQuery(Request $request, string $listType)
     {
         $query = User::query();
@@ -50,6 +102,8 @@ class UserController extends Controller
             $query->where('role', 'student');
         } elseif ($listType === 'employers') {
             $query->where('role', 'employer');
+        } elseif ($listType === 'admins') {
+            $query->whereIn('role', ['admin', 'super_admin']);
         }
 
         $allowedSorts = ['id', 'name', 'email', 'mobile', 'created_at'];
@@ -61,6 +115,8 @@ class UserController extends Controller
             $allowedSorts[] = 'designation';
             $allowedSorts[] = 'company_name';
             $allowedSorts[] = 'status';
+        } elseif ($listType === 'admins') {
+            $allowedSorts[] = 'role';
         }
 
         $sort = $request->query('sort', 'created_at');
@@ -103,7 +159,7 @@ class UserController extends Controller
             'name' => 'required|min:5|max:20',
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
             'mobile' => $isStudent ? 'nullable' : 'required|digits:7',
-            'role' => $isStudent ? 'nullable' : 'required|in:admin,student,employer,user',
+            'role' => $isStudent ? 'nullable' : 'required|in:admin,super_admin,student,employer,user',
             'student_id' => $isStudent ? 'required|string|max:9|unique:users,student_id,' . $id . ',id' : 'nullable',
             'designation' => $isStudent ? 'nullable' : 'nullable|string|max:100',
             'company_name' => $willBeEmployer ? 'required|string|max:255' : 'nullable',
