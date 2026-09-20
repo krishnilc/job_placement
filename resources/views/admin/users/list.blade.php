@@ -216,7 +216,7 @@
                                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                @if (in_array(($list_type ?? 'all'), ['students', 'employers'], true))
+                                                                @if (in_array(($list_type ?? 'all'), ['admins', 'students', 'employers'], true))
                                                                     <li><a class="dropdown-item"
                                                                             href="{{ route('admin.users.profile', $user->id) }}"><i
                                                                                 class="fa fa-user" aria-hidden="true"></i>

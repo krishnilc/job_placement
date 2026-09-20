@@ -228,7 +228,7 @@ class AccountController extends Controller
             'mobile' => 'required|digits:7',
             'email_2' => 'nullable|email|max:255',
             'mobile_2' => 'nullable|digits:7',
-            'designation' => in_array($role, ['admin', 'employer'], true)
+            'designation' => in_array($role, ['admin', 'super_admin', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
             'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
@@ -369,7 +369,7 @@ class AccountController extends Controller
 
     public function createJob()
     {
-        if (!in_array(Auth::user()->role, ['admin', 'employer'], true)) {
+        if (!in_array(Auth::user()->role, ['admin', 'super_admin', 'employer'], true)) {
             session()->flash('error', 'Only admins and employers can create jobs.');
 
             return redirect()->route('home');

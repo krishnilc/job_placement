@@ -49,7 +49,7 @@
                     </a>
                 </li>
                 <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('account.createJob')])>
-                    @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
+                    @if (in_array(auth()->user()->role, ['super_admin', 'admin', 'employer'], true))
                         <a href="{{ route('account.createJob') }}">
                             <i class="fa fa-arrow-right"></i> Create Job
                         </a>
@@ -66,7 +66,7 @@
                     </a>
                 </li>
 
-                <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.students') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && $user->role !== 'employer')])>
+                <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.students') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && in_array($user->role, ['user', 'student'], true))])>
                     <a href="{{ route('admin.users.students') }}">
                         <i class="fa fa-arrow-right"></i> Manage Students
                     </a>

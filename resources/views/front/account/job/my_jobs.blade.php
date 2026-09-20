@@ -20,7 +20,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                    @if (auth()->user()->role == 'admin')
+                    @if (auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin')
                         @include('admin.sidebar')
                     @elseif (auth()->user()->role == 'employer')
                         @include('employer.sidebar')

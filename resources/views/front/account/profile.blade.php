@@ -1,6 +1,7 @@
 @extends('front.layouts.app')
 
 @section('main')
+    @php($isAdmin = in_array($user->role, ['admin', 'super_admin'], true))
     <section class="section-5 bg-2">
         <div class="container py-5">
             <div class="row">
@@ -22,7 +23,7 @@
 
             <div class="row">
                 <div class="col-lg-3">
-                    @if (auth()->user()->role == 'admin')
+                    @if (auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin')
                         @include('admin.sidebar')
                     @elseif (auth()->user()->role == 'employer')
                         @include('employer.sidebar')
@@ -32,7 +33,7 @@
                 </div>
                 <div class="col-lg-9">
                     <div class="profile-page">
-                        <div class="profile-hero mb-4">
+                        <div class="profile-hero {{ $isAdmin ? 'profile-hero-admin' : '' }} mb-4">
                             <div class="profile-hero-content">
                                 <div class="profile-avatar">
                                     @if ($user->image)
@@ -147,6 +148,11 @@
             background: linear-gradient(120deg, #174a68 0%, #237d83 100%);
             border-radius: .75rem;
             box-shadow: 0 .5rem 1.5rem rgba(24, 59, 86, .16);
+        }
+
+        .profile-hero-admin {
+            background: linear-gradient(120deg, #702c3b 0%, #b6535d 100%);
+            box-shadow: 0 .5rem 1.5rem rgba(112, 44, 59, .2);
         }
 
         .profile-hero-content { display: flex; align-items: center; gap: 1rem; min-width: 0; }

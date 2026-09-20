@@ -140,7 +140,7 @@ class UserController extends Controller
 
     public function profile($id)
     {
-        $user = User::whereIn('role', ['student', 'employer'])->findOrFail($id);
+        $user = User::whereIn('role', ['admin', 'super_admin', 'student', 'employer'])->findOrFail($id);
 
         return view('admin.users.profile', [
             'user' => $user,

@@ -2,6 +2,7 @@
 
 @section('main')
     @php($isEmployer = $user->role === 'employer')
+    @php($isAdmin = in_array($user->role, ['admin', 'super_admin'], true))
     <section class="section-5 bg-2">
         <div class="container py-5">
             <div class="row">
@@ -10,7 +11,7 @@
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                             <li class="breadcrumb-item"><a
-                                    href="{{ $isEmployer ? route('admin.users.employers') : route('admin.users.students') }}">{{ $isEmployer ? 'Employers' : 'Students' }}</a>
+                                    href="{{ $isAdmin ? route('admin.users.admins') : ($isEmployer ? route('admin.users.employers') : route('admin.users.students')) }}">{{ $isAdmin ? 'Admins' : ($isEmployer ? 'Employers' : 'Students') }}</a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">View Profile</li>
                         </ol>
@@ -68,11 +69,11 @@
                                     @endif
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ $isEmployer ? route('admin.users.employers') : route('admin.users.students') }}"
+                                    <a href="{{ $isAdmin ? route('admin.users.admins') : ($isEmployer ? route('admin.users.employers') : route('admin.users.students')) }}"
                                         class="btn btn-outline-secondary">Back to
-                                        {{ $isEmployer ? 'Employers' : 'Students' }}</a>
-                                    <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isEmployer ? 'employers' : 'students']) }}"
-                                        class="btn btn-primary">Edit {{ $isEmployer ? 'Employer' : 'Student' }}</a>
+                                        {{ $isAdmin ? 'Admins' : ($isEmployer ? 'Employers' : 'Students') }}</a>
+                                    <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isAdmin ? 'admins' : ($isEmployer ? 'employers' : 'students')]) }}"
+                                        class="btn btn-primary">Edit {{ $isAdmin ? 'Admin' : ($isEmployer ? 'Employer' : 'Student') }}</a>
                                 </div>
                             </div>
 

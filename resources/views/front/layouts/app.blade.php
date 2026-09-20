@@ -73,7 +73,7 @@
 
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2"
                                 aria-labelledby="accountDropdown">
-                                @if (Auth::user()->role == 'admin')
+                                @if (Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')
                                     <li>
                                         <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('admin.dashboard')]) href="{{ route('admin.dashboard') }}">
                                             Admin Dashboard
@@ -101,7 +101,7 @@
                                 </li>
                                 <li>
                                     <a @class(['dropdown-item py-2', 'account-dropdown-active' => request()->routeIs('admin.account.*', 'employer.account.*', 'account.profile', 'account.editProfile', 'account.editPassword')])
-                                        href="{{ Auth::user()->role == 'admin' ? route('admin.account.profile') : (Auth::user()->role == 'employer' ? route('employer.account.profile') : route('account.profile')) }}">
+                                        href="{{ in_array(Auth::user()->role, ['admin', 'super_admin'], true) ? route('admin.account.profile') : (Auth::user()->role == 'employer' ? route('employer.account.profile') : route('account.profile')) }}">
                                         Account Settings
                                     </a>
                                 </li>

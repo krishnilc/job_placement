@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="col-lg-3">
-                    @if (auth()->user()->role === 'admin')
+                    @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
                         @include('admin.sidebar')
                     @elseif (auth()->user()->role === 'employer')
                         @include('employer.sidebar')

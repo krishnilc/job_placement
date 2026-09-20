@@ -7,7 +7,11 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            @elseif(auth()->user()->role === 'employer')
+                                <li class="breadcrumb-item"><a href="{{ route('employer.dashboard') }}">Home</a></li>
+                            @endif
                             <li class="breadcrumb-item active">Create Job</li>
                         </ol>
                     </nav>
@@ -15,7 +19,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-3">
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
                         @include('admin.sidebar')
                     @elseif(auth()->user()->role === 'employer')
                         @include('employer.sidebar')

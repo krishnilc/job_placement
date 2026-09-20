@@ -1,9 +1,10 @@
 @php
-    $isAdmin = $user->role === 'admin';
+    $isAdmin = in_array($user->role, ['admin', 'super_admin'], true);
     $isEmployer = $user->role === 'employer';
     $homeRoute = $isAdmin ? 'admin.dashboard' : ($isEmployer ? 'employer.dashboard' : 'student.dashboard');
     $profileRoute = $isAdmin ? 'admin.account.profile' : ($isEmployer ? 'employer.account.profile' : 'account.profile');
     $editRoute = $isAdmin ? 'admin.account.editProfile' : ($isEmployer ? 'employer.account.editProfile' : 'account.editProfile');
+    $editLabel = $isAdmin ? 'Edit Admin' : ($isEmployer ? 'Edit Employer' : 'Edit Student');
 @endphp
 
 <section class="section-5 bg-2">
@@ -37,7 +38,7 @@
                                 <p class="profile-role mb-0">{{ $user->designation ?: 'Status Not Provided' }}</p>
                             </div>
                         </div>
-                        <a href="{{ route($editRoute) }}" class="btn btn-light profile-edit-button"><i class="fa fa-pencil me-1" aria-hidden="true"></i> Edit Profile</a>
+                        <a href="{{ route($editRoute) }}" class="btn btn-light profile-edit-button"><i class="fa fa-pencil me-1" aria-hidden="true"></i> {{ $editLabel }}</a>
                     </div>
 
                     <div class="profile-section mb-4">
