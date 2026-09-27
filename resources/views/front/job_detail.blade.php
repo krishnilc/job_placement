@@ -156,10 +156,10 @@
                                     @if (!empty($job->salary))
                                         <li>Salary: <span>{{ $job->salary }}</span></li>
                                     @endif
-                                    @if (!empty($job->location))
+                                    {{-- @if (!empty($job->location))
                                         <li>Location: <span>{{ $job->location }}</span></li>
                                     @endif
-                                    <li>Job Nature: <span>{{ $job->jobType->name ?? 'N/A' }}</span></li>
+                                    <li>Job Nature: <span>{{ $job->jobType->name ?? 'N/A' }}</span></li> --}}
                                 </ul>
                             </div>
                         </div>

@@ -58,7 +58,7 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <a href="{{ route('account.myJobApplications') }}">
+                                    <a href="{{ route('admin.jobApplications') }}">
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body text-center p-4">
                                                 <h3 class="fw-bold text-success">
@@ -73,7 +73,7 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <a href="{{ route('account.myJobApplications') }}">
+                                    <a href="{{ route('admin.jobApplications') }}">
                                         <div class="card border-0 shadow-sm rounded-4 h-100">
                                             <div class="card-body text-center p-4">
                                                 <h3 class="fw-bold text-warning">
