@@ -19,12 +19,20 @@ class HomeController extends Controller
 
         $featuredJobs = Job::where('status', 1)
             ->where('isFeatured', 1)
+            ->where(function ($query) {
+                $query->whereNull('closing_date')
+                    ->orWhere('closing_date', '>=', now()->toDateString());
+            })
             ->with('jobType')
             ->orderBy('created_at', 'desc')
             ->take(6)
             ->get();
 
         $latestJobs = Job::where('status', 1)
+            ->where(function ($query) {
+                $query->whereNull('closing_date')
+                    ->orWhere('closing_date', '>=', now()->toDateString());
+            })
             ->with('jobType')
             ->orderBy('created_at', 'desc')
             ->take(6)

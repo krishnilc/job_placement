@@ -68,18 +68,20 @@
                                         $isSaved = isset($count) && $count == 1;
                                     @endphp
                                     <div class="jobs_right text-end">
-                                        <div class="apply_now {{ $isSaved ? 'saved-job' : '' }}">
+                                        <div class="apply_now {{ $isSaved ? 'saved-job' : '' }}" id="saveNowArea">
                                             @if($isSaved)
                                                 <span class="badge bg-info">You saved this job</span>
                                             @else
                                                 <a class="heart_mark" href="#" onclick="saveJob({{ $job->id }})"> <i class="fa fa-heart-o" aria-hidden="true"></i></a>
                                             @endif
                                         </div>
-                                        @if($myApplication)
-                                            <div class="mt-1"><span class="badge bg-success">You applied on {{ optional($myApplication->applied_at)->format('d M, Y') }}</span></div>
-                                        @elseif($isClosed)
-                                            <div class="mt-1"><span class="badge bg-danger">Applications closed</span></div>
-                                        @endif
+                                        <div id="topApplyBadgeArea">
+                                            @if($myApplication)
+                                                <div class="mt-1"><span class="badge bg-success">You applied on {{ optional($myApplication->applied_at)->format('d M, Y') }}</span></div>
+                                            @elseif($isClosed)
+                                                <div class="mt-1"><span class="badge bg-danger">Applications closed</span></div>
+                                            @endif
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -111,29 +113,33 @@
                                 
 
                                 <div class="pt-3 text-end">
-                                    @if (Auth::check())
-                                        @if($isSaved)
-                                            <button class="btn btn-secondary" disabled>Saved</button>
-                                        @else
-                                            <a href="#" onclick="saveJob({{ $job->id }})" class="btn btn-secondary">Save</a>
-                                        @endif
-                                    @else
-                                        <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
-                                    @endif
-                                    <!-- apply if user is logged in or closed -->
-                                    @if(!empty($isClosed) && $isClosed)
-                                        <button class="btn btn-danger" disabled>Closed</button>
-                                    @else
+                                    <span id="saveBtnArea">
                                         @if (Auth::check())
-                                            @if ($myApplication)
-                                                <button class="btn btn-success" disabled>Applied</button>
+                                            @if($isSaved)
+                                                <button class="btn btn-secondary" disabled>Saved</button>
                                             @else
-                                                <a href="#" class="btn btn-primary" onclick="openApplyModal({{ $job->id }})">Apply</a>
+                                                <a href="#" onclick="saveJob({{ $job->id }})" class="btn btn-secondary">Save</a>
                                             @endif
                                         @else
-                                            <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
+                                            <a href="{{ route('account.login') }}" class="btn btn-secondary">Login to Save</a>
                                         @endif
-                                    @endif
+                                    </span>
+                                    <!-- apply if user is logged in or closed -->
+                                    <span id="applyBtnArea">
+                                        @if(!empty($isClosed) && $isClosed)
+                                            <button class="btn btn-danger" disabled>Closed</button>
+                                        @else
+                                            @if (Auth::check())
+                                                @if ($myApplication)
+                                                    <button class="btn btn-success" disabled>Applied</button>
+                                                @else
+                                                    <a href="#" class="btn btn-primary" onclick="openApplyModal({{ $job->id }})">Apply</a>
+                                                @endif
+                                            @else
+                                                <a href="{{ route('account.login') }}" class="btn btn-primary">Login to Apply</a>
+                                            @endif
+                                        @endif
+                                    </span>
                                 </div>
                             @endif
                         </div>
@@ -202,16 +208,16 @@
                         <input type="hidden" name="job_id" id="applyJobId" value="">
                         <div class="mb-3">
                             <label class="form-label">Application Letter (PDF/DOC)</label>
-                            <input type="file" name="application" class="form-control" accept=".pdf,.doc,.docx">
+                            <input type="file" name="application" class="form-control" accept=".pdf,.doc,.docx" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Resume (PDF/DOC)</label>
-                            <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx">
+                            <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Certificates (you can select multiple)</label>
                             <input type="file" name="certificates[]" class="form-control"
-                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -226,6 +232,12 @@
 
 @section('customJS')
         <script type="text/javascript">
+        function formatDateForBadge(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${day} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+        }
+
         function openApplyModal(jobId) {
             var jobIsClosed = {{ json_encode($isClosed ?? false) }};
             if (jobIsClosed) {
@@ -241,6 +253,17 @@
             e.preventDefault();
             var form = document.getElementById('applyForm');
             var formData = new FormData(form);
+
+            var applicationFile = form.querySelector('input[name="application"]').files.length;
+            var resumeFile = form.querySelector('input[name="resume"]').files.length;
+            var certificateFiles = form.querySelector('input[name="certificates[]"]').files.length;
+
+            if (!applicationFile && !resumeFile && !certificateFiles) {
+                let alertBox =
+                    `<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">Please upload at least one document (application letter, resume, or certificate) before submitting.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                $(".col-md-8").prepend(alertBox);
+                return;
+            }
 
             $.ajax({
                 url: '{{ route('applyJob') }}',
@@ -258,6 +281,15 @@
                     let alertBox =
                         `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">${response.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
                     $(".col-md-8").prepend(alertBox);
+
+                    if (response.status) {
+                        let today = formatDateForBadge(new Date());
+                        $('#applyBtnArea').html('<button class="btn btn-success" disabled>Applied</button>');
+                        $('#topApplyBadgeArea').html(
+                            `<div class="mt-1"><span class="badge bg-success">You applied on ${today}</span></div>`
+                        );
+                        form.reset();
+                    }
                 },
                 error: function(xhr) {
                     let msg = 'An error occurred while applying for the job.';
@@ -290,6 +322,13 @@
                                                     </div>`;
                     // Insert message at the top of the main column
                     $(".col-md-8").prepend(alertBox);
+
+                    if (response.status) {
+                        $('#saveBtnArea').html('<button class="btn btn-secondary" disabled>Saved</button>');
+                        $('#saveNowArea').addClass('saved-job').html(
+                            '<span class="badge bg-info">You saved this job</span>'
+                        );
+                    }
                 },
                 error: function(xhr) {
                     let alertBox =

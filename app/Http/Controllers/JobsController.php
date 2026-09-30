@@ -25,7 +25,11 @@ class JobsController extends Controller
       $categories = Category::where('status', 1)->get(); // Retrieve active categories to display in the jobs listing page
       $jobTypes = JobType::where('status', 1)->get(); // Retrieve active job types to display in the jobs listing page
 
-      $jobs = Job::where('status', 1); // Only active jobs are public
+      $jobs = Job::where('status', 1) // Only active jobs are public
+         ->where(function ($query) {
+            $query->whereNull('closing_date')
+               ->orWhere('closing_date', '>=', now()->toDateString());
+         });
 
       //Search using keywords
       if (!empty($request->keywords)) {
@@ -160,7 +164,15 @@ class JobsController extends Controller
             'message' => 'You have already applied for this job'
          ]); // Return a JSON response indicating that the user has already applied for the job
       }
-      // Validate uploaded files (optional)
+      // At least one document must be uploaded
+      if (!$request->hasFile('application') && !$request->hasFile('resume') && !$request->hasFile('certificates')) {
+         return response()->json([
+            'status' => false,
+            'message' => 'Please upload at least one document (application letter, resume, or certificate) before submitting.'
+         ], 422);
+      }
+
+      // Validate uploaded files
       $validator = \Validator::make($request->all(), [
          'application' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
          'resume' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
