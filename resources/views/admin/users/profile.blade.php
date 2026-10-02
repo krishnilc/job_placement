@@ -9,7 +9,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a
                                     href="{{ $isAdmin ? route('admin.users.admins') : ($isEmployer ? route('admin.users.employers') : route('admin.users.students')) }}">{{ $isAdmin ? 'Admins' : ($isEmployer ? 'Employers' : 'Students') }}</a>
                             </li>

@@ -8,7 +8,7 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Categories</li>
+                            <li class="breadcrumb-item active">Admins</li>
                         </ol>
                     </nav>
                 </div>
@@ -23,20 +23,22 @@
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h3 class="fs-4 mb-1">Categories</h3>
+                                    <h3 class="fs-4 mb-1">Admins</h3>
                                 </div>
-                                <div>
-                                    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                                        <i class="fa fa-plus"></i> Add Category
-                                    </a>
-                                </div>
+                                @if (auth()->user()->role === 'super_admin')
+                                    <div>
+                                        <a href="{{ route('admin.users.admins.create') }}" class="btn btn-primary">
+                                            <i class="fa fa-plus"></i> Add Admin
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                             <div class="table-responsive">
                                 @php
-                                    $currentSort = request()->query('sort', 'name');
+                                    $currentSort = request()->query('sort', 'created_at');
                                     $currentDirection =
                                         strtolower(request()->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
-                                    $baseRoute = route('admin.categories');
+                                    $baseRoute = route('admin.users.admins');
                                     $buildSortUrl = function ($column) use (
                                         $baseRoute,
                                         $currentSort,
@@ -74,10 +76,24 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th scope="col">College</th>
-                                            <th scope="col">Jobs</th>
-                                            <th scope="col"><a href="{{ $buildSortUrl('status') }}"
-                                                    class="text-decoration-none text-dark">Status @if ($currentSort === 'status')
+                                            <th scope="col"><a href="{{ $buildSortUrl('role') }}"
+                                                    class="text-decoration-none text-dark">Role @if ($currentSort === 'role')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('email') }}"
+                                                    class="text-decoration-none text-dark">Email @if ($currentSort === 'email')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('mobile') }}"
+                                                    class="text-decoration-none text-dark">Mobile @if ($currentSort === 'mobile')
                                                         <i
                                                         class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
                                                             class="fa fa-sort text-muted ms-1"></i>
@@ -88,18 +104,14 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
-                                        @if ($categories->isNotEmpty())
-                                            @foreach ($categories as $category)
+                                        @if ($users->isNotEmpty())
+                                            @foreach ($users as $user)
                                                 <tr class="active">
-                                                    <td>{{ $category->id }}</td>
-                                                    <td>{{ $category->name }}</td>
-                                                    <td>{{ $category->college?->display_name ?? '-' }}</td>
-                                                    <td>{{ $category->jobs_count }}</td>
-                                                    <td>
-                                                        <span class="badge bg-{{ $category->status == 1 ? 'success' : 'danger' }}">
-                                                            {{ $category->status == 1 ? 'Active' : 'Inactive' }}
-                                                        </span>
-                                                    </td>
+                                                    <td>{{ $user->id }}</td>
+                                                    <td>{{ $user->name }}</td>
+                                                    <td>{{ $user->role === 'super_admin' ? 'Super Admin' : 'Admin' }}</td>
+                                                    <td>{{ $user->email }}</td>
+                                                    <td>{{ $user->mobile }}</td>
                                                     <td>
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
@@ -108,13 +120,19 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item"
-                                                                        href="{{ route('admin.categories.edit', $category->id) }}"><i
+                                                                        href="{{ route('admin.users.profile', $user->id) }}"><i
+                                                                            class="fa fa-user" aria-hidden="true"></i>
+                                                                        View Profile</a></li>
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.users.edit', $user->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteCategory({{ $category->id }})"><i
-                                                                            class="fa fa-trash" aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if ($user->id !== auth()->id())
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                            onclick="deleteUser({{ $user->id }})"><i
+                                                                                class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -122,7 +140,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No categories found.</td>
+                                                <td colspan="6" class="text-center">No admins found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
@@ -130,7 +148,7 @@
                             </div>
 
                             <div>
-                                {{ $categories->links() }}
+                                {{ $users->links() }}
                             </div>
                         </div>
                     </div>
@@ -142,10 +160,10 @@
 
 @section('customJS')
     <script type="text/javascript">
-        function deleteCategory(id) {
-            if (confirm('Are you sure you want to delete this category?')) {
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this admin?')) {
                 $.ajax({
-                    url: "{{ route('admin.categories.destroy') }}",
+                    url: "{{ route('admin.users.destroy') }}",
                     type: "DELETE",
                     dataType: "json",
                     data: {
@@ -153,11 +171,11 @@
                     },
 
                     success: function(response) {
-                        window.location.href = "{{ route('admin.categories') }}"; // Redirect after deletion
+                        window.location.href = "{{ route('admin.users.admins') }}"; // Redirect after deletion
                     },
 
                     error: function(xhr, status, error) {
-                        alert('An error occurred while deleting the category. Please try again.');
+                        alert('An error occurred while deleting the admin. Please try again.');
                     }
                 });
             }

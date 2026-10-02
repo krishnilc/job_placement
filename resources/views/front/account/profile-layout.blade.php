@@ -9,10 +9,10 @@
 
 <section class="section-5 bg-2">
     <div class="container py-5">
-        <div class="row"><div class="col"><nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="{{ route($homeRoute) }}">Home</a></li><li class="breadcrumb-item active" aria-current="page">View Profile</li></ol></nav></div></div>
+        <div class="row"><div class="col"><nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="{{ route($homeRoute) }}">Dashboard</a></li><li class="breadcrumb-item active" aria-current="page">View Profile</li></ol></nav></div></div>
         <div class="row">
             <div class="col-lg-3">
-                @if ($isAdmin) @include('admin.sidebar') @elseif ($isEmployer) @include('employer.sidebar') @else @include('front.account.student-sidebar') @endif
+                @if ($isAdmin) @include('admin.sidebar') @elseif ($isEmployer) @include('employer.sidebar') @else @include('student.sidebar') @endif
             </div>
             <div class="col-lg-9">
                 <div class="profile-page">

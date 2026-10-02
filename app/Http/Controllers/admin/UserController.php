@@ -5,136 +5,27 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = $this->buildUserQuery($request, 'all')->paginate(10);
-        $users->appends($request->query());
-
-        return view('admin.users.list', [
-            'users' => $users,
-            'list_type' => 'all',
-        ]);
-    }
-
-    public function students(Request $request)
-    {
-        $users = $this->buildUserQuery($request, 'students')->paginate(10);
-        $users->appends($request->query());
-
-        return view('admin.users.list', [
-            'users' => $users,
-            'list_type' => 'students'
-        ]);
-    }
-
-    public function employers(Request $request)
-    {
-        $users = $this->buildUserQuery($request, 'employers')->paginate(10);
-        $users->appends($request->query());
-
-        return view('admin.users.list', [
-            'users' => $users,
-            'list_type' => 'employers'
-        ]);
-    }
-
-    public function admins(Request $request)
-    {
-        $users = $this->buildUserQuery($request, 'admins')->paginate(10);
-        $users->appends($request->query());
-
-        return view('admin.users.list', [
-            'users' => $users,
-            'list_type' => 'admins'
-        ]);
-    }
-
-    public function createAdmin()
-    {
-        return view('admin.users.create-admin');
-    }
-
-    public function storeAdmin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:5|max:20',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:5|same:confirm_password',
-            'confirm_password' => 'required|min:5',
-            'mobile' => 'required|digits:7',
-            'role' => 'required|in:admin,super_admin',
-        ]);
-
-        if ($validator->passes()) {
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = Hash::make($request->password);
-            $user->mobile = $request->mobile;
-            $user->role = $request->role;
-            $user->status = 'active';
-            $user->save();
-
-            session()->flash('success', 'Admin user created successfully!');
-
-            return response()->json([
-                'status' => true,
-                'errors' => []
-            ]);
-        }
-
-        return response()->json([
-            'status' => false,
-            'errors' => $validator->errors()
-        ]);
-    }
-
-    private function buildUserQuery(Request $request, string $listType)
-    {
-        $query = User::query();
-
-        if ($listType === 'students') {
-            $query->where('role', 'student');
-        } elseif ($listType === 'employers') {
-            $query->where('role', 'employer');
-        } elseif ($listType === 'admins') {
-            $query->whereIn('role', ['admin', 'super_admin']);
-        }
-
-        $allowedSorts = ['id', 'name', 'email', 'mobile', 'created_at'];
-
-        if ($listType === 'students') {
-            $allowedSorts[] = 'student_id';
-            $allowedSorts[] = 'status';
-        } elseif ($listType === 'employers') {
-            $allowedSorts[] = 'designation';
-            $allowedSorts[] = 'company_name';
-            $allowedSorts[] = 'status';
-        } elseif ($listType === 'admins') {
-            $allowedSorts[] = 'role';
-        }
-
-        $sort = $request->query('sort', 'created_at');
-        $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
-
-        if (!in_array($sort, $allowedSorts, true)) {
-            $sort = 'created_at';
-        }
-
-        return $query->orderBy($sort, $direction);
+        return redirect()->route('admin.users.students');
     }
 
     public function edit(Request $request, $id)
     {
         $user = User::findOrfail($id);
-        return view('admin.users.edit', [
+
+        $view = match (true) {
+            in_array($user->role, ['user', 'student'], true) => 'admin.students.edit',
+            $user->role === 'employer' => 'admin.employers.edit',
+            default => 'admin.admins.edit',
+        };
+
+        return view($view, [
             'user' => $user,
-            'list_type' => $request->query('list_type', 'all'),
         ]);
     }
 
@@ -184,8 +75,8 @@ class UserController extends Controller
             $user->company_name = $normalizedRole === 'employer' ? $request->company_name : null;
             if (in_array($normalizedRole, ['student', 'employer'], true)) {
                 $user->status = $request->status ?? $user->status ?? 'pending';
-            } elseif ($user->status !== 'active') {
-                $user->status = 'active';
+            } else {
+                $user->status = $request->status ?? $user->status ?? 'active';
             }
 
             $user->save();
@@ -212,6 +103,14 @@ class UserController extends Controller
 
         if ($user == null) {
             session()->flash('error', 'User not found!');
+
+            return response()->json([
+                'status' => false,
+            ]);
+        }
+
+        if (in_array($user->role, ['student', 'user', 'employer'], true) && $request->user()->role !== 'super_admin') {
+            session()->flash('error', 'Only super admins can delete students and employers.');
 
             return response()->json([
                 'status' => false,

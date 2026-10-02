@@ -8,11 +8,11 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             @if (auth()->user()->role == 'user')
-                                <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('account.dashboard') }}">Dashboard</a></li>
                             @elseif (auth()->user()->role == 'admin')
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             @endif
-                            {{-- <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Home</a></li> --}}
+                            {{-- <li class="breadcrumb-item"><a href="{{ route('account.profile') }}">Dashboard</a></li> --}}
                             <li class="breadcrumb-item active">My Jobs</li>
                         </ol>
                     </nav>
@@ -25,7 +25,7 @@
                     @elseif (auth()->user()->role == 'employer')
                         @include('employer.sidebar')
                     @else
-                        @include('front.account.sidebar')
+                        @include('student.sidebar')
                     @endif
                 </div>
                 <div class="col-lg-9">

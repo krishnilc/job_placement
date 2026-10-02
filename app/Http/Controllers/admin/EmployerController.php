@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\employer;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationStatus;
@@ -9,11 +9,79 @@ use App\Models\JobApplication;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class EmployerController extends Controller
 {
-     //This method will show employer dashboard
-    public function index()
+    public function index(Request $request)
+    {
+        $allowedSorts = ['id', 'name', 'email', 'mobile', 'designation', 'company_name', 'status', 'created_at'];
+
+        $sort = $request->query('sort', 'created_at');
+        $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        $users = User::where('role', 'employer')
+            ->orderBy($sort, $direction)
+            ->paginate(10);
+        $users->appends($request->query());
+
+        return view('admin.employers.list', [
+            'users' => $users,
+        ]);
+    }
+
+    public function create()
+    {
+        return view('admin.employers.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:5|max:50',
+            'email' => 'required|email|unique:users,email',
+            'mobile' => 'required|digits:7',
+            'designation' => 'required|string|max:100',
+            'company_name' => 'required|string|max:255',
+            'company_address' => 'required|string|max:1000',
+            'password' => 'required|min:5|same:confirm_password',
+            'confirm_password' => 'required|min:5',
+        ]);
+
+        if ($validator->passes()) {
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->designation = $request->designation;
+            $user->company_name = $request->company_name;
+            $user->company_address = $request->company_address;
+            $user->password = Hash::make($request->password);
+            $user->role = 'employer';
+            $user->status = 'active';
+            $user->save();
+
+            session()->flash('success', 'Employer created successfully!');
+
+            return response()->json([
+                'status' => true,
+                'errors' => []
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ]);
+    }
+
+    //This method will show employer dashboard
+    public function dashboard()
     {
         $userId = Auth::user()->id;
 
@@ -70,5 +138,4 @@ class EmployerController extends Controller
             'recentJobs' => $recentJobs
         ]);
     }
-
 }

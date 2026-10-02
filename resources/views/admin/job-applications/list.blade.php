@@ -7,7 +7,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ auth()->user()->role === 'employer' ? route('employer.dashboard') : route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ auth()->user()->role === 'employer' ? route('employer.dashboard') : route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Job Applications</li>
                         </ol>
                     </nav>
