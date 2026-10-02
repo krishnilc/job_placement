@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\College;
 use App\Models\Job;
 use App\Models\JobType;
 use Illuminate\Http\Request;
@@ -52,11 +53,13 @@ class JobController extends Controller
     public function edit($id)
     {
         $job = Job::findOrFail($id); // Find the job by ID or throw a 404 error if not found
+        $colleges = College::active()->orderBy('name')->get(); // Fetch active colleges to populate the college dropdown
         $categories = Category::orderBy('name', 'ASC')->get(); // Fetch all categories to populate the dropdown in the edit form
         $jobTypes = JobType::orderBy('name', 'ASC')->get(); // Fetch all job types to populate the dropdown in the edit form
 
         return view('admin.jobs.edit', [
             'job' => $job,
+            'colleges' => $colleges,
             'categories' => $categories,
             'jobTypes' => $jobTypes
         ]);

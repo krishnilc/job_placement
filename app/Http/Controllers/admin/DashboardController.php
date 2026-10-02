@@ -326,6 +326,48 @@ class DashboardController extends Controller
                 return count($jobs);
             });
 
+        // Job Categories report: jobs, applications and placements per category
+        $categoryJobCounts = Job::select('category_id', DB::raw('COUNT(*) as job_count'))
+            ->groupBy('category_id')
+            ->pluck('job_count', 'category_id');
+        $categoryApplicationCounts = (clone $applicationQuery)
+            ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
+            ->select('jobs.category_id', DB::raw('COUNT(job_applications.id) as application_count'))
+            ->groupBy('jobs.category_id')
+            ->pluck('application_count', 'jobs.category_id');
+        $categoryPlacedCounts = (clone $applicationQuery)
+            ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
+            ->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Placed'))
+            ->select('jobs.category_id', DB::raw('COUNT(job_applications.id) as placed_count'))
+            ->groupBy('jobs.category_id')
+            ->pluck('placed_count', 'jobs.category_id');
+        $categoryRejectedCounts = (clone $applicationQuery)
+            ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
+            ->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Rejected'))
+            ->select('jobs.category_id', DB::raw('COUNT(job_applications.id) as rejected_count'))
+            ->groupBy('jobs.category_id')
+            ->pluck('rejected_count', 'jobs.category_id');
+
+        $categoryReports = \App\Models\Category::with('college:id,name')
+            ->orderBy('name')
+            ->get(['id', 'name', 'college_id'])
+            ->map(function ($category) use ($categoryJobCounts, $categoryApplicationCounts, $categoryPlacedCounts, $categoryRejectedCounts) {
+                $applicationCount = $categoryApplicationCounts[$category->id] ?? 0;
+                $placedCount = $categoryPlacedCounts[$category->id] ?? 0;
+
+                return (object) [
+                    'name' => $category->name,
+                    'college_name' => $category->college->name ?? '—',
+                    'job_count' => $categoryJobCounts[$category->id] ?? 0,
+                    'application_count' => $applicationCount,
+                    'placed_count' => $placedCount,
+                    'rejected_count' => $categoryRejectedCounts[$category->id] ?? 0,
+                    'placement_rate' => $applicationCount > 0 ? round(($placedCount / $applicationCount) * 100, 1) : 0,
+                ];
+            })
+            ->sortByDesc('job_count')
+            ->values();
+
         $applicationStatusReports = ApplicationStatus::query()
             ->leftJoin('application_status_history', 'application_status_history.application_status_id', '=', 'application_statuses.id')
             ->select(
@@ -388,6 +430,7 @@ class DashboardController extends Controller
             'pendingApplications' => $pendingApplications,
             'recentApplications' => $recentApplications,
             'jobsByCategory' => $jobsByCategory,
+            'categoryReports' => $categoryReports,
             'applicationStatusReports' => $applicationStatusReports,
             'applicationStatusReportTotal' => $applicationStatusReportTotal,
             'applicationStatusCategoryReports' => $applicationStatusCategoryReports,
@@ -441,6 +484,15 @@ class DashboardController extends Controller
                 'Drop Off' => $row['drop_off'],
                 'Drop Off Rate' => $row['drop_off_rate'] . '%',
                 'Conversion from Start' => $row['conversion_from_start'] . '%',
+            ])->toArray(),
+            'categories' => collect($dashboard['categoryReports'])->map(fn ($row) => [
+                'Category' => $row->name,
+                'College' => $row->college_name,
+                'Jobs' => $row->job_count,
+                'Applications' => $row->application_count,
+                'Placed' => $row->placed_count,
+                'Rejected' => $row->rejected_count,
+                'Placement Rate' => number_format($row->placement_rate, 1) . '%',
             ])->toArray(),
             default => [
                 ['Report', 'Value'],

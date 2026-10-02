@@ -39,19 +39,19 @@
                                             class="form-control">
                                         <p class="text-danger" id="titleError"></p>
                                     </div>
-                                    <div class="col-md-6  mb-4">
-                                        <label for="college" class="mb-2">College</label>
-                                        <select name="college" id="college" class="form-control">
-                                            <option value="">Select a College</option>
-                                            @if ($colleges->isNotEmpty())
-                                                @foreach ($colleges as $college)
-                                                    <option value="{{ $college->id }}">{{ $college->name }}
-                                                        ({{ $college->code }})
-                                                    </option>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="" class="mb-2">Job Type<span class="req">*</span></label>
+                                        <select name="job_type" id="job_type" class="form-control">
+                                            <option value="">Select Job </option>
+                                            @if ($jobTypes->isNotEmpty())
+                                                @foreach ($jobTypes as $jobType)
+                                                    <option value="{{ $jobType->id }}">{{ $jobType->name }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
+                                        <p class="text-danger" id="jobTypeError"></p>
                                     </div>
+
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6  mb-4">
@@ -68,20 +68,21 @@
                                         </select>
                                         <p class="text-danger" id="categoryError"></p>
                                     </div>
-
-
-                                    <div class="col-md-6 mb-4">
-                                        <label for="" class="mb-2">Job Type<span class="req">*</span></label>
-                                        <select name="job_type" id="job_type" class="form-control">
-                                            <option value="">Select Job </option>
-                                            @if ($jobTypes->isNotEmpty())
-                                                @foreach ($jobTypes as $jobType)
-                                                    <option value="{{ $jobType->id }}">{{ $jobType->name }}</option>
+                                    <div class="col-md-6  mb-4">
+                                        <label for="college" class="mb-2">College</label>
+                                        <select name="college" id="college" class="form-control">
+                                            <option value="">Select a College</option>
+                                            @if ($colleges->isNotEmpty())
+                                                @foreach ($colleges as $college)
+                                                    <option value="{{ $college->id }}">{{ $college->name }}
+                                                        ({{ $college->code }})
+                                                    </option>
                                                 @endforeach
                                             @endif
                                         </select>
-                                        <p class="text-danger" id="jobTypeError"></p>
                                     </div>
+
+
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6  mb-4">
@@ -99,18 +100,17 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="mb-4 col-md-6">
-                                        <label for="" class="mb-2">Closing Date</label>
-                                        <input type="date" id="closing_date" name="closing_date" class="form-control">
-                                    </div>
-
-
-                                    <div class="mb-4 col-md-6">
+                                                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location<span class="req">*</span></label>
                                         <input type="text" placeholder="location" id="location" name="location"
                                             class="form-control">
                                         <p class="text-danger" id="locationError"></p>
                                     </div>
+                                       <div class="mb-4 col-md-6">
+                                        <label for="" class="mb-2">Closing Date</label>
+                                        <input type="date" id="closing_date" name="closing_date" class="form-control">
+                                    </div>
+
                                 </div>
 
                                 <div class="mb-4">

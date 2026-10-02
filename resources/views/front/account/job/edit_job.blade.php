@@ -36,6 +36,21 @@
                                             id="title" name="title" class="form-control">
                                         <p class="text-danger" id="titleError"></p>
                                     </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="" class="mb-2">Job Typesadfds<span class="req">*</span></label>
+                                        <select name="job_type" id="job_type" class="form-control">
+                                            <option value="">Select Job </option>
+                                            @if ($jobTypes->isNotEmpty())
+                                                @foreach ($jobTypes as $jobType)
+                                                    <option {{ $job->job_type_id == $jobType->id ? 'selected' : '' }}
+                                                        value="{{ $jobType->id }}">{{ $jobType->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <p class="text-danger" id="jobTypeError"></p>
+                                    </div>
+
                                     <div class="col-md-6  mb-4">
                                         <label for="college" class="mb-2">College</label>
                                         <select name="college" id="college" class="form-control">
@@ -64,21 +79,9 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <label for="" class="mb-2">Job Type<span class="req">*</span></label>
-                                        <select name="job_type" id="job_type" class="form-control">
-                                            <option value="">Select Job </option>
-                                            @if ($jobTypes->isNotEmpty())
-                                                @foreach ($jobTypes as $jobType)
-                                                    <option {{ $job->job_type_id == $jobType->id ? 'selected' : '' }}
-                                                        value="{{ $jobType->id }}">{{ $jobType->name }}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                        <p class="text-danger" id="jobTypeError"></p>
-                                    </div>
+                                    {{-- Job Type selection removed --}}
                                     <div class="col-md-6  mb-4">
-                                        <label for="" class="mb-2">Vacancy<span class="req">*</span></label>
+                                        <label for="" class="mb-2">No. of Vacancies<span class="req">*</span></label>
                                         <input type="number" min="1" placeholder="Vacancy" id="vacancy"
                                             name="vacancy" class="form-control" value="{{ $job->vacancy }}">
                                         <p class="text-danger" id="vacancyError"></p>

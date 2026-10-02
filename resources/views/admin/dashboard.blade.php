@@ -34,6 +34,9 @@
                                 id="tab-placement-btn" data-bs-toggle="tab" data-bs-target="#tab-placement" type="button"
                                 role="tab">Placement</button></li>
                         <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
+                                id="tab-categories-btn" data-bs-toggle="tab" data-bs-target="#tab-categories"
+                                type="button" role="tab">Categories</button></li>
+                        <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
                                 id="tab-rejection-btn" data-bs-toggle="tab" data-bs-target="#tab-rejection" type="button"
                                 role="tab">Rejection
                                 Trends</button></li>
@@ -665,6 +668,63 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Categories Tab -->
+                        <div class="tab-pane fade" id="tab-categories" role="tabpanel">
+                            <div class="card border-0 shadow mb-4">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Job Categories Report</h5>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('admin.reports.export', ['report' => 'categories', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'categories', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-success">Excel</a>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>College</th>
+                                                <th class="text-end">Jobs</th>
+                                                <th class="text-end">Applications</th>
+                                                <th class="text-end">Placed</th>
+                                                <th class="text-end">Rejected</th>
+                                                <th class="text-end">Placement Rate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($categoryReports as $report)
+                                                <tr>
+                                                    <td class="fw-semibold">{{ $report->name }}</td>
+                                                    <td class="text-muted">{{ $report->college_name }}</td>
+                                                    <td class="text-end">{{ number_format($report->job_count) }}</td>
+                                                    <td class="text-end">
+                                                        {{ number_format($report->application_count) }}
+                                                    </td>
+                                                    <td class="text-end text-success">
+                                                        {{ number_format($report->placed_count) }}
+                                                    </td>
+                                                    <td class="text-end text-danger">
+                                                        {{ number_format($report->rejected_count) }}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span
+                                                            class="badge {{ $report->placement_rate >= 50 ? 'bg-success' : ($report->placement_rate >= 25 ? 'bg-warning text-dark' : 'bg-danger') }}">{{ number_format($report->placement_rate, 1) }}%</span>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="text-center text-muted py-4">No category data
+                                                        available.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
