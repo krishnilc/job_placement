@@ -34,6 +34,20 @@
                             </div>
 
                             <div class="mb-4">
+                                <h2>College</h2>
+                                <select name="college" id="college" class="form-control">
+                                    <option value="">Select a College</option>
+                                    @if ($colleges->isNotEmpty())
+                                        @foreach ($colleges as $college)
+                                            <option value="{{ $college->id }}"
+                                                {{ Request::get('college') == $college->id ? 'selected' : '' }}>
+                                                {{ $college->name }} ({{ $college->code }})</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
                                 <h2>Category</h2>
                                 <select value="{{ Request::get('category') }}" name="category" id="category"
                                     class="form-control">
@@ -165,6 +179,7 @@
 
                 var keywords = $('#keywords').val();
                 var location = $('#location').val();
+                var college = $('#college').val();
                 var category = $('#category').val();
                 // var jobType = $('input[name="job_type"]:checked').val();
                 var experience = $('#experience').val();
@@ -181,6 +196,10 @@
                 //if location is not empty, add to url
                 if (location !== '') {
                     url += '&location=' + encodeURIComponent(location); // Append location to the URL
+                }
+                //if college is not empty, add to url
+                if (college !== '') {
+                    url += '&college=' + encodeURIComponent(college); // Append college to the URL
                 }
                 //if category is not empty, add to url
                 if (category !== '') {
@@ -210,6 +229,12 @@
         });
 
         $('#sort').on('change', function() {
+            $('#searchForm').submit();
+        });
+
+        // When college changes, clear category and submit so categories reload for that college
+        $('#college').on('change', function() {
+            $('#category').val('');
             $('#searchForm').submit();
         });
     </script>

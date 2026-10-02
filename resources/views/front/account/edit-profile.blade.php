@@ -202,17 +202,14 @@
                                                 <p class="text-danger" id="highSchoolGraduationYearError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="university" class="mb-2">College*</label>
-                                                <select name="university" id="university" class="form-control" required>
+                                                <label for="college_id" class="mb-2">College*</label>
+                                                <select name="college_id" id="college_id" class="form-control" required>
                                                     <option value="">Select your college</option>
-                                                    <option value="College of Agriculture, Fisheries and Forestry (CAFF)" {{ old('university', $user->university) == 'College of Agriculture, Fisheries and Forestry (CAFF)' ? 'selected' : '' }}>College of Agriculture, Fisheries and Forestry (CAFF)</option>
-                                                    <option value="College of Business, Hospitality and Tourism Studies (CBHTS)" {{ old('university', $user->university) == 'College of Business, Hospitality and Tourism Studies (CBHTS)' ? 'selected' : '' }}>College of Business, Hospitality and Tourism Studies (CBHTS)</option>
-                                                    <option value="College of Engineering and Technical Vocational Education and Training (CETVET)" {{ old('university', $user->university) == 'College of Engineering and Technical Vocational Education and Training (CETVET)' ? 'selected' : '' }}>College of Engineering and Technical Vocational Education and Training (CETVET)</option>
-                                                    <option value="College of Medicine, Nursing and Health Sciences (CMNHS)" {{ old('university', $user->university) == 'College of Medicine, Nursing and Health Sciences (CMNHS)' ? 'selected' : '' }}>College of Medicine, Nursing and Health Sciences (CMNHS)</option>
-                                                    <option value="National Training and Productivity Centre (NTPC)" {{ old('university', $user->university) == 'National Training and Productivity Centre (NTPC)' ? 'selected' : '' }}>National Training and Productivity Centre (NTPC)</option>
-                                                    <option value="Pacific Centre for Maritime Studies (PCMS)" {{ old('university', $user->university) == 'Pacific Centre for Maritime Studies (PCMS)' ? 'selected' : '' }}>Pacific Centre for Maritime Studies (PCMS)</option>
+                                                    @foreach ($colleges as $college)
+                                                        <option value="{{ $college->id }}" {{ old('college_id', $user->college_id) == $college->id ? 'selected' : '' }}>{{ $college->display_name }}</option>
+                                                    @endforeach
                                                 </select>
-                                                <p class="text-danger" id="universityError"></p>
+                                                <p class="text-danger" id="collegeIdError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="degree" class="mb-2">Degree / Program*</label>
@@ -320,7 +317,7 @@
                     $("#countryError").text('');
                     $("#highSchoolError").text('');
                     $("#highSchoolGraduationYearError").text('');
-                    $("#universityError").text('');
+                    $("#collegeIdError").text('');
                     $("#degreeError").text('');
                     $("#majorError").text('');
                     $("#graduationYearError").text('');
@@ -389,8 +386,8 @@
                         if (errors.high_school_graduation_year) {
                             $("#highSchoolGraduationYearError").text(errors.high_school_graduation_year[0]);
                         }
-                        if (errors.university) {
-                            $("#universityError").text(errors.university[0]);
+                        if (errors.college_id) {
+                            $("#collegeIdError").text(errors.college_id[0]);
                         }
                         if (errors.degree) {
                             $("#degreeError").text(errors.degree[0]);

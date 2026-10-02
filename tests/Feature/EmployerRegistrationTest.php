@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\College;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -62,6 +63,12 @@ class EmployerRegistrationTest extends TestCase
             'designation' => 'Full-time Student',
         ]);
 
+        $college = College::create([
+            'name' => 'College of Medicine, Nursing & Health Sciences',
+            'code' => 'CMNHS',
+            'status' => 1,
+        ]);
+
         $response = $this->actingAs($user)->put('/account/update-profile', [
             'name' => 'Student One',
             'email' => $user->email,
@@ -77,7 +84,7 @@ class EmployerRegistrationTest extends TestCase
             'country' => 'Fiji',
             'high_school' => 'Suva Grammar School',
             'high_school_graduation_year' => '2019',
-            'university' => 'Fiji National University',
+            'college_id' => $college->id,
             'degree' => 'Bachelor of Information Technology',
             'major' => 'Software Engineering',
             'graduation_year' => '2027',
@@ -99,7 +106,7 @@ class EmployerRegistrationTest extends TestCase
             'city' => 'Suva',
             'country' => 'Fiji',
             'high_school' => 'Suva Grammar School',
-            'university' => 'Fiji National University',
+            'college_id' => $college->id,
             'degree' => 'Bachelor of Information Technology',
             'major' => 'Software Engineering',
             'graduation_year' => '2027',

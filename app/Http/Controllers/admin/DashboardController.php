@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationStatus;
+use App\Models\College;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\User;
@@ -75,7 +76,7 @@ class DashboardController extends Controller
         $blockedStudents = User::where('role', 'student')->where('status', 'blocked')->count();
         $applicationQuery = JobApplication::query();
         $applicationQuery
-            ->when($request->filled('college'), fn ($query) => $query->whereHas('user', fn ($userQuery) => $userQuery->where('university', $request->college)))
+            ->when($request->filled('college'), fn ($query) => $query->whereHas('user', fn ($userQuery) => $userQuery->where('college_id', $request->college)))
             ->when($request->filled('programme'), fn ($query) => $query->whereHas('user', fn ($userQuery) => $userQuery->where('degree', $request->programme)))
             ->when($request->filled('employer'), fn ($query) => $query->whereHas('job', fn ($jobQuery) => $jobQuery->where('user_id', $request->employer)))
             ->when($request->filled('year'), fn ($query) => $query->whereYear('job_applications.created_at', $request->year))
@@ -87,19 +88,19 @@ class DashboardController extends Controller
         $placementRate = $placementTotalApplications > 0 ? ($placedApplications / $placementTotalApplications) * 100 : 0;
         $collegePlacementReports = (clone $applicationQuery)
             ->join('users', 'users.id', '=', 'job_applications.user_id')
-            ->whereNotNull('users.university')
-            ->select('users.university', DB::raw('COUNT(job_applications.id) as application_count'))
-            ->groupBy('users.university')
+            ->join('colleges', 'colleges.id', '=', 'users.college_id')
+            ->select('colleges.name as college_name', DB::raw('COUNT(job_applications.id) as application_count'))
+            ->groupBy('colleges.id', 'colleges.name')
             ->get();
         $collegePlacedCounts = (clone $applicationQuery)
             ->join('users', 'users.id', '=', 'job_applications.user_id')
-            ->whereNotNull('users.university')
+            ->join('colleges', 'colleges.id', '=', 'users.college_id')
             ->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Placed'))
-            ->select('users.university', DB::raw('COUNT(job_applications.id) as placed_count'))
-            ->groupBy('users.university')
-            ->pluck('placed_count', 'university');
+            ->select('colleges.name as college_name', DB::raw('COUNT(job_applications.id) as placed_count'))
+            ->groupBy('colleges.id', 'colleges.name')
+            ->pluck('placed_count', 'college_name');
         $collegePlacementReports->each(function ($report) use ($collegePlacedCounts) {
-            $report->placed_count = $collegePlacedCounts[$report->university] ?? 0;
+            $report->placed_count = $collegePlacedCounts[$report->college_name] ?? 0;
             $report->placement_rate = $report->application_count > 0
                 ? round(($report->placed_count / $report->application_count) * 100, 1)
                 : 0;
@@ -151,9 +152,9 @@ class DashboardController extends Controller
         $rejectionByYear = $this->rejectionBreakdown($applicationQuery, $this->getYearExpression('job_applications.created_at'), 'year');
         $rejectionByMonth = $this->rejectionBreakdown($applicationQuery, $this->getMonthExpression('job_applications.created_at'), 'month');
         $rejectionByCollege = $this->rejectionBreakdown(
-            (clone $applicationQuery)->join('users', 'users.id', '=', 'job_applications.user_id')->whereNotNull('users.university')->where('users.university', '<>', ''),
-            'users.university',
-            'university'
+            (clone $applicationQuery)->join('users', 'users.id', '=', 'job_applications.user_id')->join('colleges', 'colleges.id', '=', 'users.college_id'),
+            'colleges.name',
+            'college_name'
         );
         $rejectionByProgramme = $this->rejectionBreakdown(
             (clone $applicationQuery)->join('users', 'users.id', '=', 'job_applications.user_id')->whereNotNull('users.degree')->where('users.degree', '<>', ''),
@@ -295,7 +296,8 @@ class DashboardController extends Controller
             'graduate_employment_rate' => $studentsSeekingEmployment > 0 ? round(($studentsSuccessfullyPlaced / $studentsSeekingEmployment) * 100, 1) : 0,
         ];
 
-        $collegeOptions = User::whereNotNull('university')->where('university', '<>', '')->distinct()->orderBy('university')->pluck('university');
+        $collegeOptions = College::active()->orderBy('name')->get(['id', 'name']);
+        $collegeCategoryCounts = College::withCount('categories')->orderBy('name')->get(['id', 'name', 'code']);
         $programmeOptions = User::whereNotNull('degree')->where('degree', '<>', '')->distinct()->orderBy('degree')->pluck('degree');
         $employerOptions = User::where('role', 'employer')->orderBy('name')->get(['id', 'name']);
         $yearOptions = JobApplication::whereNotNull('created_at')->get(['created_at'])->pluck('created_at')->map(fn ($date) => $date->year)->unique()->sortDesc()->values();
@@ -372,6 +374,7 @@ class DashboardController extends Controller
             'placedApplications' => $placedApplications,
             'placementRate' => $placementRate,
             'collegePlacementReports' => $collegePlacementReports,
+            'collegeCategoryCounts' => $collegeCategoryCounts,
             'interviewedApplications' => $interviewedApplications,
             'interviewPlacedApplications' => $interviewPlacedApplications,
             'interviewConversionRate' => $interviewConversionRate,

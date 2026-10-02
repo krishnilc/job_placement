@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\JobNotificationEmail;
 use App\Models\Category;
 use App\Models\ApplicationStatus;
+use App\Models\College;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
@@ -22,7 +23,11 @@ class JobsController extends Controller
 {
    public function index(Request $request)
    {
-      $categories = Category::where('status', 1)->get(); // Retrieve active categories to display in the jobs listing page
+      $colleges = College::active()->orderBy('name')->get(); // Retrieve active colleges for the filter
+      $categories = Category::where('status', 1)
+         ->when($request->college, fn ($query) => $query->where('college_id', $request->college))
+         ->orderBy('name')
+         ->get(); // Retrieve active categories, filtered by college if selected
       $jobTypes = JobType::where('status', 1)->get(); // Retrieve active job types to display in the jobs listing page
 
       $jobs = Job::where('status', 1) // Only active jobs are public
@@ -42,6 +47,11 @@ class JobsController extends Controller
       //Search using location
       if (!empty($request->location)) {
          $jobs = $jobs->where('location', $request->location);
+      }
+
+      //Search using college
+      if (!empty($request->college)) {
+         $jobs = $jobs->whereHas('category', fn ($query) => $query->where('college_id', $request->college));
       }
 
       //Search using category
@@ -74,6 +84,7 @@ class JobsController extends Controller
 
       // Logic to retrieve and display all jobs will go here
       return view('front.jobs', [
+         'colleges' => $colleges,
          'categories' => $categories,
          'jobTypes' => $jobTypes,
          'jobs' => $jobs,

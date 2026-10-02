@@ -42,7 +42,7 @@ class User extends Authenticatable
         'country',
         'high_school',
         'high_school_graduation_year',
-        'university',
+        'college_id',
         'degree',
         'major',
         'graduation_year',
@@ -74,5 +74,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function college()
+    {
+        return $this->belongsTo(College::class);
     }
 }

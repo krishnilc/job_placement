@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\College;
 use App\Models\JobApplication;
 use App\Models\JobType;
 use App\Models\SavedJob;
@@ -176,7 +177,8 @@ class AccountController extends Controller
         //dd($user); // Debugging statement to check if the user data is being retrieved correctly
 
         return view('front.account.edit-profile', [
-            'user' => $user
+            'user' => $user,
+            'colleges' => College::active()->orderBy('name')->get(),
         ]);
     }
 
@@ -243,17 +245,7 @@ class AccountController extends Controller
             'country' => 'nullable|string|max:100',
             'high_school' => 'nullable|string|max:255',
             'high_school_graduation_year' => 'nullable|string|max:10',
-            'university' => [
-                'nullable',
-                Rule::in([
-                    'College of Agriculture, Fisheries and Forestry (CAFF)',
-                    'College of Business, Hospitality and Tourism Studies (CBHTS)',
-                    'College of Engineering and Technical Vocational Education and Training (CETVET)',
-                    'College of Medicine, Nursing and Health Sciences (CMNHS)',
-                    'National Training and Productivity Centre (NTPC)',
-                    'Pacific Centre for Maritime Studies (PCMS)',
-                ]),
-            ],
+            'college_id' => 'nullable|exists:colleges,id',
             'degree' => 'nullable|string|max:255',
             'major' => 'nullable|string|max:255',
             'graduation_year' => 'nullable|string|max:10',
@@ -287,7 +279,7 @@ class AccountController extends Controller
             $user->country = $request->country;
             $user->high_school = $request->high_school;
             $user->high_school_graduation_year = $request->high_school_graduation_year;
-            $user->university = $request->university;
+            $user->college_id = $request->college_id;
             $user->degree = $request->degree;
             $user->major = $request->major;
             $user->graduation_year = $request->graduation_year;
@@ -375,10 +367,12 @@ class AccountController extends Controller
             return redirect()->route('home');
         }
 
+        $colleges = College::active()->orderBy('name')->get();
         $categories = Category::orderBy('name', 'ASC')->where('status', '1')->get();
         $jobTypes = JobType::orderBy('name', 'ASC')->where('status', '1')->get();
 
         return view('front.account.job.create_job', [
+            'colleges' => $colleges,
             'categories' => $categories,
             'jobTypes' => $jobTypes
         ]);
@@ -477,6 +471,7 @@ class AccountController extends Controller
     public function editJob(Request $request, $id)
     {
 
+        $colleges = College::active()->orderBy('name')->get();
         $categories = Category::orderBy('name', 'ASC')->where('status', '1')->get();
         $jobTypes = JobType::orderBy('name', 'ASC')->where('status', '1')->get();
 
@@ -490,6 +485,7 @@ class AccountController extends Controller
         }
 
         return view('front.account.job.edit_job', [
+            'colleges' => $colleges,
             'categories' => $categories,
             'jobTypes' => $jobTypes,
             'job' => $job

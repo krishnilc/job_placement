@@ -426,9 +426,9 @@
                                             <select name="college" id="college" class="form-select">
                                                 <option value="">All colleges</option>
                                                 @foreach ($collegeOptions as $college)
-                                                    <option value="{{ $college }}"
-                                                        {{ request('college') === $college ? 'selected' : '' }}>
-                                                        {{ $college }}</option>
+                                                    <option value="{{ $college->id }}"
+                                                        {{ (string) request('college') === (string) $college->id ? 'selected' : '' }}>
+                                                        {{ $college->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -541,7 +541,7 @@
                                         <tbody>
                                             @forelse($collegePlacementReports as $report)
                                                 <tr>
-                                                    <td>{{ $report->university }}</td>
+                                                    <td>{{ $report->college_name }}</td>
                                                     <td class="text-end">{{ $report->placed_count }}</td>
                                                     <td class="text-end">{{ $report->application_count }}</td>
                                                     <td class="text-end fw-semibold">
@@ -556,6 +556,43 @@
                                                 </tr>
                                             @endforelse
                                         </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card border-0 shadow mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Categories per College</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>College</th>
+                                                <th>Code</th>
+                                                <th class="text-end">Categories</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($collegeCategoryCounts as $college)
+                                                <tr>
+                                                    <td>{{ $college->name }}</td>
+                                                    <td>{{ $college->code }}</td>
+                                                    <td class="text-end">{{ $college->categories_count }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-4">No colleges
+                                                        found.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="fw-bold">
+                                                <td colspan="2">Total</td>
+                                                <td class="text-end">{{ $collegeCategoryCounts->sum('categories_count') }}</td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -824,7 +861,7 @@
                                                     <tbody>
                                                         @forelse($rejectionByCollege as $report)
                                                             <tr>
-                                                                <td>{{ $report->university }}</td>
+                                                                <td>{{ $report->college_name }}</td>
                                                                 <td class="text-end">{{ $report->application_count }}</td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">

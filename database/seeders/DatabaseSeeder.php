@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(ApplicationStatusSeeder::class);
+        $this->call(CollegeSeeder::class);
+        $this->call(CategorySeeder::class);
 
         User::firstOrCreate([
             'email' => 'superadmin@jobplacement.test',

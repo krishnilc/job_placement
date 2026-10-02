@@ -37,13 +37,25 @@
                                         <p class="text-danger" id="titleError"></p>
                                     </div>
                                     <div class="col-md-6  mb-4">
+                                        <label for="college" class="mb-2">College</label>
+                                        <select name="college" id="college" class="form-control">
+                                            <option value="">Select a College</option>
+                                            @if ($colleges->isNotEmpty())
+                                                @foreach ($colleges as $college)
+                                                    <option {{ $job->category?->college_id == $college->id ? 'selected' : '' }}
+                                                        value="{{ $college->id }}">{{ $college->name }} ({{ $college->code }})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6  mb-4">
                                         <label for="" class="mb-2">Category<span class="req">*</span></label>
                                         <select name="category" id="category" class="form-control">
                                             <option value="">Select a Category</option>
                                             @if ($categories->isNotEmpty())
                                                 @foreach ($categories as $category)
                                                     <option {{ $job->category_id == $category->id ? 'selected' : '' }}
-                                                        value="{{ $category->id }}">{{ $category->name }}</option>
+                                                        value="{{ $category->id }}" data-college="{{ $category->college_id }}">{{ $category->name }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
@@ -186,6 +198,40 @@
 
 @section('customJS')
     <script>
+        // Store all category options for filtering by college
+        var allCategoryOptions = $('#category option').clone();
+        var preselectedCategory = $('#category').val();
+
+        function filterCategoriesByCollege() {
+            var collegeId = $('#college').val();
+            var $categorySelect = $('#category');
+            var currentVal = $categorySelect.val();
+            $categorySelect.empty();
+
+            allCategoryOptions.each(function() {
+                var $option = $(this);
+                if ($option.val() === '') {
+                    $categorySelect.append($option.clone());
+                    return;
+                }
+                if (collegeId === '' || $option.data('college') == collegeId) {
+                    $categorySelect.append($option.clone());
+                }
+            });
+
+            // Restore selection if still valid
+            $categorySelect.val(currentVal);
+        }
+
+        $('#college').on('change', function() {
+            $('#category').val('');
+            filterCategoriesByCollege();
+        });
+
+        // Filter on page load to respect pre-selected college
+        filterCategoriesByCollege();
+        $('#category').val(preselectedCategory);
+
         $('#editJobForm').submit(function(e) {
             e.preventDefault();
             $("button[type='submit']").prop('disabled',

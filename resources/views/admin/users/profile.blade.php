@@ -186,7 +186,7 @@
                                     ])
                                     @include('admin.users.profile-field', [
                                         'label' => 'College',
-                                        'value' => $user->university,
+                                        'value' => optional($user->college)->display_name,
                                     ])
                                     @include('admin.users.profile-field', [
                                         'label' => 'Degree / Program',
