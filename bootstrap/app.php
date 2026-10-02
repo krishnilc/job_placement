@@ -1,5 +1,6 @@
 <?php
 use App\Http\Middleware\CheckAdmin;
+use App\Http\Middleware\CheckAdminOrSuperAdmin;
 use App\Http\Middleware\CheckSuperAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'checkRole' => CheckAdmin::class,
             'checkSuperAdmin' => CheckSuperAdmin::class,
+            'checkAdminOrSuperAdmin' => CheckAdminOrSuperAdmin::class,
         ]);
         //
         $middleware->redirectTo(

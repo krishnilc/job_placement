@@ -66,6 +66,19 @@
                     </a>
                 </li>
 
+                @if (in_array(Auth::user()->role, ['admin', 'super_admin'], true))
+                    <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
+                        <a href="{{ route('admin.colleges') }}">
+                            <i class="fa fa-arrow-right"></i> Manage Colleges
+                        </a>
+                    </li>
+                    <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.categories', 'admin.categories.create', 'admin.categories.edit')])>
+                        <a href="{{ route('admin.categories') }}">
+                            <i class="fa fa-arrow-right"></i> Manage Categories
+                        </a>
+                    </li>
+                @endif
+
                 <li @class(['list-group-item d-flex justify-content-between p-3', 'account-nav-active' => request()->routeIs('admin.users.students') || (request()->routeIs('admin.users.profile', 'admin.users.edit') && isset($user) && in_array($user->role, ['user', 'student'], true))])>
                     <a href="{{ route('admin.users.students') }}">
                         <i class="fa fa-arrow-right"></i> Manage Students

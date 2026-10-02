@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\CollegeController;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\JobApplicationController;
 use App\Http\Controllers\admin\JobController;
@@ -65,6 +67,22 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/job-applications', [JobApplicationController::class, 'index'])->name('admin.jobApplications');
     Route::patch('/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('admin.jobApplications.status');
     Route::delete('/job-applications/delete', [JobApplicationController::class, 'destroy'])->name('admin.jobApplications.destroy');
+
+    Route::middleware('checkAdminOrSuperAdmin')->group(function () {
+        Route::get('/colleges', [CollegeController::class, 'index'])->name('admin.colleges');
+        Route::get('/colleges/create', [CollegeController::class, 'create'])->name('admin.colleges.create');
+        Route::post('/colleges/store', [CollegeController::class, 'store'])->name('admin.colleges.store');
+        Route::get('/colleges/edit/{id}', [CollegeController::class, 'edit'])->name('admin.colleges.edit');
+        Route::put('/colleges/update/{id}', [CollegeController::class, 'update'])->name('admin.colleges.update');
+        Route::delete('/colleges/delete', [CollegeController::class, 'destroy'])->name('admin.colleges.destroy');
+
+        Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories');
+        Route::get('/categories/create', [CategoryController::class, 'create'])->name('admin.categories.create');
+        Route::post('/categories/store', [CategoryController::class, 'store'])->name('admin.categories.store');
+        Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+        Route::put('/categories/update/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
+        Route::delete('/categories/delete', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+    });
 });
 
 Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
