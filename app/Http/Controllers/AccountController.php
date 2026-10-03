@@ -57,7 +57,12 @@ class AccountController extends Controller
     //This method will save user registration data to database
     public function processRegistration(Request $request)
     {
-        $role = in_array($request->input('role'), ['student', 'employer'], true) ? $request->input('role') : 'student';
+        $inputRole = $request->input('role');
+        $role = in_array($inputRole, ['student', 'alumni', 'employer'], true) ? $inputRole : 'student';
+        // Alumni are stored with the 'student' role; isAlumni distinguishes them.
+        $isAlumni = $role === 'alumni';
+        $isStudentType = in_array($role, ['student', 'alumni'], true);
+        $dbRole = $isAlumni ? 'student' : $role;
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -65,8 +70,10 @@ class AccountController extends Controller
             'mobile' => 'required|digits:7',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
-            'role' => 'required|in:student,employer',
-            'student_id' => $role === 'student' ? 'required|string|max:9|unique:student_profiles,student_id' : 'nullable|string|max:9',
+            'role' => 'required|in:student,alumni,employer',
+            'student_id' => $role === 'student' ? 'required|string|max:9|unique:student_profiles,student_id' : 'nullable|string|max:9|unique:student_profiles,student_id',
+            'date_of_birth' => $isStudentType ? 'required|date|before:today' : 'nullable|date',
+            'graduation_year' => $isAlumni ? 'required|integer|min:1950|max:' . date('Y') : 'nullable|integer|min:1950|max:' . date('Y'),
             'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
             'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
             'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
@@ -82,10 +89,14 @@ class AccountController extends Controller
             $user->mobile = $request->mobile;
             $user->password = Hash::make($request->password); // Hash the password before saving
             // Set the role based on the selected option in the radio button (student or employer)
-            $user->role = $role;
+            $user->role = $dbRole;
             $user->status = 'pending';
-            if ($role === 'student') {
+            if ($isStudentType) {
                 $user->student_id = $request->student_id;
+                $user->date_of_birth = $request->date_of_birth;
+                if ($isAlumni) {
+                    $user->graduation_year = $request->graduation_year;
+                }
             } else {
                 $user->designation = $request->designation;
                 $user->company_name = $request->company_name;
