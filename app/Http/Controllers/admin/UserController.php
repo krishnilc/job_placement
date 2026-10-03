@@ -51,7 +51,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
             'mobile' => $isStudent ? 'nullable' : 'required|digits:7',
             'role' => $isStudent ? 'nullable' : 'required|in:admin,super_admin,student,employer,user',
-            'student_id' => $isStudent ? 'required|string|max:9|unique:users,student_id,' . $id . ',id' : 'nullable',
+            'student_id' => $isStudent ? 'required|string|max:9|unique:student_profiles,student_id,' . $id . ',user_id' : 'nullable',
             'designation' => $isStudent ? 'nullable' : 'nullable|string|max:100',
             'company_name' => $willBeEmployer ? 'required|string|max:255' : 'nullable',
             'status' => 'nullable|in:pending,active,blocked',
@@ -68,11 +68,15 @@ class UserController extends Controller
                 $user->mobile = $request->mobile;
             }
             $user->role = $normalizedRole;
-            $user->student_id = $normalizedRole === 'student' ? $request->student_id : null;
+            if ($normalizedRole === 'student') {
+                $user->student_id = $request->student_id;
+            }
             if (!$isStudent) {
                 $user->designation = $request->designation;
             }
-            $user->company_name = $normalizedRole === 'employer' ? $request->company_name : null;
+            if ($normalizedRole === 'employer') {
+                $user->company_name = $request->company_name;
+            }
             if (in_array($normalizedRole, ['student', 'employer'], true)) {
                 $user->status = $request->status ?? $user->status ?? 'pending';
             } else {

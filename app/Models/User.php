@@ -24,33 +24,43 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
-        'student_id',
         'mobile',
         'email_2',
         'mobile_2',
         'designation',
-        'company_name',
-        'company_address',
-        'website_url',
-        'company_description',
-        'date_of_birth',
-        'gender',
-        'address',
-        'residential_address',
-        'postal_address',
-        'city',
-        'country',
-        'high_school',
-        'high_school_graduation_year',
-        'college_id',
-        'degree',
-        'major',
-        'graduation_year',
-        'skills',
-        'bio',
-        'linkedin_url',
-        'facebook_url',
-        'availability',
+    ];
+
+    /**
+     * Profile attributes that live on the related profile tables.
+     * Mapped to their relationship name for transparent access.
+     *
+     * @var array<string, string>
+     */
+    protected static $profileAttributeMap = [
+        // student_profiles
+        'student_id' => 'studentProfile',
+        'date_of_birth' => 'studentProfile',
+        'gender' => 'studentProfile',
+        'residential_address' => 'studentProfile',
+        'postal_address' => 'studentProfile',
+        'city' => 'studentProfile',
+        'country' => 'studentProfile',
+        'high_school' => 'studentProfile',
+        'high_school_graduation_year' => 'studentProfile',
+        'college_id' => 'studentProfile',
+        'degree' => 'studentProfile',
+        'major' => 'studentProfile',
+        'graduation_year' => 'studentProfile',
+        'skills' => 'studentProfile',
+        'bio' => 'studentProfile',
+        'linkedin_url' => 'studentProfile',
+        'facebook_url' => 'studentProfile',
+        'availability' => 'studentProfile',
+        // employer_profiles
+        'company_name' => 'employerProfile',
+        'company_address' => 'employerProfile',
+        'website_url' => 'employerProfile',
+        'company_description' => 'employerProfile',
     ];
 
     /**
@@ -76,8 +86,90 @@ class User extends Authenticatable
         ];
     }
 
+    public function studentProfile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    public function employerProfile()
+    {
+        return $this->hasOne(EmployerProfile::class);
+    }
+
     public function college()
     {
-        return $this->belongsTo(College::class);
+        return $this->hasOneThrough(College::class, StudentProfile::class, 'user_id', 'id', 'id', 'college_id');
+    }
+
+    /**
+     * Transparently read profile attributes from the related profile model.
+     */
+    public function getAttribute($key)
+    {
+        $value = parent::getAttribute($key);
+
+        if ($value === null && isset(static::$profileAttributeMap[$key])) {
+            $relation = static::$profileAttributeMap[$key];
+            // Only resolve via relationship when the column truly no longer exists on users
+            if (!array_key_exists($key, $this->attributes)) {
+                $related = $this->getRelationValue($relation);
+                return $related ? $related->getAttribute($key) : null;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Transparently write profile attributes to the related profile model.
+     */
+    public function setAttribute($key, $value)
+    {
+        if (isset(static::$profileAttributeMap[$key]) && !$this->hasUserColumn($key)) {
+            $relation = static::$profileAttributeMap[$key];
+            $related = $this->getRelationValue($relation);
+
+            if (!$related) {
+                $class = $relation === 'studentProfile' ? StudentProfile::class : EmployerProfile::class;
+                $related = new $class();
+                $related->user_id = $this->id;
+                $this->setRelation($relation, $related);
+            }
+
+            $related->setAttribute($key, $value);
+            return $this;
+        }
+
+        return parent::setAttribute($key, $value);
+    }
+
+    /**
+     * Persist any pending profile relation alongside the user.
+     */
+    public function save(array $options = [])
+    {
+        $saved = parent::save($options);
+
+        if ($saved) {
+            foreach (['studentProfile', 'employerProfile'] as $relation) {
+                if ($this->relationLoaded($relation) && ($related = $this->getRelation($relation))) {
+                    if ($related->isDirty()) {
+                        $related->user_id = $this->id;
+                        $related->save();
+                    }
+                }
+            }
+        }
+
+        return $saved;
+    }
+
+    /**
+     * Whether the given attribute is still a real column on the users table.
+     */
+    protected function hasUserColumn(string $key): bool
+    {
+        return array_key_exists($key, $this->attributes)
+            || in_array($key, $this->fillable, true);
     }
 }

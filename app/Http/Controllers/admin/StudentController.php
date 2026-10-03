@@ -42,7 +42,7 @@ class StudentController extends Controller
             'name' => 'required|min:5|max:50',
             'email' => 'required|email|unique:users,email',
             'mobile' => 'required|digits:7',
-            'student_id' => 'required|string|max:9|unique:users,student_id',
+            'student_id' => 'required|string|max:9|unique:student_profiles,student_id',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|min:5',
         ], [

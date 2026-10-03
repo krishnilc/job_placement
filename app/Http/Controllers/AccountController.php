@@ -66,7 +66,7 @@ class AccountController extends Controller
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|same:password',
             'role' => 'required|in:student,employer',
-            'student_id' => $role === 'student' ? 'required|string|max:9|unique:users,student_id' : 'nullable|string|max:9',
+            'student_id' => $role === 'student' ? 'required|string|max:9|unique:student_profiles,student_id' : 'nullable|string|max:9',
             'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
             'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
             'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
@@ -87,7 +87,6 @@ class AccountController extends Controller
             if ($role === 'student') {
                 $user->student_id = $request->student_id;
             } else {
-                $user->student_id = null;
                 $user->designation = $request->designation;
                 $user->company_name = $request->company_name;
                 $user->company_address = $request->company_address;
