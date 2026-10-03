@@ -27,6 +27,18 @@
                                 </div>
 
                             </div>
+                            <form method="GET" action="{{ route('account.myJobApplications') }}" class="row g-2 my-3">
+                                <div class="col-md-6 col-lg-4">
+                                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                                        class="form-control" placeholder="Search title, company, location...">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                        Search</button>
+                                    <a href="{{ route('account.myJobApplications') }}"
+                                        class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 <table class="table ">
                                     <thead class="bg-light">

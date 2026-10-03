@@ -1,5 +1,34 @@
 @extends('front.layouts.app')
 
+@php
+    $fields = [
+        'name' => ['label' => 'Name*', 'max' => 20],
+        'student_id' => ['label' => 'Student ID*', 'max' => 9],
+        'email' => ['label' => 'Email*'],
+        'email_2' => ['label' => 'Alternate Email'],
+        'mobile' => ['label' => 'Mobile', 'max' => 7],
+        'mobile_2' => ['label' => 'Alternate Mobile', 'max' => 7],
+        'designation' => ['label' => 'Designation', 'max' => 100],
+        'date_of_birth' => ['label' => 'Date of Birth', 'type' => 'date'],
+        'gender' => ['label' => 'Gender', 'type' => 'select', 'options' => ['' => 'Select gender', 'Male' => 'Male', 'Female' => 'Female', 'Other' => 'Other']],
+        'residential_address' => ['label' => 'Residential Address'],
+        'postal_address' => ['label' => 'Postal Address'],
+        'city' => ['label' => 'City', 'max' => 100],
+        'country' => ['label' => 'Country', 'max' => 100],
+        'high_school' => ['label' => 'High School'],
+        'high_school_graduation_year' => ['label' => 'High School Graduation Year', 'max' => 10],
+        'college_id' => ['label' => 'College', 'type' => 'select', 'options' => ['' => 'Select college'] + $colleges->pluck('display_name', 'id')->all()],
+        'degree' => ['label' => 'Degree / Program'],
+        'major' => ['label' => 'Major'],
+        'graduation_year' => ['label' => 'Graduation Year', 'max' => 10],
+        'availability' => ['label' => 'Availability'],
+        'linkedin_url' => ['label' => 'LinkedIn URL'],
+        'facebook_url' => ['label' => 'Facebook URL'],
+        'skills' => ['label' => 'Skills', 'type' => 'textarea', 'full' => true],
+        'bio' => ['label' => 'Bio', 'type' => 'textarea', 'full' => true],
+    ];
+@endphp
+
 @section('main')
     <section class="section-5 bg-2">
         <div class="container py-5">
@@ -27,32 +56,26 @@
                                     @csrf
                                     <div class="card-body  p-4">
                                         <h3 class="fs-4 mb-1">Student/Edit</h3>
-                                        <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
-                                            <input type="text" name="name" id="name" class="form-control"
-                                                value="{{ $user->name }}">
-                                            <p class="text-danger" id="nameError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="email" class="mb-2">Email*</label>
-                                            <input type="text" name="email" id="email" class="form-control"
-                                                value="{{ $user->email }}">
-                                            <p class="text-danger" id="emailError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="student_id" class="mb-2">Student ID*</label>
-                                            <input type="text" name="student_id" id="student_id" class="form-control"
-                                                value="{{ $user->student_id }}" maxlength="9">
-                                            <p class="text-danger" id="student_idError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="status" class="mb-2">Account Status*</label>
-                                            <select name="status" id="status" class="form-control">
-                                                <option value="pending" {{ $user->status === 'pending' ? 'selected' : '' }} class="text-warning">Pending Approval</option>
-                                                <option value="active" {{ $user->status === 'active' ? 'selected' : '' }} class="text-success">Active</option>
-                                                <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }} class="text-danger">Blocked</option>
-                                            </select>
-                                            <p class="text-danger" id="statusError"></p>
+                                        <div class="row g-3 mt-1">
+                                            @foreach ($fields as $name => $f)
+                                                <div class="{{ $f['full'] ?? false ? 'col-12' : 'col-md-6' }}">
+                                                    <label for="{{ $name }}" class="mb-2">{{ $f['label'] }}</label>
+                                                    @if (($f['type'] ?? 'text') === 'select')
+                                                        <select name="{{ $name }}" id="{{ $name }}" class="form-control">
+                                                            @foreach ($f['options'] as $value => $text)
+                                                                <option value="{{ $value }}" @selected((string) $user->{$name} === (string) $value)>{{ $text }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @elseif (($f['type'] ?? 'text') === 'textarea')
+                                                        <textarea name="{{ $name }}" id="{{ $name }}" rows="3" class="form-control">{{ $user->{$name} }}</textarea>
+                                                    @else
+                                                        <input type="{{ $f['type'] ?? 'text' }}" name="{{ $name }}" id="{{ $name }}"
+                                                            class="form-control" maxlength="{{ $f['max'] ?? 255 }}"
+                                                            value="{{ ($f['type'] ?? 'text') === 'date' && $user->{$name} ? \Illuminate\Support\Carbon::parse($user->{$name})->format('Y-m-d') : $user->{$name} }}">
+                                                    @endif
+                                                    <p class="text-danger mb-0" id="{{ $name }}Error"></p>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
                                     <div class="card-footer  p-4">
@@ -81,28 +104,14 @@
                 data: $("#userForm").serializeArray(),
 
                 success: function(response) {
-                    $("#nameError").text('');
-                    $("#emailError").text('');
-                    $("#student_idError").text('');
-                    $("#statusError").text('');
+                    $('#userForm .text-danger').text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('admin.users.students') }}";
                     } else {
-                        var errors = response.errors;
-
-                        if (errors.name) {
-                            $("#nameError").text(errors.name[0]);
-                        }
-                        if (errors.email) {
-                            $("#emailError").text(errors.email[0]);
-                        }
-                        if (errors.student_id) {
-                            $("#student_idError").text(errors.student_id[0]);
-                        }
-                        if (errors.status) {
-                            $("#statusError").text(errors.status[0]);
-                        }
+                        $.each(response.errors, function(field, messages) {
+                            $('#' + field + 'Error').text(messages[0]);
+                        });
                     }
                 },
                 error: function(xhr, status, error) {

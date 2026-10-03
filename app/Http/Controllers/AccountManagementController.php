@@ -198,10 +198,21 @@ class AccountManagementController extends Controller
 
     public function myJobApplications(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+
         $jobApplications = JobApplication::where('user_id', Auth::user()->id)
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->whereHas('job', function ($j) use ($like) {
+                    $j->where('title', 'like', $like)
+                        ->orWhere('company_name', 'like', $like)
+                        ->orWhere('location', 'like', $like);
+                });
+            })
             ->with(['job', 'job.JobType', 'job.applications', 'applicationStatus'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10); // Retrieve job applications submitted by the authenticated user
+            ->paginate(10)
+            ->withQueryString(); // Retrieve job applications submitted by the authenticated user
 
         return view('student.job.my-job-applications', [
             'jobApplications' => $jobApplications
@@ -251,9 +262,19 @@ class AccountManagementController extends Controller
         }
 
         $sortColumn = $sortableColumns[$sort] ?? 'saved_jobs.created_at';
+        $search = trim((string) $request->query('search', ''));
+
         $savedJobs = SavedJob::select('saved_jobs.*')
             ->leftJoin('jobs', 'jobs.id', '=', 'saved_jobs.job_id')
             ->where('saved_jobs.user_id', Auth::id())
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('jobs.title', 'like', $like)
+                        ->orWhere('jobs.company_name', 'like', $like)
+                        ->orWhere('jobs.location', 'like', $like);
+                });
+            })
             ->with(['job', 'job.jobType', 'job.applications'])
             ->orderBy($sortColumn, $direction)
             ->paginate(10)

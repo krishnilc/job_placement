@@ -36,8 +36,21 @@ class JobController extends Controller
             $direction = 'desc';
         }
 
+        $mine = $request->boolean('mine');
+        $search = trim((string) $request->query('search', ''));
+
         $jobs = Job::select('jobs.*')
             ->leftJoin('users', 'users.id', '=', 'jobs.user_id')
+            ->when($mine, fn ($query) => $query->where('jobs.user_id', auth()->id()))
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('jobs.title', 'like', $like)
+                        ->orWhere('jobs.company_name', 'like', $like)
+                        ->orWhere('jobs.location', 'like', $like)
+                        ->orWhere('users.name', 'like', $like);
+                });
+            })
             ->with('user', 'applications')
             ->orderBy($sortableColumns[$sort], $direction)
             ->paginate(10)
@@ -47,6 +60,71 @@ class JobController extends Controller
             'jobs' => $jobs,
             'sort' => $sort,
             'direction' => $direction,
+            'mine' => $mine,
+        ]);
+    }
+
+    public function create()
+    {
+        return view('admin.jobs.create', [
+            'colleges' => College::active()->orderBy('name')->get(),
+            'categories' => Category::orderBy('name', 'ASC')->get(),
+            'jobTypes' => JobType::orderBy('name', 'ASC')->get(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|min:5|max:200',
+            'category' => 'required',
+            'job_type' => 'required',
+            'vacancy' => 'required|integer',
+            'location' => 'required|max:50',
+            'description' => 'required',
+            'company_name' => 'required|min:3|max:75',
+            'closing_date' => 'nullable|date',
+            'experience' => 'required',
+            'job_status' => 'required|in:pending,active,blocked',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        $job = new Job();
+        $job->title = $request->title;
+        $job->category_id = $request->category;
+        $job->job_type_id = $request->job_type;
+        $job->user_id = auth()->id();
+        $job->vacancy = $request->vacancy;
+        $job->closing_date = $request->closing_date;
+        $job->salary = $request->salary;
+        $job->location = $request->location;
+        $job->description = $request->description;
+        $job->responsibilities = $request->responsibilities;
+        $job->qualifications = $request->qualifications;
+        $job->keywords = $request->keywords;
+        $job->experience = $request->experience;
+        $job->company_name = $request->company_name;
+        $job->company_location = $request->company_location;
+        $job->company_website = $request->company_website;
+        $job->isFeatured = $request->has('isFeatured') ? 1 : 0;
+        $job->status = match ($request->job_status) {
+            'pending' => 0,
+            'active' => 1,
+            'blocked' => 2,
+        };
+        $job->save();
+
+        session()->flash('success', 'Job added successfully!');
+
+        return response()->json([
+            'status' => true,
+            'errors' => []
         ]);
     }
 

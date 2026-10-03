@@ -95,6 +95,7 @@ class AccountController extends Controller
                 $user->student_id = $request->student_id;
                 $user->date_of_birth = $request->date_of_birth;
                 if ($isAlumni) {
+                    $user->designation = 'Alumni';
                     $user->graduation_year = $request->graduation_year;
                 }
             } else {

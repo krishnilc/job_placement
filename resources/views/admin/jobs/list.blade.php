@@ -25,8 +25,37 @@
                                 <div>
                                     <h3 class="fs-4 mb-1">Manage Jobs</h3>
                                 </div>
-
+                                <div>
+                                    <a href="{{ route('admin.jobs.create') }}" class="btn btn-primary">
+                                        <i class="fa fa-plus"></i> Add Job
+                                    </a>
+                                </div>
                             </div>
+                            <ul class="nav nav-pills my-3">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $mine ? '' : 'active' }}" href="{{ route('admin.jobs') }}">All Jobs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $mine ? 'active' : '' }}" href="{{ route('admin.jobs', ['mine' => 1]) }}">My Jobs</a>
+                                </li>
+                            </ul>
+                            <form method="GET" action="{{ route('admin.jobs') }}" class="row g-2 mb-3">
+                                @if ($mine)
+                                    <input type="hidden" name="mine" value="1">
+                                @endif
+                                <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
+                                <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
+                                <div class="col-md-6 col-lg-4">
+                                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                                        class="form-control" placeholder="Search title, company, location, creator...">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                        Search</button>
+                                    <a href="{{ route('admin.jobs', $mine ? ['mine' => 1] : []) }}"
+                                        class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
+                                </div>
+                            </form>
                             <div class="table-responsive ">
                                 @php
                                     $sortUrl = function ($column) use ($sort, $direction) {

@@ -25,7 +25,19 @@ class EmployerController extends Controller
             $sort = 'created_at';
         }
 
+        $search = trim((string) $request->query('search', ''));
+
         $users = User::where('role', 'employer')
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like)
+                        ->orWhere('mobile', 'like', $like)
+                        ->orWhere('designation', 'like', $like)
+                        ->orWhereHas('employerProfile', fn ($p) => $p->where('company_name', 'like', $like));
+                });
+            })
             ->orderBy($sort, $direction)
             ->paginate(10);
         $users->appends($request->query());
@@ -33,6 +45,17 @@ class EmployerController extends Controller
         return view('admin.employers.list', [
             'users' => $users,
         ]);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate(['status' => 'required|in:pending,active,blocked']);
+
+        $user = User::where('role', 'employer')->findOrFail($id);
+        $user->status = $request->status;
+        $user->save();
+
+        return response()->json(['status' => true]);
     }
 
     public function create()

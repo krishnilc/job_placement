@@ -19,6 +19,11 @@
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
+                    <div id="statusAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                        <span id="statusAlertText"></span>
+                        <button type="button" class="btn-close" aria-label="Close"
+                            onclick="document.getElementById('statusAlert').classList.add('d-none')"></button>
+                    </div>
                     <div class="card border-0 shadow mb-4">
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
@@ -33,6 +38,20 @@
                                     </div>
                                 @endif
                             </div>
+                            <form method="GET" action="{{ route('admin.users.students') }}" class="row g-2 my-3">
+                                <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
+                                <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
+                                <div class="col-md-6 col-lg-4">
+                                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                                        class="form-control" placeholder="Search name, email, mobile, student ID...">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                        Search</button>
+                                    <a href="{{ route('admin.users.students') }}"
+                                        class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 @php
                                     $currentSort = request()->query('sort', 'created_at');
@@ -53,6 +72,7 @@
                                                 'sort' => $column,
                                                 'direction' => $nextDirection,
                                                 'page' => 1,
+                                                'search' => request()->query('search'),
                                             ]);
                                     };
                                 @endphp
@@ -92,6 +112,8 @@
                                                     @endif
                                                 </a>
                                             </th>
+                                            <th scope="col">Designation</th>
+                                            <th scope="col">Date of Birth</th>
                                             <th scope="col"><a href="{{ $buildSortUrl('mobile') }}"
                                                     class="text-decoration-none text-dark">Mobile @if ($currentSort === 'mobile')
                                                         <i
@@ -119,12 +141,25 @@
                                                     <td>{{ $user->name }}</td>
                                                     <td>{{ $user->student_id }}</td>
                                                     <td>{{ $user->email }}</td>
+                                                    <td>{{ $user->designation ?: '-' }}</td>
+                                                    <td>{{ $user->date_of_birth ? \Illuminate\Support\Carbon::parse($user->date_of_birth)->format('d M Y') : '-' }}</td>
                                                     <td>{{ $user->mobile }}</td>
                                                     <td>
-                                                        <span
-                                                            class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
-                                                            {{ $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status) }}
-                                                        </span>
+                                                        @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
+                                                            <select class="form-select form-select-sm status-select status-{{ $user->status }}"
+                                                                style="min-width: 150px"
+                                                                data-id="{{ $user->id }}"
+                                                                data-original="{{ $user->status }}">
+                                                                <option value="pending" @selected($user->status === 'pending')>Pending Approval</option>
+                                                                <option value="active" @selected($user->status === 'active')>Active</option>
+                                                                <option value="blocked" @selected($user->status === 'blocked')>Blocked</option>
+                                                            </select>
+                                                        @else
+                                                            <span
+                                                                class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">
+                                                                {{ $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status) }}
+                                                            </span>
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         <div class="action-dots">
@@ -140,7 +175,7 @@
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.users.edit', $user->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
-                                                                        Edit</a></li>
+                                                                        Update Profile</a></li>
                                                                 @if (auth()->user()->role === 'super_admin')
                                                                     <li><a class="dropdown-item" href="javascript:void(0);"
                                                                             onclick="deleteUser({{ $user->id }})"><i
@@ -154,7 +189,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="7" class="text-center">No students found.</td>
+                                                <td colspan="9" class="text-center">No students found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
@@ -173,7 +208,49 @@
 @endsection
 
 @section('customJS')
+    <style>
+        .status-select { font-weight: 600; border-width: 2px; }
+        .status-select.status-active { background-color: #d1e7dd; border-color: #198754; color: #0f5132; }
+        .status-select.status-blocked { background-color: #f8d7da; border-color: #dc3545; color: #842029; }
+        .status-select.status-pending { background-color: #fff3cd; border-color: #ffc107; color: #664d03; }
+    </style>
     <script type="text/javascript">
+        function applyStatusColor(select) {
+            select.removeClass('status-active status-blocked status-pending').addClass('status-' + select.val());
+        }
+
+        $('.status-select').on('change', function() {
+            const select = $(this);
+            const previous = select.data('original');
+            applyStatusColor(select);
+            select.prop('disabled', true);
+
+            $.ajax({
+                url: "{{ url('admin/users/students') }}/" + select.data('id') + "/status",
+                type: "PATCH",
+                dataType: "json",
+                data: {
+                    status: select.val(),
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function() {
+                    select.data('original', select.val());
+                    const label = select.find('option:selected').text();
+                    const name = select.closest('tr').find('td').eq(1).text().trim();
+                    $('#statusAlertText').text(name + "'s status has been changed to " + label + '.');
+                    $('#statusAlert').removeClass('d-none');
+                },
+                error: function() {
+                    select.val(previous);
+                    applyStatusColor(select);
+                    alert('Could not update the status. Please try again.');
+                },
+                complete: function() {
+                    select.prop('disabled', false);
+                }
+            });
+        });
+
         function deleteUser(id) {
             if (confirm('Are you sure you want to delete this student?')) {
                 $.ajax({

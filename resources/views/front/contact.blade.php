@@ -15,8 +15,8 @@
                                     <div class="mb-4">
                                         <h5 class="mb-2">Our contact details</h5>
                                         <p class="mb-1"><strong>Address:</strong> Fiji National University</p>
-                                        <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@fnu.ac.fj">info@fnu.ac.fj</a></p>
-                                        <p class="mb-0"><strong>Phone:</strong> +679 1234 567</p>
+                                        <p class="mb-1"><strong>Email:</strong> <a href="mailto:maraia.naqura@fnu.ac.fj">maraia.naqura@fnu.ac.fj</a></p>
+                                        <p class="mb-0"><strong>Phone:</strong> +679 3394000 ext: 2405</p>
                                     </div>
                                 </div>
 

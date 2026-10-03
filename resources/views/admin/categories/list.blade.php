@@ -31,6 +31,20 @@
                                     </a>
                                 </div>
                             </div>
+                            <form method="GET" action="{{ route('admin.categories') }}" class="row g-2 my-3">
+                                <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
+                                <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
+                                <div class="col-md-6 col-lg-4">
+                                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                                        class="form-control" placeholder="Search category or college...">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                        Search</button>
+                                    <a href="{{ route('admin.categories') }}" class="btn btn-secondary ms-1"><i
+                                            class="fa fa-times"></i> Clear</a>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 @php
                                     $currentSort = request()->query('sort', 'name');
@@ -51,6 +65,7 @@
                                                 'sort' => $column,
                                                 'direction' => $nextDirection,
                                                 'page' => 1,
+                                                'search' => request()->query('search'),
                                             ]);
                                     };
                                 @endphp

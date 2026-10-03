@@ -109,7 +109,17 @@ class MyJobController extends Controller
             $direction = 'desc';
         }
 
+        $search = trim((string) $request->query('search', ''));
+
         $jobs = Job::where('user_id', Auth::id())
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('title', 'like', $like)
+                        ->orWhere('company_name', 'like', $like)
+                        ->orWhere('location', 'like', $like);
+                });
+            })
             ->with(['jobType', 'applications'])
             ->orderBy($sortableColumns[$sort], $direction)
             ->paginate(10)

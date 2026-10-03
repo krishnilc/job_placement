@@ -32,6 +32,20 @@
                                 </div>
 
                             </div>
+                            <form method="GET" action="{{ route('admin.jobApplications') }}" class="row g-2 my-3">
+                                <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
+                                <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
+                                <div class="col-md-6 col-lg-4">
+                                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                                        class="form-control" placeholder="Search title, applicant, company...">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                        Search</button>
+                                    <a href="{{ route('admin.jobApplications') }}" class="btn btn-secondary ms-1"><i
+                                            class="fa fa-times"></i> Clear</a>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 @php
                                     $sortUrl = function ($column) use ($sort, $direction) {

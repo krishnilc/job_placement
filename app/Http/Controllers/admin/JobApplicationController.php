@@ -42,7 +42,18 @@ class JobApplicationController extends Controller
             $applicationsQuery->where('job_applications.user_id', $user->id);
         }
 
+        $search = trim((string) $request->query('search', ''));
+
         $applications = $applicationsQuery
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('jobs.title', 'like', $like)
+                        ->orWhere('jobs.company_name', 'like', $like)
+                        ->orWhere('users.name', 'like', $like)
+                        ->orWhere('users.email', 'like', $like);
+                });
+            })
             ->with('job', 'user', 'employer', 'applicationStatus', 'latestStatusHistory.changedBy', 'statusHistories.applicationStatus', 'statusHistories.changedBy')
             ->orderBy($sortableColumns[$sort], $direction)
             ->paginate(10)

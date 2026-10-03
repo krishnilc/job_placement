@@ -26,58 +26,76 @@
                                 <form action="" method="POST" id="userForm" name="userForm">
                                     @csrf
                                     <div class="card-body  p-4">
-                                        <h3 class="fs-4 mb-1">Employer/Edit</h3>
-                                        <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
-                                            <input type="text" name="name" id="name" class="form-control"
-                                                value="{{ $user->name }}">
-                                            <p class="text-danger" id="nameError"></p>
+                                        <h3 class="fs-4 mb-4">Update Employer Profile</h3>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label for="name" class="mb-2">Name*</label>
+                                                <input type="text" name="name" id="name" class="form-control" value="{{ $user->name }}">
+                                                <p class="text-danger" id="nameError"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="designation" class="mb-2">Designation*</label>
+                                                <input type="text" name="designation" id="designation" class="form-control" value="{{ $user->designation }}" placeholder="e.g. HR Manager">
+                                                <p class="text-danger" id="designationError"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="email" class="mb-2">Email*</label>
+                                                <input type="email" name="email" id="email" class="form-control" value="{{ $user->email }}">
+                                                <p class="text-danger" id="emailError"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="email_2" class="mb-2">Additional Email</label>
+                                                <input type="email" name="email_2" id="email_2" class="form-control" value="{{ $user->email_2 }}">
+                                                <p class="text-danger" id="email_2Error"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="mobile" class="mb-2">Mobile*</label>
+                                                <input type="text" name="mobile" id="mobile" class="form-control" value="{{ $user->mobile }}" maxlength="7">
+                                                <p class="text-danger" id="mobileError"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="mobile_2" class="mb-2">Additional Mobile</label>
+                                                <input type="text" name="mobile_2" id="mobile_2" class="form-control" value="{{ $user->mobile_2 }}" maxlength="7">
+                                                <p class="text-danger" id="mobile_2Error"></p>
+                                            </div>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="email" class="mb-2">Email*</label>
-                                            <input type="text" name="email" id="email" class="form-control"
-                                                value="{{ $user->email }}">
-                                            <p class="text-danger" id="emailError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="designation" class="mb-2">Designation*</label>
-                                            <input type="text" name="designation" id="designation" class="form-control"
-                                                value="{{ $user->designation }}">
-                                            <p class="text-danger" id="designationError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="company_name" class="mb-2">Company Name*</label>
-                                            <input type="text" name="company_name" id="company_name" class="form-control"
-                                                value="{{ $user->company_name }}">
-                                            <p class="text-danger" id="company_nameError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="mobile" class="mb-2">Mobile*</label>
-                                            <input type="text" name="mobile" id="mobile" class="form-control"
-                                                value="{{ $user->mobile }}">
-                                            <p class="text-danger" id="mobileError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="role" class="mb-2">Role*</label>
-                                            <select name="role" id="role" class="form-control">
-                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                                <option value="student" {{ in_array($user->role, ['user', 'student'], true) ? 'selected' : '' }}>Student</option>
-                                                <option value="employer" {{ $user->role == 'employer' ? 'selected' : '' }}>Employer</option>
-                                            </select>
-                                            <p class="text-danger" id="roleError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="status" class="mb-2">Account Status*</label>
-                                            <select name="status" id="status" class="form-control">
-                                                <option value="pending" {{ $user->status === 'pending' ? 'selected' : '' }} class="text-warning">Pending Approval</option>
-                                                <option value="active" {{ $user->status === 'active' ? 'selected' : '' }} class="text-success">Active</option>
-                                                <option value="blocked" {{ $user->status === 'blocked' ? 'selected' : '' }} class="text-danger">Blocked</option>
-                                            </select>
-                                            <p class="text-danger" id="statusError"></p>
-                                        </div>
-                                    </div>
+                                        <div class="border-top mt-4 pt-4">
+                                            <h4 class="fs-5 mb-3">Company Details</h4>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <label for="company_name" class="mb-2">Company Name*</label>
+                                                    <input type="text" name="company_name" id="company_name" class="form-control" value="{{ $user->company_name }}">
+                                                    <p class="text-danger" id="company_nameError"></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="website_url" class="mb-2">Website</label>
+                                                    <input type="url" name="website_url" id="website_url" class="form-control" value="{{ $user->website_url }}" placeholder="https://example.com">
+                                                    <p class="text-danger" id="website_urlError"></p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="company_address" class="mb-2">Company Address*</label>
+                                                    <textarea name="company_address" id="company_address" rows="3" class="form-control">{{ $user->company_address }}</textarea>
+                                                    <p class="text-danger" id="company_addressError"></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="linkedin_url" class="mb-2">LinkedIn Page</label>
+                                                    <input type="url" name="linkedin_url" id="linkedin_url" class="form-control" value="{{ $user->linkedin_url }}" placeholder="https://www.linkedin.com/company/...">
+                                                    <p class="text-danger" id="linkedin_urlError"></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="facebook_url" class="mb-2">Facebook Page</label>
+                                                    <input type="url" name="facebook_url" id="facebook_url" class="form-control" value="{{ $user->facebook_url }}" placeholder="https://www.facebook.com/...">
+                                                    <p class="text-danger" id="facebook_urlError"></p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="company_description" class="mb-2">Company Description*</label>
+                                                    <textarea name="company_description" id="company_description" rows="5" class="form-control" placeholder="Tell candidates about your company">{{ $user->company_description }}</textarea>
+                                                    <p class="text-danger" id="company_descriptionError"></p>
+                                                </div>
+                                            </div>
+                                        </div>                                    </div>
                                     <div class="card-footer  p-4">
-                                        <button type="submit" class="btn btn-primary">Update</button>
+                                        <button type="submit" class="btn btn-primary">Update Profile</button>
                                         <a href="{{ route('admin.users.employers') }}" class="btn btn-secondary">Cancel</a>
                                     </div>
                                 </form>
@@ -102,40 +120,14 @@
                 data: $("#userForm").serializeArray(),
 
                 success: function(response) {
-                    $("#nameError").text('');
-                    $("#emailError").text('');
-                    $("#designationError").text('');
-                    $("#company_nameError").text('');
-                    $("#mobileError").text('');
-                    $("#roleError").text('');
-                    $("#statusError").text('');
+                    $('#userForm .text-danger').text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('admin.users.employers') }}";
                     } else {
-                        var errors = response.errors;
-
-                        if (errors.name) {
-                            $("#nameError").text(errors.name[0]);
-                        }
-                        if (errors.email) {
-                            $("#emailError").text(errors.email[0]);
-                        }
-                        if (errors.designation) {
-                            $("#designationError").text(errors.designation[0]);
-                        }
-                        if (errors.company_name) {
-                            $("#company_nameError").text(errors.company_name[0]);
-                        }
-                        if (errors.mobile) {
-                            $("#mobileError").text(errors.mobile[0]);
-                        }
-                        if (errors.role) {
-                            $("#roleError").text(errors.role[0]);
-                        }
-                        if (errors.status) {
-                            $("#statusError").text(errors.status[0]);
-                        }
+                        $.each(response.errors, function(field, messages) {
+                            $('#' + field + 'Error').text(messages[0]);
+                        });
                     }
                 },
                 error: function(xhr, status, error) {

@@ -21,9 +21,18 @@ class CategoryController extends Controller
             $sort = 'name';
         }
 
+        $search = trim((string) $request->query('search', ''));
+
         $categories = Category::query()
             ->with('college')
             ->withCount('jobs')
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('name', 'like', $like)
+                        ->orWhereHas('college', fn ($c) => $c->where('name', 'like', $like));
+                });
+            })
             ->orderBy($sort, $direction)
             ->paginate(10);
         $categories->appends($request->query());

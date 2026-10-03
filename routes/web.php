@@ -65,6 +65,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('/jobs', [JobController::class, 'index'])->name('admin.jobs');
+    Route::get('/jobs/create', [JobController::class, 'create'])->name('admin.jobs.create');
+    Route::post('/jobs/store', [JobController::class, 'store'])->name('admin.jobs.store');
     Route::get('/jobs/edit/{id}', [JobController::class, 'edit'])->name('admin.jobs.edit');
     Route::put('/jobs/update/{id}', [JobController::class, 'update'])->name('admin.jobs.update');
     Route::delete('/jobs/delete', [JobController::class, 'destroy'])->name('admin.jobs.destroy');
@@ -75,6 +77,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::middleware('checkAdminOrSuperAdmin')->group(function () {
         Route::get('/users/students/create', [StudentController::class, 'create'])->name('admin.users.students.create');
         Route::post('/users/students/store', [StudentController::class, 'store'])->name('admin.users.students.store');
+        Route::patch('/users/students/{id}/status', [StudentController::class, 'updateStatus'])->name('admin.users.students.status');
+        Route::patch('/users/employers/{id}/status', [EmployerController::class, 'updateStatus'])->name('admin.users.employers.status');
         Route::get('/users/employers/create', [EmployerController::class, 'create'])->name('admin.users.employers.create');
         Route::post('/users/employers/store', [EmployerController::class, 'store'])->name('admin.users.employers.store');
 
