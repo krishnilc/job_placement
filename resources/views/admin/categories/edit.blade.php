@@ -37,7 +37,7 @@
                                         <div class="mb-4">
                                             <label for="college_id" class="mb-2">College*</label>
                                             <select name="college_id" id="college_id" class="form-control">
-                                                <option value="">Select a College</option>
+                                                <option value="">Select a College/Center</option>
                                                 @foreach ($colleges as $college)
                                                     <option value="{{ $college->id }}"
                                                         {{ old('college_id', $category->college_id) == $college->id ? 'selected' : '' }}>

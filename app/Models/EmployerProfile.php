@@ -15,7 +15,6 @@ class EmployerProfile extends Model
         'company_address',
         'website_url',
         'company_description',
-        'residential_address',
         'postal_address',
     ];
 

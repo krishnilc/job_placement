@@ -39,6 +39,14 @@
                                     <input type="text" name="search" value="{{ request()->query('search') }}"
                                         class="form-control" placeholder="Search title, applicant, company...">
                                 </div>
+                                <div class="col-md-4 col-lg-3">
+                                    <select name="status" class="form-select">
+                                        <option value="">All Statuses</option>
+                                        @foreach($applicationStatuses as $status)
+                                            <option value="{{ $status->id }}" @selected(request()->query('status') == $status->id)>{{ $status->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-auto">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
                                         Search</button>
@@ -183,7 +191,9 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusHistoryModal{{ $application->id }}"><i class="fa fa-history" aria-hidden="true"></i> View History</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteApplication({{ $application->id }})"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
+                                                                @if (auth()->user()->role === 'super_admin')
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteApplication({{ $application->id }})"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -277,12 +287,17 @@
                     },
 
                     success: function (response) {
-                        window.location.href =
-                            "{{ route('admin.jobApplications') }}"; // Redirect to the Job Applications page after deletion
+                        if (response.success == true) {
+                            window.location.href =
+                                "{{ route('admin.jobApplications') }}"; // Redirect to the Job Applications page after deletion
+                        } else {
+                            alert(response.message || 'You are not allowed to delete this application.');
+                        }
                     },
 
                     error: function (xhr, status, error) {
-                        alert('An error occurred while deleting the application. Please try again.');
+                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'An error occurred while deleting the application. Please try again.';
+                        alert(msg);
                     }
                 });
             }

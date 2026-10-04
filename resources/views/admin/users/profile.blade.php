@@ -77,6 +77,31 @@
                                 </div>
                             </div>
 
+                            @if ($isEmployer)
+                                <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-address-card-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Contact information</h2><p class="profile-section-caption">Account contact details</p></div></div><div class="row g-3">
+                                    @include('front.account.profile-field', ['icon' => 'envelope-o', 'label' => 'Email', 'value' => $user->email])
+                                    @include('front.account.profile-field', ['icon' => 'envelope-o', 'label' => 'Additional Email', 'value' => $user->email_2])
+                                    @include('front.account.profile-field', ['icon' => 'phone', 'label' => 'Mobile', 'value' => $user->mobile])
+                                    @include('front.account.profile-field', ['icon' => 'phone', 'label' => 'Additional Mobile', 'value' => $user->mobile_2])
+                                </div></div>
+
+                                <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-building-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Company information</h2><p class="profile-section-caption">Company identity and location</p></div></div><div class="row g-3">
+                                    @include('front.account.profile-field', ['icon' => 'building-o', 'label' => 'Company Name', 'value' => $user->company_name])
+                                    @include('front.account.profile-field', ['icon' => 'briefcase', 'label' => 'Designation', 'value' => $user->designation])
+                                    @include('front.account.profile-field', ['icon' => 'map-marker', 'label' => 'Company Address', 'value' => $user->company_address])
+                                    @include('front.account.profile-field', ['icon' => 'mail-forward', 'label' => 'Company Postal Address', 'value' => optional($user->employerProfile)->postal_address])
+                                </div></div>
+
+                                <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-globe" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Online presence</h2><p class="profile-section-caption">Company web and social links</p></div></div><div class="row g-3">
+                                    @include('front.account.profile-field', ['icon' => 'globe', 'label' => 'Website', 'value' => $user->website_url, 'link' => true])
+                                    @include('front.account.profile-field', ['icon' => 'linkedin', 'label' => 'LinkedIn Page', 'value' => $user->linkedin_url, 'link' => true])
+                                    @include('front.account.profile-field', ['icon' => 'facebook', 'label' => 'Facebook Page', 'value' => $user->facebook_url, 'link' => true])
+                                </div></div>
+
+                                <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">About the company</h2><p class="profile-section-caption">What candidates should know</p></div></div><div class="row g-3">
+                                    @include('front.account.profile-field', ['icon' => 'file-text-o', 'label' => 'Company Description', 'value' => $user->company_description, 'wide' => true])
+                                </div></div>
+                            @else
                             <div class="row g-3">
                                 {{-- @include('admin.users.profile-field', [
                                     'label' => 'Status',
@@ -99,43 +124,12 @@
                                     'label' => 'Additional Mobile',
                                     'value' => $user->mobile_2,
                                 ])
-                                @if ($isEmployer)
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Company Name',
-                                        'value' => $user->company_name,
-                                    ])
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Company Address',
-                                        'value' => $user->company_address,
-                                        'wide' => true,
-                                    ])
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Website',
-                                        'value' => $user->website_url,
-                                        'link' => true,
-                                    ])
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'LinkedIn Page',
-                                        'value' => $user->linkedin_url,
-                                        'link' => true,
-                                    ])
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Facebook Page',
-                                        'value' => $user->facebook_url,
-                                        'link' => true,
-                                    ])
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Company Description',
-                                        'value' => $user->company_description,
-                                        'wide' => true,
-                                    ])
-                                @else
-                                    @include('admin.users.profile-field', [
-                                        'label' => 'Student Status',
-                                        'value' => $user->designation,
-                                    ])
-                                @endif
+                                @include('admin.users.profile-field', [
+                                    'label' => 'Student Status',
+                                    'value' => $user->designation,
+                                ])
                             </div>
+                            @endif
 
                             @if (!$isEmployer)
                                 <div class="profile-divider">
@@ -185,7 +179,7 @@
                                         'value' => $user->high_school_graduation_year,
                                     ])
                                     @include('admin.users.profile-field', [
-                                        'label' => 'College',
+                                        'label' => 'College/Center',
                                         'value' => optional($user->college)->display_name,
                                     ])
                                     @include('admin.users.profile-field', [
@@ -400,5 +394,20 @@
                 flex-direction: column;
             }
         }
+
+        /* Front-profile styles so the employer view matches the employer self-view */
+        .profile-section { padding: 1.5rem; background: #fff; border: 1px solid #e5edf1; border-radius: .65rem; box-shadow: 0 .25rem .9rem rgba(24, 59, 86, .05); }
+        .profile-section-heading { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+        .profile-section-icon { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex: 0 0 38px; color: #237d83; background: #e7f4f2; border-radius: .5rem; }
+        .profile-section-title { margin: 0; color: #183b56; font-size: 1.05rem; font-weight: 700; }
+        .profile-section-caption { margin: .2rem 0 0; color: #6f8291; font-size: .82rem; }
+        .profile-field { display: flex; align-items: flex-start; gap: .75rem; min-height: 70px; padding: .9rem; background: #f5f9fa; border: 1px solid #edf3f5; border-radius: .45rem; }
+        .profile-field-icon { width: 28px; padding-top: .15rem; flex: 0 0 28px; color: #237d83; text-align: center; }
+        .profile-field-content { min-width: 0; }
+        .profile-field-label { display: block; margin-bottom: .25rem; color: #6f8291; font-size: .74rem; font-weight: 700; text-transform: uppercase; }
+        .profile-field-value { display: block; overflow-wrap: anywhere; color: #183b56; font-size: .94rem; line-height: 1.45; }
+        .profile-empty { color: #9aaab3; font-style: italic; }
+        .profile-link { color: #16727c; text-decoration: none; }
+        .profile-link:hover { color: #174a68; text-decoration: underline; }
     </style>
 @endsection

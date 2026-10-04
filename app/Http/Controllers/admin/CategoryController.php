@@ -113,6 +113,14 @@ class CategoryController extends Controller
     //delete category
     public function destroy(Request $request)
     {
+        if ($request->user()->role !== 'super_admin') {
+            session()->flash('error', 'Only super admins can delete categories.');
+
+            return response()->json([
+                'status' => false,
+            ]);
+        }
+
         $id = $request->id;
         $category = Category::find($id);
 

@@ -47,9 +47,9 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6  mb-4">
-                                            <label for="college" class="mb-2">College</label>
+                                            <label for="college" class="mb-2">College/Center</label>
                                             <select name="college" id="college" class="form-control">
-                                                <option value="">Select a College</option>
+                                                <option value="">Select a College/Center</option>
                                                 @if ($colleges->isNotEmpty())
                                                     @foreach ($colleges as $college)
                                                         <option

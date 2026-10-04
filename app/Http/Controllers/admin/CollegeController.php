@@ -100,6 +100,14 @@ class CollegeController extends Controller
     //delete college
     public function destroy(Request $request)
     {
+        if ($request->user()->role !== 'super_admin') {
+            session()->flash('error', 'Only super admins can delete colleges.');
+
+            return response()->json([
+                'status' => false,
+            ]);
+        }
+
         $id = $request->id;
         $college = College::find($id);
 
@@ -111,7 +119,7 @@ class CollegeController extends Controller
             ]);
         }
 
-        $isAssignedToUsers = \App\Models\User::where('college_id', $college->id)->exists();
+        $isAssignedToUsers = \App\Models\StudentProfile::where('college_id', $college->id)->exists();
 
         if ($isAssignedToUsers || $college->categories()->exists()) {
             session()->flash('error', 'College cannot be deleted because it is assigned to users or categories.');

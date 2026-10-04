@@ -43,6 +43,7 @@ class JobApplicationController extends Controller
         }
 
         $search = trim((string) $request->query('search', ''));
+        $statusFilter = $request->query('status');
 
         $applications = $applicationsQuery
             ->when($search !== '', function ($query) use ($search) {
@@ -54,14 +55,16 @@ class JobApplicationController extends Controller
                         ->orWhere('users.email', 'like', $like);
                 });
             })
-            ->with('job', 'user', 'employer', 'applicationStatus', 'latestStatusHistory.changedBy', 'statusHistories.applicationStatus', 'statusHistories.changedBy')
+            ->when($statusFilter, fn ($query) => $query->where('job_applications.application_status_id', $statusFilter))
+            // Only eager-load what's actually rendered; full statusHistories are lazy-loaded per-modal on demand.
+            ->with(['job:id,title,company_name,user_id', 'user:id,name', 'applicationStatus:id,name,sort_order', 'latestStatusHistory.changedBy:id,name'])
             ->orderBy($sortableColumns[$sort], $direction)
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         return view('admin.job-applications.list', [
             'applications' => $applications,
-            'applicationStatuses' => ApplicationStatus::orderBy('sort_order')->get(),
+            'applicationStatuses' => ApplicationStatus::orderBy('sort_order')->get(['id', 'name']),
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -97,6 +100,11 @@ class JobApplicationController extends Controller
 
     public function destroy(Request $request)
     {
+        if ($request->user()->role !== 'super_admin') {
+            session()->flash('error', 'Only super admins can delete applications.');
+            return response()->json(['success' => false, 'message' => 'Only super admins can delete applications.'], 403);
+        }
+
         $applicationId = $request->id;
         $application = JobApplication::findOrFail($applicationId);
 

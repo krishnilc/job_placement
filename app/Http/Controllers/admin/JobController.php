@@ -201,6 +201,13 @@ class JobController extends Controller
 
         public function destroy(Request $request)
         {
+            if ($request->user()->role !== 'super_admin') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Only super admins can delete jobs.'
+                ], 403);
+            }
+
             $job = Job::findOrFail($request->id); // Find the job by ID or throw a 404 error if not found
 
             if ($job->applications()->exists()) {

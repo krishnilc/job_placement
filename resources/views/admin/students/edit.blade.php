@@ -17,7 +17,7 @@
         'country' => ['label' => 'Country', 'max' => 100],
         'high_school' => ['label' => 'High School'],
         'high_school_graduation_year' => ['label' => 'High School Graduation Year', 'max' => 10],
-        'college_id' => ['label' => 'College', 'type' => 'select', 'options' => ['' => 'Select college'] + $colleges->pluck('display_name', 'id')->all()],
+        'college_id' => ['label' => 'College/Center', 'type' => 'select', 'options' => ['' => 'Select college'] + $colleges->pluck('display_name', 'id')->all()],
         'degree' => ['label' => 'Degree / Program'],
         'major' => ['label' => 'Major'],
         'graduation_year' => ['label' => 'Graduation Year', 'max' => 10],

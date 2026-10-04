@@ -34,9 +34,9 @@
                             </div>
 
                             <div class="mb-4">
-                                <h2>College</h2>
+                                <h2>College/Center</h2>
                                 <select name="college" id="college" class="form-control">
-                                    <option value="">Select a College</option>
+                                    <option value="">Select a College/Center</option>
                                     @if ($colleges->isNotEmpty())
                                         @foreach ($colleges as $college)
                                             <option value="{{ $college->id }}"

@@ -8,8 +8,8 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.colleges') }}">Colleges</a></li>
-                            <li class="breadcrumb-item active">Edit College</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.colleges') }}">Colleges/Centers</a></li>
+                            <li class="breadcrumb-item active">Edit College/Center</li>
                         </ol>
                     </nav>
                 </div>
@@ -27,7 +27,7 @@
                                     @csrf
                                     @method('PUT')
                                     <div class="card-body p-4">
-                                        <h3 class="fs-4 mb-1">Edit College</h3>
+                                        <h3 class="fs-4 mb-1">Edit College/Center</h3>
                                         <div class="mb-4">
                                             <label for="name" class="mb-2">Name*</label>
                                             <input type="text" name="name" id="name" class="form-control"
@@ -50,7 +50,7 @@
                                         </div>
                                     </div>
                                     <div class="card-footer p-4">
-                                        <button type="submit" class="btn btn-primary">Update College</button>
+                                        <button type="submit" class="btn btn-primary">Update College/Center</button>
                                         <a href="{{ route('admin.colleges') }}" class="btn btn-secondary">Cancel</a>
                                     </div>
                                 </form>

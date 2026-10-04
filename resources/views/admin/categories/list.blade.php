@@ -36,7 +36,7 @@
                                 <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
                                 <div class="col-md-6 col-lg-4">
                                     <input type="text" name="search" value="{{ request()->query('search') }}"
-                                        class="form-control" placeholder="Search category or college...">
+                                        class="form-control" placeholder="Search category or college/center...">
                                 </div>
                                 <div class="col-auto">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
@@ -89,7 +89,7 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th scope="col">College</th>
+                                            <th scope="col">College/Center</th>
                                             <th scope="col">Jobs</th>
                                             <th scope="col"><a href="{{ $buildSortUrl('status') }}"
                                                     class="text-decoration-none text-dark">Status @if ($currentSort === 'status')
@@ -126,10 +126,12 @@
                                                                         href="{{ route('admin.categories.edit', $category->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteCategory({{ $category->id }})"><i
-                                                                            class="fa fa-trash" aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if (auth()->user()->role === 'super_admin')
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                            onclick="deleteCategory({{ $category->id }})"><i
+                                                                                class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -168,7 +170,11 @@
                     },
 
                     success: function(response) {
-                        window.location.href = "{{ route('admin.categories') }}"; // Redirect after deletion
+                        if (response.status == true) {
+                            window.location.href = "{{ route('admin.categories') }}"; // Redirect after deletion
+                        } else {
+                            alert('Unable to delete this category. It may be assigned to jobs, or you may not have permission.');
+                        }
                     },
 
                     error: function(xhr, status, error) {

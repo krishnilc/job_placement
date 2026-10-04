@@ -8,7 +8,7 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Colleges</li>
+                            <li class="breadcrumb-item active">Colleges/Centers</li>
                         </ol>
                     </nav>
                 </div>
@@ -23,11 +23,11 @@
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h3 class="fs-4 mb-1">Colleges</h3>
+                                    <h3 class="fs-4 mb-1">Colleges/Centers</h3>
                                 </div>
                                 <div>
                                     <a href="{{ route('admin.colleges.create') }}" class="btn btn-primary">
-                                        <i class="fa fa-plus"></i> Add College
+                                        <i class="fa fa-plus"></i> Add College/Center
                                     </a>
                                 </div>
                             </div>
@@ -118,10 +118,12 @@
                                                                         href="{{ route('admin.colleges.edit', $college->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteCollege({{ $college->id }})"><i
-                                                                            class="fa fa-trash" aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if (auth()->user()->role === 'super_admin')
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                            onclick="deleteCollege({{ $college->id }})"><i
+                                                                                class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -129,7 +131,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No colleges found.</td>
+                                                <td colspan="6" class="text-center">No Colleges/Centers found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
@@ -150,7 +152,7 @@
 @section('customJS')
     <script type="text/javascript">
         function deleteCollege(id) {
-            if (confirm('Are you sure you want to delete this college?')) {
+            if (confirm('Are you sure you want to delete this College/Center?')) {
                 $.ajax({
                     url: "{{ route('admin.colleges.destroy') }}",
                     type: "DELETE",
@@ -160,7 +162,11 @@
                     },
 
                     success: function(response) {
-                        window.location.href = "{{ route('admin.colleges') }}"; // Redirect after deletion
+                        if (response.status == true) {
+                            window.location.href = "{{ route('admin.colleges') }}"; // Redirect after deletion
+                        } else {
+                            alert('Unable to delete this college. It may be assigned to users/categories, or you may not have permission.');
+                        }
                     },
 
                     error: function(xhr, status, error) {

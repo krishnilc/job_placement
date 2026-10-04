@@ -92,13 +92,13 @@
                                     </div>
                                 </div>
 
-                                <!-- Active Jobs -->
+                                <!-- Open Jobs -->
                                 <div class="col-md-6 col-lg-3 mb-3">
                                     <div class="card border-0 shadow h-100">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
-                                                    <h7 class="text-muted mb-1">Active Jobs</h7>
+                                                    <h7 class="text-muted mb-1">Open Jobs</h7>
                                                     <h2 class="text-success mb-0">{{ $activeJobs }}</h2>
                                                 </div>
                                                 <div class="text-success" style="font-size: 2rem;"><i
@@ -134,6 +134,38 @@
                                                 </div>
                                                 <div class="text-primary" style="font-size: 2rem;"><i
                                                         class="fa fa-star"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- <!-- Total Colleges -->
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <div class="card border-0 shadow h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h7 class="text-muted mb-1">Colleges/Centers</h7>
+                                                    <h2 class="text-info mb-0">{{ $collegeCategoryCounts->count() }}</h2>
+                                                </div>
+                                                <div class="text-info" style="font-size: 2rem;"><i
+                                                        class="fa fa-university"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> --}}
+
+                                <!-- Total Categories -->
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <div class="card border-0 shadow h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h7 class="text-muted mb-1">Categories</h7>
+                                                    <h2 class="text-secondary mb-0">{{ $collegeCategoryCounts->sum('categories_count') }}</h2>
+                                                </div>
+                                                <div class="text-secondary" style="font-size: 2rem;"><i
+                                                        class="fa fa-th-list"></i></div>
                                             </div>
                                         </div>
                                     </div>
@@ -424,9 +456,9 @@
                                     </div>
                                     <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
                                         <div class="col-md-6 col-lg-4">
-                                            <label for="college" class="form-label">College</label>
+                                            <label for="college" class="form-label">College/Center</label>
                                             <select name="college" id="college" class="form-select">
-                                                <option value="">All colleges</option>
+                                                <option value="">All Colleges/Centers</option>
                                                 @foreach ($collegeOptions as $college)
                                                     <option value="{{ $college->id }}"
                                                         {{ (string) request('college') === (string) $college->id ? 'selected' : '' }}>
@@ -528,13 +560,13 @@
 
                             <div class="card border-0 shadow mb-4">
                                 <div class="card-header bg-light">
-                                    <h5 class="mb-0">Placement Rate by College</h5>
+                                    <h5 class="mb-0">Placement Rate by College/Center</h5>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
                                         <thead>
                                             <tr>
-                                                <th>College</th>
+                                                <th>College/Center</th>
                                                 <th class="text-end">Placed</th>
                                                 <th class="text-end">Applications</th>
                                                 <th class="text-end">Placement Rate</th>
@@ -558,43 +590,6 @@
                                                 </tr>
                                             @endforelse
                                         </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="card border-0 shadow mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Categories per College</h5>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>College</th>
-                                                <th>Code</th>
-                                                <th class="text-end">Categories</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($collegeCategoryCounts as $college)
-                                                <tr>
-                                                    <td>{{ $college->name }}</td>
-                                                    <td>{{ $college->code }}</td>
-                                                    <td class="text-end">{{ $college->categories_count }}</td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="3" class="text-center text-muted py-4">No colleges
-                                                        found.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="fw-bold">
-                                                <td colspan="2">Total</td>
-                                                <td class="text-end">{{ $collegeCategoryCounts->sum('categories_count') }}</td>
-                                            </tr>
-                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -674,6 +669,43 @@
                         <!-- Job Categories Tab -->
                         <div class="tab-pane fade" id="tab-categories" role="tabpanel">
                             <div class="card border-0 shadow mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Categories per College/Center</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>College/Center</th>
+                                                <th>Code</th>
+                                                <th class="text-end">Categories</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($collegeCategoryCounts as $college)
+                                                <tr>
+                                                    <td>{{ $college->name }}</td>
+                                                    <td>{{ $college->code }}</td>
+                                                    <td class="text-end">{{ $college->categories_count }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-4">No Colleges/Centers
+                                                        found.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="fw-bold">
+                                                <td colspan="2">Total</td>
+                                                <td class="text-end">{{ $collegeCategoryCounts->sum('categories_count') }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card border-0 shadow">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Job Categories Report</h5>
                                     <div class="d-flex gap-2">
@@ -683,12 +715,32 @@
                                             class="btn btn-sm btn-outline-success">Excel</a>
                                     </div>
                                 </div>
+                                <div class="card-body border-bottom">
+                                    <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-2 align-items-end">
+                                        <input type="hidden" name="tab" value="categories">
+                                        <div class="col-md-6 col-lg-4">
+                                            <label for="category_college" class="form-label">Filter by College/Center</label>
+                                            <select name="category_college" id="category_college" class="form-select">
+                                                <option value="">All Colleges/Centers</option>
+                                                @foreach ($collegeOptions as $college)
+                                                    <option value="{{ $college->id }}"
+                                                        {{ (string) request('category_college') === (string) $college->id ? 'selected' : '' }}>
+                                                        {{ $college->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Apply</button>
+                                            <a href="{{ route('admin.dashboard') }}?tab=categories" class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
+                                        </div>
+                                    </form>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
                                         <thead>
                                             <tr>
                                                 <th>Category</th>
-                                                <th>College</th>
+                                                <th>College/Center</th>
                                                 <th class="text-end">Jobs</th>
                                                 <th class="text-end">Applications</th>
                                                 <th class="text-end">Placed</th>
@@ -697,25 +749,35 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($categoryReports as $report)
-                                                <tr>
-                                                    <td class="fw-semibold">{{ $report->name }}</td>
-                                                    <td class="text-muted">{{ $report->college_name }}</td>
-                                                    <td class="text-end">{{ number_format($report->job_count) }}</td>
-                                                    <td class="text-end">
-                                                        {{ number_format($report->application_count) }}
-                                                    </td>
-                                                    <td class="text-end text-success">
-                                                        {{ number_format($report->placed_count) }}
-                                                    </td>
-                                                    <td class="text-end text-danger">
-                                                        {{ number_format($report->rejected_count) }}
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span
-                                                            class="badge {{ $report->placement_rate >= 50 ? 'bg-success' : ($report->placement_rate >= 25 ? 'bg-warning text-dark' : 'bg-danger') }}">{{ number_format($report->placement_rate, 1) }}%</span>
+                                            @php
+                                                $groupedCategories = $categoryReports->groupBy('college_name');
+                                            @endphp
+                                            @forelse($groupedCategories as $collegeName => $reports)
+                                                <tr class="table-light">
+                                                    <td colspan="7" class="fw-bold text-uppercase small text-secondary">
+                                                        <i class="fa fa-university me-1"></i> {{ $collegeName }}
                                                     </td>
                                                 </tr>
+                                                @foreach($reports as $report)
+                                                    <tr>
+                                                        <td class="fw-semibold ps-4">{{ $report->name }}</td>
+                                                        <td class="text-muted">{{ $report->college_name }}</td>
+                                                        <td class="text-end">{{ number_format($report->job_count) }}</td>
+                                                        <td class="text-end">
+                                                            {{ number_format($report->application_count) }}
+                                                        </td>
+                                                        <td class="text-end text-success">
+                                                            {{ number_format($report->placed_count) }}
+                                                        </td>
+                                                        <td class="text-end text-danger">
+                                                            {{ number_format($report->rejected_count) }}
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span
+                                                                class="badge {{ $report->placement_rate >= 50 ? 'bg-success' : ($report->placement_rate >= 25 ? 'bg-warning text-dark' : 'bg-danger') }}">{{ number_format($report->placement_rate, 1) }}%</span>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             @empty
                                                 <tr>
                                                     <td colspan="7" class="text-center text-muted py-4">No category data
@@ -825,7 +887,7 @@
                                                 type="button" role="tab">Month</button></li>
                                         <li class="nav-item" role="presentation"><button class="nav-link"
                                                 id="rej-college-tab" data-bs-toggle="tab" data-bs-target="#rej-college"
-                                                type="button" role="tab">College</button></li>
+                                                type="button" role="tab">College/Center</button></li>
                                         <li class="nav-item" role="presentation"><button class="nav-link"
                                                 id="rej-programme-tab" data-bs-toggle="tab"
                                                 data-bs-target="#rej-programme" type="button"
@@ -911,7 +973,7 @@
                                                 <table class="table table-hover align-middle mb-0">
                                                     <thead>
                                                         <tr>
-                                                            <th>College</th>
+                                                            <th>College/Center</th>
                                                             <th class="text-end">Applications</th>
                                                             <th class="text-end">Rejected</th>
                                                             <th class="text-end">Rejection Rate</th>
@@ -1369,10 +1431,14 @@
             var hasFilters = filterKeys.some(function(key) {
                 return params.has(key) && params.get(key) !== '';
             });
+            var hasCategoryCollege = params.has('category_college') && params.get('category_college') !== '';
+            var tabParam = params.get('tab');
+            var tabParamSelector = tabParam && document.querySelector('#tab-' + tabParam) ? '#tab-' + tabParam : null;
 
-            var targetSelector = window.location.hash && document.querySelector(window.location.hash) ?
+            var targetSelector = tabParamSelector ||
+                (window.location.hash && document.querySelector(window.location.hash) ?
                 window.location.hash :
-                (hasFilters ? '#tab-placement' : null);
+                (hasCategoryCollege ? '#tab-categories' : (hasFilters ? '#tab-placement' : null)));
 
             if (targetSelector) {
                 var trigger = document.querySelector('#dashboardMainTabs [data-bs-target="' + targetSelector +

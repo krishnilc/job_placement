@@ -161,10 +161,12 @@
                                                                         href="{{ route('admin.jobs.edit', $job->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                <li><a class="dropdown-item" href="javascript:void(0);"
-                                                                        onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"
-                                                                            aria-hidden="true"></i>
-                                                                        Delete</a></li>
+                                                                @if (auth()->user()->role === 'super_admin')
+                                                                    <li><a class="dropdown-item" href="javascript:void(0);"
+                                                                            onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"
+                                                                                aria-hidden="true"></i>
+                                                                            Delete</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>

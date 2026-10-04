@@ -63,7 +63,12 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalJobs = Job::count();
         $pendingJobs = Job::where('status', 0)->count();
-        $activeJobs = Job::where('status', 1)->count();
+        $activeJobs = Job::where('status', 1)
+            ->where(function ($query) {
+                $query->whereNull('closing_date')
+                    ->orWhere('closing_date', '>=', now()->toDateString());
+            })
+            ->count();
         $blockedJobs = Job::where('status', 2)->count();
         $featuredJobs = Job::where('isFeatured', 1)->count();
         $totalEmployers = User::where('role', 'employer')->count();
@@ -351,6 +356,7 @@ class DashboardController extends Controller
             ->pluck('rejected_count', 'jobs.category_id');
 
         $categoryReports = \App\Models\Category::with('college:id,name')
+            ->when($request->filled('category_college'), fn ($query) => $query->where('college_id', $request->category_college))
             ->orderBy('name')
             ->get(['id', 'name', 'college_id'])
             ->map(function ($category) use ($categoryJobCounts, $categoryApplicationCounts, $categoryPlacedCounts, $categoryRejectedCounts) {
@@ -367,7 +373,7 @@ class DashboardController extends Controller
                     'placement_rate' => $applicationCount > 0 ? round(($placedCount / $applicationCount) * 100, 1) : 0,
                 ];
             })
-            ->sortByDesc('job_count')
+            ->sortBy([['college_name', 'asc'], ['job_count', 'desc'], ['name', 'asc']])
             ->values();
 
         $applicationStatusReports = ApplicationStatus::query()

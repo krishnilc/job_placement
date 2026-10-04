@@ -60,7 +60,7 @@
                     <li class="{{ $headingClass }}">Setup</li>
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
                         <a href="{{ route('admin.colleges') }}">
-                            <i class="fa fa-arrow-right"></i> Manage Colleges
+                            <i class="fa fa-arrow-right"></i> Manage Colleges/Centers
                         </a>
                     </li>
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.categories', 'admin.categories.create', 'admin.categories.edit')])>

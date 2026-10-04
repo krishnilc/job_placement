@@ -84,6 +84,7 @@ class AccountManagementController extends Controller
             'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
             'website_url' => $role === 'employer' ? 'nullable|url|max:255' : 'nullable',
             'company_description' => $role === 'employer' ? 'required|string|max:2000' : 'nullable',
+            'postal_address' => $role === 'employer' ? 'required|string|max:255' : 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|string|max:20',
             'residential_address' => 'nullable|string|max:255',
@@ -117,6 +118,8 @@ class AccountManagementController extends Controller
                 $user->company_address = $request->company_address;
                 $user->website_url = $request->website_url;
                 $user->company_description = $request->company_description;
+                // postal_address is mapped to studentProfile on the User model, so set it on the employer profile directly
+                $user->employerProfile()->updateOrCreate(['user_id' => $user->id], ['postal_address' => $request->postal_address]);
             }
             $user->date_of_birth = $request->date_of_birth;
             $user->gender = $request->gender;
