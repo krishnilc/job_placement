@@ -275,8 +275,8 @@ class JobsController extends Controller
       $userId = Auth::id();
       $user = Auth::user();
       
-      // Allow if user is the applicant, employer, or admin
-      if ($user->role !== 'admin' && $userId !== $application->user_id && $userId !== $application->employer_id) {
+      // Allow if user is the applicant, employer, or an admin/super admin
+      if (!in_array($user->role, ['admin', 'super_admin'], true) && $userId !== $application->user_id && $userId !== $application->employer_id) {
          abort(403);
       }
 

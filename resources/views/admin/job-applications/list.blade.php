@@ -90,7 +90,6 @@
                                                     aria-label="Sort by company">Company <i
                                                         class="fa {{ $sortIcon('company_name') }}"
                                                         aria-hidden="true"></i></a></th>
-                                            <th scope="col" class="fw-semibold">Files</th>
                                             <th scope="col" class="fw-semibold"><a href="{{ $sortUrl('applied_at') }}"
                                                     class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
                                                     aria-label="Sort by application date">Application Date <i
@@ -104,69 +103,11 @@
                                         @if ($applications->isNotEmpty())
                                             @foreach ($applications as $application)
                                                 <tr>
-                                                    <td>
-                                                        <p>{{ $application->job->title }}</p>
-                                                        {{-- <p>Applicants: {{ $application->job->applications->count() }}</p> --}}
+                                                    <td style="min-width: 200px; white-space: normal;">
+                                                        <p class="mb-0">{{ $application->job->title }}</p>
                                                     </td>
                                                     <td>{{ $application->user->name }}</td>
                                                     <td>{{ $application->job->company_name }}</td>
-                                                    <td style="min-width: 140px; white-space: normal;">
-                                                        <div class="d-flex flex-column gap-1">
-                                                        @if(!empty($application->application_file))
-                                                            @php
-                                                                $path = $application->application_file;
-                                                                $fileLabel = $application->application_file_label ?? basename($path);
-                                                                $shortFileLabel = \Illuminate\Support\Str::limit($fileLabel, 18);
-                                                            @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}"
-                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
-                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm"
-                                                                style="max-width: 130px; font-size: 0.76rem;">
-                                                                <i class="fa fa-file bg-primary"></i>
-                                                                <span class="d-inline-block text-truncate"
-                                                                    style="max-width: 80px;">{{ $shortFileLabel }}</span>
-                                                            </a>
-                                                        @else
-                                                            N/A
-                                                        @endif
-
-                                                        @if(!empty($application->resume_file))
-                                                            @php
-                                                                $path = $application->resume_file;
-                                                                $fileLabel = $application->resume_file_label ?? basename($path);
-                                                                $shortFileLabel = \Illuminate\Support\Str::limit($fileLabel, 18);
-                                                            @endphp
-                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}"
-                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
-                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm"
-                                                                style="max-width: 130px; font-size: 0.76rem;">
-                                                                <i class="fa fa-file text-success"></i>
-                                                                <span class="d-inline-block text-truncate"
-                                                                    style="max-width: 80px;">{{ $shortFileLabel }}</span>
-                                                            </a>
-                                                        @else
-                                                            @if(empty($application->application_file))
-                                                                N/A
-                                                            @endif
-                                                        @endif
-
-                                                        @if(!empty($application->certificates_file))
-                                                            @php $certs = json_decode($application->certificates_file, true) ?? [];
-                                                            $certLabels = $application->certificate_file_labels; @endphp
-                                                            @if(!empty($certs))
-                                                                    @foreach($certs as $cert)
-                                                                        @php $certLabel = $certLabels[$loop->index] ?? basename($cert); @endphp
-                                                                        <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download="{{ $certLabel }}" title="{{ $certLabel }}"
-                                                                            class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm mb-1"
-                                                                            style="max-width: 130px; font-size: 0.76rem;">
-                                                                            <i class="fa fa-file text-warning"></i>
-                                                                            <span class="d-inline-block text-truncate" style="max-width: 80px;">{{ \Illuminate\Support\Str::limit($certLabel, 18) }}</span>
-                                                                        </a>
-                                                                    @endforeach
-                                                            @endif
-                                                        @endif
-                                                        </div>
-                                                    </td>
                                                     <td>{{ optional($application->applied_at)->format('M d, Y') ?? 'N/A' }}</td>
                                                     <td>
                                                         <form action="{{ route('admin.jobApplications.status', $application) }}" method="POST">
@@ -191,6 +132,11 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusHistoryModal{{ $application->id }}"><i class="fa fa-history" aria-hidden="true"></i> View History</a></li>
+                                                                @if(!empty($application->application_file) || !empty($application->resume_file) || !empty($application->certificates_file))
+                                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#filesModal{{ $application->id }}"><i class="fa fa-file" aria-hidden="true"></i> View Files</a></li>
+                                                                @else
+                                                                    <li><a class="dropdown-item disabled" href="#" onclick="event.preventDefault();" aria-disabled="true"><i class="fa fa-file" aria-hidden="true"></i> No Files Submitted</a></li>
+                                                                @endif
                                                                 @if (auth()->user()->role === 'employer' && $application->isPlaced())
                                                                     <li>
                                                                         @if ($application->employerFeedback)
@@ -210,7 +156,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="7" class="text-center">No job applications found.</td>
+                                                <td colspan="6" class="text-center">No job applications found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
@@ -259,6 +205,73 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                @if(!empty($application->application_file) || !empty($application->resume_file) || !empty($application->certificates_file))
+                                    <div class="modal fade" id="filesModal{{ $application->id }}" tabindex="-1"
+                                        aria-labelledby="filesModalLabel{{ $application->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="filesModalLabel{{ $application->id }}">
+                                                        Submitted Files
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="text-muted mb-3">{{ $application->job->title }} - {{ $application->user->name }}</p>
+                                                    <div class="d-flex flex-column gap-2">
+                                                        @if(!empty($application->application_file))
+                                                            @php
+                                                                $fileLabel = $application->application_file_label ?? basename($application->application_file);
+                                                            @endphp
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'application']) }}"
+                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
+                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-3 py-2 bg-primary-subtle shadow-sm">
+                                                                <i class="fa fa-file bg-primary"></i>
+                                                                <span>{{ $fileLabel }}</span>
+                                                                <small class="text-muted ms-auto">Application</small>
+                                                            </a>
+                                                        @endif
+
+                                                        @if(!empty($application->resume_file))
+                                                            @php
+                                                                $fileLabel = $application->resume_file_label ?? basename($application->resume_file);
+                                                            @endphp
+                                                            <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'resume']) }}"
+                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
+                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-3 py-2 bg-success-subtle shadow-sm">
+                                                                <i class="fa fa-file text-success"></i>
+                                                                <span>{{ $fileLabel }}</span>
+                                                                <small class="text-muted ms-auto">Resume</small>
+                                                            </a>
+                                                        @endif
+
+                                                        @if(!empty($application->certificates_file))
+                                                            @php
+                                                                $certs = json_decode($application->certificates_file, true) ?? [];
+                                                                $certLabels = $application->certificate_file_labels;
+                                                            @endphp
+                                                            @foreach($certs as $cert)
+                                                                @php $certLabel = $certLabels[$loop->index] ?? basename($cert); @endphp
+                                                                <a href="{{ route('application.download', ['application' => $application->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}"
+                                                                    download="{{ $certLabel }}" title="{{ $certLabel }}"
+                                                                    class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-3 py-2 bg-warning-subtle shadow-sm">
+                                                                    <i class="fa fa-file text-warning"></i>
+                                                                    <span>{{ $certLabel }}</span>
+                                                                    <small class="text-muted ms-auto">Certificate</small>
+                                                                </a>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 @if (auth()->user()->role === 'employer' && $application->isPlaced() && !$application->employerFeedback)
                                     <div class="modal fade" id="feedbackModal{{ $application->id }}" tabindex="-1"

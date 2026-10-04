@@ -61,48 +61,6 @@
                                                         <div class="">{{ $jobApplication->job->jobType->name }}.
                                                             {{ $jobApplication->job->location }}
                                                         </div>
-                                                        @if(!empty($jobApplication->application_file) || !empty($jobApplication->resume_file) || !empty($jobApplication->certificates_file))
-                                                            <div class="mt-2 d-flex flex-column gap-2 small">
-                                                                @if(!empty($jobApplication->application_file))
-                                                                    @php
-                                                                        $path = $jobApplication->application_file;
-                                                                        $fileLabel = $jobApplication->application_file_label ?? basename($path);
-                                                                    @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'application']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-primary-subtle rounded-pill px-2 py-1 bg-primary-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
-                                                                        <i class="fa fa-file text-primary"></i>
-                                                                        <span class="text-truncate" style="font-size: 0.85rem;">{{ $fileLabel }}</span>
-                                                                    </a>
-                                                                @endif
-
-                                                                @if(!empty($jobApplication->resume_file))
-                                                                    @php
-                                                                        $path = $jobApplication->resume_file;
-                                                                        $fileLabel = $jobApplication->resume_file_label ?? basename($path);
-                                                                    @endphp
-                                                                    <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'resume']) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-success-subtle rounded-pill px-2 py-1 bg-success-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
-                                                                        <i class="fa fa-file text-info"></i>
-                                                                        <span class="text-truncate" style="font-size: 0.85rem;">{{ $fileLabel }}</span>
-                                                                    </a>
-                                                                @endif
-
-                                                                @if(!empty($jobApplication->certificates_file))
-                                                                    @php $certs = json_decode($jobApplication->certificates_file, true) ?? []; $certLabels = $jobApplication->certificate_file_labels; @endphp
-                                                                    @if(!empty($certs))
-                                                                        @foreach($certs as $cert)
-                                                                            @php
-                                                                                $certLabel = $certLabels[$loop->index] ?? basename($cert);
-                                                                            @endphp
-                                                                            <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}" download class="d-inline-flex align-items-center gap-2 text-decoration-none text-secondary border border-warning-subtle rounded-pill px-2 py-1 bg-warning-subtle shadow-sm" style="width: fit-content; max-width: 100%;">
-                                                                                <i class="fa fa-file text-warning"></i>
-                                                                                <span class="text-truncate" style="font-size: 0.85rem;">{{ $certLabel }}</span>
-                                                                            </a>
-                                                                        @endforeach
-                                                                    @else
-                                                                        <span class="text-muted">N/A</span>
-                                                                    @endif
-                                                                @endif
-                                                            </div>
-                                                        @endif
                                                     </td>
                                                     <td>{{ $jobApplication->created_at->format('d M, Y') }}</td>
                                                     <td>{{ !empty($jobApplication->job->closing_date) ? \Carbon\Carbon::parse($jobApplication->job->closing_date)->format('d M, Y') : 'Not set' }}</td>
@@ -127,7 +85,12 @@
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('jobDetail', $jobApplication->job->id) }}">
                                                                         <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                        View</a></li>
+                                                                        View Job</a></li>
+                                                                @if(!empty($jobApplication->application_file) || !empty($jobApplication->resume_file) || !empty($jobApplication->certificates_file))
+                                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#filesModal{{ $jobApplication->id }}"><i class="fa fa-file" aria-hidden="true"></i> View Files Submitted</a></li>
+                                                                @else
+                                                                    <li><a class="dropdown-item disabled" href="#" onclick="event.preventDefault();" aria-disabled="true"><i class="fa fa-file" aria-hidden="true"></i> No Files Submitted</a></li>
+                                                                @endif
                                                                 @if ($jobApplication->isPlaced())
                                                                     <li>
                                                                         @if ($jobApplication->studentFeedback)
@@ -156,6 +119,72 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                @if(!empty($jobApplication->application_file) || !empty($jobApplication->resume_file) || !empty($jobApplication->certificates_file))
+                                                    <div class="modal fade" id="filesModal{{ $jobApplication->id }}" tabindex="-1"
+                                                        aria-labelledby="filesModalLabel{{ $jobApplication->id }}" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="filesModalLabel{{ $jobApplication->id }}">
+                                                                        Submitted Files
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p class="text-muted mb-3">{{ $jobApplication->job->title }} - {{ $jobApplication->job->company_name }}</p>
+                                                                    <div class="d-flex flex-column gap-2">
+                                                                        @if(!empty($jobApplication->application_file))
+                                                                            @php
+                                                                                $fileLabel = $jobApplication->application_file_label ?? basename($jobApplication->application_file);
+                                                                            @endphp
+                                                                            <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'application']) }}"
+                                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
+                                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-primary border border-primary-subtle rounded-pill px-3 py-2 bg-primary-subtle shadow-sm">
+                                                                                <i class="fa fa-file bg-primary"></i>
+                                                                                <span>{{ $fileLabel }}</span>
+                                                                                <small class="text-muted ms-auto">Application</small>
+                                                                            </a>
+                                                                        @endif
+
+                                                                        @if(!empty($jobApplication->resume_file))
+                                                                            @php
+                                                                                $fileLabel = $jobApplication->resume_file_label ?? basename($jobApplication->resume_file);
+                                                                            @endphp
+                                                                            <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'resume']) }}"
+                                                                                download="{{ $fileLabel }}" title="{{ $fileLabel }}"
+                                                                                class="d-inline-flex align-items-center gap-2 text-decoration-none text-success border border-success-subtle rounded-pill px-3 py-2 bg-success-subtle shadow-sm">
+                                                                                <i class="fa fa-file text-success"></i>
+                                                                                <span>{{ $fileLabel }}</span>
+                                                                                <small class="text-muted ms-auto">Resume</small>
+                                                                            </a>
+                                                                        @endif
+
+                                                                        @if(!empty($jobApplication->certificates_file))
+                                                                            @php
+                                                                                $certs = json_decode($jobApplication->certificates_file, true) ?? [];
+                                                                                $certLabels = $jobApplication->certificate_file_labels;
+                                                                            @endphp
+                                                                            @foreach($certs as $cert)
+                                                                                @php $certLabel = $certLabels[$loop->index] ?? basename($cert); @endphp
+                                                                                <a href="{{ route('application.download', ['application' => $jobApplication->id, 'type' => 'certificate']) . '?file=' . urlencode(base64_encode($cert)) }}"
+                                                                                    download="{{ $certLabel }}" title="{{ $certLabel }}"
+                                                                                    class="d-inline-flex align-items-center gap-2 text-decoration-none text-warning border border-warning-subtle rounded-pill px-3 py-2 bg-warning-subtle shadow-sm">
+                                                                                    <i class="fa fa-file text-warning"></i>
+                                                                                    <span>{{ $certLabel }}</span>
+                                                                                    <small class="text-muted ms-auto">Certificate</small>
+                                                                                </a>
+                                                                            @endforeach
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                                 @if ($jobApplication->isPlaced() && !$jobApplication->studentFeedback)
                                                     <div class="modal fade" id="feedbackModal{{ $jobApplication->id }}" tabindex="-1"
                                                         aria-labelledby="feedbackModalLabel{{ $jobApplication->id }}" aria-hidden="true">
