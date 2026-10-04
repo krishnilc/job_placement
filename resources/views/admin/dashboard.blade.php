@@ -53,6 +53,12 @@
                     <div class="tab-content" id="dashboardMainTabsContent">
                         <!-- Overview Tab -->
                         <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'show active' }}" id="tab-overview" role="tabpanel">
+                            <div class="d-flex justify-content-end gap-2 mb-3">
+                                <a href="{{ route('admin.reports.export', ['report' => 'overview', 'format' => 'pdf']) }}"
+                                    class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+                                <a href="{{ route('admin.reports.export', ['report' => 'overview', 'format' => 'excel']) }}"
+                                    class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                            </div>
                             <div class="row mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">Job Report</h5>
@@ -394,45 +400,33 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card border-0 shadow">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">Quick Links</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <ul class="list-unstyled">
-                                                <li class="mb-2"><a href="{{ route('admin.users.students') }}"
-                                                        class="text-decoration-none"><i class="fa fa-arrow-right"></i>
-                                                        Students</a></li>
-                                                <li class="mb-2"><a href="{{ route('admin.users.employers') }}"
-                                                        class="text-decoration-none"><i class="fa fa-arrow-right"></i>
-                                                        Employees</a></li>
-                                                <li class="mb-2"><a href="{{ route('admin.jobs') }}"
-                                                        class="text-decoration-none"><i class="fa fa-arrow-right"></i>
-                                                        Jobs</a></li>
-                                                <li><a href="{{ route('admin.jobApplications') }}"
-                                                        class="text-decoration-none"><i class="fa fa-arrow-right"></i>
-                                                        Applications</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card border-0 shadow">
+                                <div class="col-md-12">
+                                    <div class="card border-0 shadow h-100">
                                         <div class="card-header bg-light">
                                             <h6 class="mb-0">System Information</h6>
                                         </div>
-                                        <div class="card-body">
-                                            <p class="mb-2"><strong>Total Statistics:</strong></p>
-                                            <ul class="list-unstyled text-muted small">
-                                                <li>Users: <strong>{{ $totalUsers }}</strong></li>
-                                                <li>Jobs Posted: <strong>{{ $totalJobs }}</strong></li>
-                                                <li>Applications Received: <strong>{{ $totalApplications }}</strong>
-                                                </li>
-                                                <li>Avg. Applications per Job:
-                                                    <strong>{{ $totalJobs > 0 ? number_format($totalApplications / $totalJobs, 2) : 0 }}</strong>
-                                                </li>
-                                            </ul>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="bg-light">
+                                                    <tr>
+                                                        <th>Metric</th>
+                                                        <th class="text-end">Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="table-light"><td colspan="2" class="fw-bold text-uppercase small text-secondary">Users</td></tr>
+                                                    <tr><td>Total Users (SuperAdmin/Admins/Employers/Students)</td><td class="text-end fw-semibold">{{ $totalUsers }}</td></tr>
+                                                    <tr><td>Total Users (Super Admin/Admins)</td><td class="text-end fw-semibold">{{ $totalStaffUsers }}</td></tr>
+                                                    <tr><td>Total Active Users (Super Admin/Admins)</td><td class="text-end fw-semibold">{{ $activeStaffUsers }}</td></tr>
+                                                    <tr><td>Total Super Admin</td><td class="text-end fw-semibold">{{ $totalSuperAdmins }}</td></tr>
+                                                    <tr><td>Total Active Super Admin</td><td class="text-end fw-semibold">{{ $activeSuperAdmins }}</td></tr>
+                                                    <tr><td>Total Admin Users</td><td class="text-end fw-semibold">{{ $totalRegularAdmins }}</td></tr>
+                                                    <tr><td>Total Active Admin Users</td><td class="text-end fw-semibold">{{ $activeRegularAdmins }}</td></tr>
+                                                    <tr class="table-light"><td colspan="2" class="fw-bold text-uppercase small text-secondary">Content</td></tr>
+                                                    <tr><td>Total Colleges/Centers</td><td class="text-end fw-semibold">{{ $collegeCategoryCounts->count() }}</td></tr>
+                                                    <tr><td>Total Categories</td><td class="text-end fw-semibold">{{ $collegeCategoryCounts->sum('categories_count') }}</td></tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -447,14 +441,15 @@
                                         <h5 class="mb-0">Placement Rate Report</h5>
                                         <div class="d-flex gap-2">
                                             <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                                class="btn btn-sm btn-outline-danger">PDF</a>
+                                                class="btn btn-sm btn-outline-danger"> Download PDF</a>
                                             <a href="{{ route('admin.reports.export', ['report' => 'placement', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                                class="btn btn-sm btn-outline-success">Excel</a>
+                                                class="btn btn-sm btn-outline-success"> Download Excel</a>
                                             <a href="{{ route('admin.dashboard') }}"
                                                 class="btn btn-sm btn-outline-secondary">Clear filters</a>
                                         </div>
                                     </div>
                                     <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
+                                        <input type="hidden" name="tab" value="placement">
                                         <div class="col-md-6 col-lg-4">
                                             <label for="college" class="form-label">College/Center</label>
                                             <select name="college" id="college" class="form-select">
@@ -710,9 +705,9 @@
                                     <h5 class="mb-0">Job Categories Report</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.reports.export', ['report' => 'categories', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                            class="btn btn-sm btn-outline-danger"> Download PDF</a>
                                         <a href="{{ route('admin.reports.export', ['report' => 'categories', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-success">Excel</a>
+                                            class="btn btn-sm btn-outline-success"> Download Excel</a>
                                     </div>
                                 </div>
                                 <div class="card-body border-bottom">
@@ -830,9 +825,9 @@
                                         <h6 class="mb-0">Yearly Application Funnel</h6>
                                         <div class="d-flex gap-2">
                                             <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                                class="btn btn-sm btn-outline-danger">PDF</a>
+                                                class="btn btn-sm btn-outline-danger"> Download PDF</a>
                                             <a href="{{ route('admin.reports.export', ['report' => 'rejection', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                                class="btn btn-sm btn-outline-success">Excel</a>
+                                                class="btn btn-sm btn-outline-success"> Download Excel</a>
                                         </div>
                                     </div>
                                     <div class="table-responsive mb-4">
@@ -1143,9 +1138,9 @@
                                     <h5 class="mb-0">Employer-Level Reporting</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                            class="btn btn-sm btn-outline-danger"> Download PDF</a>
                                         <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-success">Excel</a>
+                                            class="btn btn-sm btn-outline-success"> Download Excel</a>
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -1191,9 +1186,9 @@
                                     <h5 class="mb-0">Recruitment Funnel</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-danger">PDF</a>
+                                            class="btn btn-sm btn-outline-danger"> Download PDF</a>
                                         <a href="{{ route('admin.reports.export', ['report' => 'funnel', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-success">Excel</a>
+                                            class="btn btn-sm btn-outline-success"> Download Excel</a>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -1314,13 +1309,14 @@
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">Application Status Reports</h5>
-                                    <a href="{{ route('admin.jobApplications') }}"
-                                        class="btn btn-sm btn-outline-primary">Review
-                                        Applications</a>
-                                </div>
-
-                                <div class="row mb-3">
-
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('admin.reports.export', ['report' => 'applications', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+                                        <a href="{{ route('admin.reports.export', ['report' => 'applications', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                                            class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                                        <a href="{{ route('admin.jobApplications') }}"
+                                            class="btn btn-sm btn-outline-primary">Review Applications</a>
+                                    </div>
                                 </div>
 
                                 <div class="card border-0 shadow">
@@ -1367,6 +1363,16 @@
                                                     </tr>
                                                 @endforeach
                                             </tbody>
+                                            <tfoot>
+                                                <tr class="fw-bold table-light">
+                                                    <td>Total</td>
+                                                    <td></td>
+                                                    <td class="text-end">{{ $applicationStatusReportTotal }}</td>
+                                                    <td class="text-end">
+                                                        <small class="text-muted text-nowrap">100%</small>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>

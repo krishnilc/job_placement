@@ -32,11 +32,24 @@ class DashboardController extends Controller
         $title = ucfirst(str_replace('-', ' ', $report));
 
         if ($format === 'pdf') {
-            $html = $this->renderPdfHtml($title, $rows);
+            $html = $this->renderPdfHtml($title, $rows, $request);
 
-            return Pdf::loadHTML($html)
-                ->setPaper('a4', 'landscape')
-                ->download(Str::slug($title) . '-report.pdf');
+            $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
+            $pdf->render();
+
+            // Page numbers via dompdf canvas (CSS counter(pages) is unreliable)
+            $canvas = $pdf->getDompdf()->getCanvas();
+            $font = $pdf->getDompdf()->getFontMetrics()->getFont('Arial', 'normal');
+            $canvas->page_text(
+                $canvas->get_width() - 90,
+                $canvas->get_height() - 28,
+                'Page {PAGE_NUM} of {PAGE_COUNT}',
+                $font,
+                9,
+                [0.33, 0.33, 0.33]
+            );
+
+            return $pdf->download(Str::slug($title) . '-report.pdf');
         }
 
         $csv = fopen('php://temp', 'r+');
@@ -79,6 +92,15 @@ class DashboardController extends Controller
         $activeStudents = User::where('role', 'student')->where('status', 'active')->count();
         $pendingApprovalStudents = User::where('role', 'student')->where('status', 'pending')->count();
         $blockedStudents = User::where('role', 'student')->where('status', 'blocked')->count();
+        $totalAdmins = User::whereIn('role', ['admin', 'super_admin'])->count();
+        $totalSuperAdmins = User::where('role', 'super_admin')->count();
+        $totalRegularAdmins = User::where('role', 'admin')->count();
+        $activeAdmins = User::whereIn('role', ['admin', 'super_admin'])->where('status', 'active')->count();
+        $totalActiveUsers = User::where('status', 'active')->count();
+        $activeSuperAdmins = User::where('role', 'super_admin')->where('status', 'active')->count();
+        $activeRegularAdmins = User::where('role', 'admin')->where('status', 'active')->count();
+        $totalStaffUsers = User::whereIn('role', ['admin', 'super_admin'])->count();
+        $activeStaffUsers = User::whereIn('role', ['admin', 'super_admin'])->where('status', 'active')->count();
         $applicationQuery = JobApplication::query();
         $applicationQuery
             ->when($request->filled('college'), fn ($query) => $query->whereHas('user.studentProfile', fn ($p) => $p->where('college_id', $request->college)))
@@ -377,13 +399,13 @@ class DashboardController extends Controller
             ->values();
 
         $applicationStatusReports = ApplicationStatus::query()
-            ->leftJoin('application_status_history', 'application_status_history.application_status_id', '=', 'application_statuses.id')
+            ->leftJoin('job_applications', 'job_applications.application_status_id', '=', 'application_statuses.id')
             ->select(
                 'application_statuses.id',
                 'application_statuses.name',
                 'application_statuses.category',
                 'application_statuses.sort_order',
-                DB::raw('COUNT(application_status_history.id) as application_count')
+                DB::raw('COUNT(job_applications.id) as application_count')
             )
             ->groupBy(
                 'application_statuses.id',
@@ -406,6 +428,15 @@ class DashboardController extends Controller
 
         return [
             'totalUsers' => $totalUsers,
+            'totalAdmins' => $totalAdmins,
+            'totalSuperAdmins' => $totalSuperAdmins,
+            'totalRegularAdmins' => $totalRegularAdmins,
+            'activeAdmins' => $activeAdmins,
+            'totalActiveUsers' => $totalActiveUsers,
+            'activeSuperAdmins' => $activeSuperAdmins,
+            'activeRegularAdmins' => $activeRegularAdmins,
+            'totalStaffUsers' => $totalStaffUsers,
+            'activeStaffUsers' => $activeStaffUsers,
             'totalJobs' => $totalJobs,
             'pendingJobs' => $pendingJobs,
             'activeJobs' => $activeJobs,
@@ -464,6 +495,40 @@ class DashboardController extends Controller
     private function buildExportRows(string $report, array $dashboard): array
     {
         return match ($report) {
+            'overview' => [
+                ['Metric', 'Value'],
+                ['--- JOB REPORT ---', ''],
+                ['Total Jobs', $dashboard['totalJobs']],
+                ['Open Jobs', $dashboard['activeJobs']],
+                ['Approval Pending Jobs', $dashboard['pendingJobs']],
+                ['Blocked Jobs', $dashboard['blockedJobs']],
+                ['Featured Jobs', $dashboard['featuredJobs']],
+                ['--- EMPLOYER REPORT ---', ''],
+                ['Total Employers', $dashboard['totalEmployers']],
+                ['Active Employers', $dashboard['activeEmployers']],
+                ['Approval Pending Employers', $dashboard['pendingEmployers']],
+                ['Blocked Employers', $dashboard['blockedEmployers']],
+                ['--- STUDENT REPORT ---', ''],
+                ['Total Students', $dashboard['totalStudents']],
+                ['Active Students', $dashboard['activeStudents']],
+                ['Approval Pending Students', $dashboard['pendingApprovalStudents']],
+                ['Blocked Students', $dashboard['blockedStudents']],
+                ['--- APPLICATION REPORT ---', ''],
+                ['Total Applications', $dashboard['totalApplications']],
+                ['Active Applications', $dashboard['activeApplications']],
+                ['Placed Applications', $dashboard['placedApplications']],
+                ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
+                ['--- SYSTEM INFORMATION ---', ''],
+                ['Total Users (Super Admin/Admins/Employers/Students)', $dashboard['totalUsers']],
+                ['Total Users (Super Admin/Admins)', $dashboard['totalStaffUsers']],
+                ['Total Active Users (Super Admin/Admins)', $dashboard['activeStaffUsers']],
+                ['Total Super Admin', $dashboard['totalSuperAdmins']],
+                ['Total Active Super Admin', $dashboard['activeSuperAdmins']],
+                ['Total Admin Users', $dashboard['totalRegularAdmins']],
+                ['Total Active Admin Users', $dashboard['activeRegularAdmins']],
+                ['Total Colleges/Centers', $dashboard['collegeCategoryCounts']->count()],
+                ['Total Categories', $dashboard['collegeCategoryCounts']->sum('categories_count')],
+            ],
             'placement' => [
                 ['Metric', 'Value'],
                 ['Total Applications', $dashboard['placementTotalApplications']],
@@ -472,6 +537,24 @@ class DashboardController extends Controller
                 ['Interviewed Applications', $dashboard['interviewedApplications']],
                 ['Interview Conversion Rate', number_format($dashboard['interviewConversionRate'], 1) . '%'],
             ],
+            'applications' => collect($dashboard['applicationStatusReports'])->map(function ($row) use ($dashboard) {
+                $percentage = $dashboard['applicationStatusReportTotal'] > 0
+                    ? round(($row->application_count / $dashboard['applicationStatusReportTotal']) * 100)
+                    : 0;
+                return [
+                    'Status' => $row->name,
+                    'Category' => $row->category,
+                    'Applications' => $row->application_count,
+                    'Share of Applications' => $percentage . '%',
+                ];
+            })
+                ->push([
+                    'Status' => 'Total',
+                    'Category' => '',
+                    'Applications' => $dashboard['applicationStatusReportTotal'],
+                    'Share of Applications' => '100%',
+                ])
+                ->toArray(),
             'rejection' => [
                 ['Metric', 'Value'],
                 ['Rejected Applications', $dashboard['rejectedApplications']],
@@ -491,7 +574,7 @@ class DashboardController extends Controller
                 'Count' => $row['count'],
                 'Drop Off' => $row['drop_off'],
                 'Drop Off Rate' => $row['drop_off_rate'] . '%',
-                'Conversion from Start' => $row['conversion_from_start'] . '%',
+                'Progression from Start' => $row['conversion_from_start'] . '%',
             ])->toArray(),
             'categories' => collect($dashboard['categoryReports'])->map(fn ($row) => [
                 'Category' => $row->name,
@@ -510,15 +593,62 @@ class DashboardController extends Controller
         };
     }
 
-    private function renderPdfHtml(string $title, array $rows): string
+    private function renderPdfHtml(string $title, array $rows, ?Request $request = null): string
     {
+        // If rows are associative (keyed), use the keys as table headers
+        $firstRow = $rows[0] ?? null;
+        $isAssoc = is_array($firstRow) && array_keys($firstRow) !== range(0, count($firstRow) - 1);
+
+        $headerHtml = '';
+        $bodyRows = $rows;
+
+        if ($isAssoc) {
+            $headerHtml = '<thead><tr>'
+                . collect(array_keys($firstRow))->map(fn ($h) => '<th>' . e($h) . '</th>')->implode('')
+                . '</tr></thead>';
+        } else {
+            // First numeric row is a header if it looks like one (e.g. ['Metric','Value'])
+            $firstIsHeader = is_array($firstRow)
+                && count($firstRow) === 2
+                && $firstRow[0] === 'Metric' && $firstRow[1] === 'Value';
+            if ($firstIsHeader) {
+                $headerHtml = '<thead><tr>'
+                    . collect($firstRow)->map(fn ($h) => '<th>' . e($h) . '</th>')->implode('')
+                    . '</tr></thead>';
+                $bodyRows = array_slice($rows, 1);
+            }
+        }
+
         $htmlRows = '';
-        foreach ($rows as $row) {
+        foreach ($bodyRows as $row) {
             $cells = collect($row)->map(fn ($value) => '<td>' . e($value) . '</td>')->implode('');
             $htmlRows .= '<tr>' . $cells . '</tr>';
         }
 
-        return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:12px}th{background:#f3f4f6}</style></head><body><h2>' . e($title) . ' Report</h2><table><tbody>' . $htmlRows . '</tbody></table></body></html>';
+        $downloadedBy = $request && $request->user() ? $request->user()->name . ' (' . $request->user()->email . ')' : 'System';
+        $downloadedAt = now()->format('F j, Y \a\t g:i A');
+
+        return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'
+            . '@page{size:A4 landscape;margin:40px 40px 60px 40px}'
+            . 'body{font-family:Arial,sans-serif;padding:0;margin:0;font-size:12px;color:#000}'
+            . '.brand{font-size:22px;font-weight:700;color:#174a68;margin:0 0 2px;text-align:left}'
+            . '.report-name{font-size:15px;font-weight:600;color:#444;margin:0 0 6px;text-align:left}'
+            . 'table{width:100%;border-collapse:collapse;margin-top:10px;page-break-inside:auto}'
+            . 'tr{page-break-inside:avoid;page-break-after:auto}'
+            . 'th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:12px}'
+            . 'th{background:#f3f4f6;font-weight:700}'
+            . '.report-footer{position:fixed;bottom:-40px;left:0;right:0;height:40px;border-top:1px solid #ddd;padding-top:6px;font-size:10px;color:#555;}'
+            . '.report-footer .left{float:left}'
+            . '.report-footer .right{float:right}'
+            . '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'
+            . '</style></head><body>'
+            . '<div class="brand">FNU Job Placement</div>'
+            . '<div class="report-name">' . e($title) . ' Report</div>'
+            . '<table>' . $headerHtml . '<tbody>' . $htmlRows . '</tbody></table>'
+            . '<div class="report-footer">'
+            . '<span class="left">Downloaded: ' . e($downloadedAt) . ' &nbsp;|&nbsp; Downloaded by: ' . e($downloadedBy) . '</span>'
+            . '</div>'
+            . '</body></html>';
     }
 
     private function getYearExpression(string $column): string
