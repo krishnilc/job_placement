@@ -128,6 +128,15 @@
                                                                         href="{{ route('jobDetail', $jobApplication->job->id) }}">
                                                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                                                         View</a></li>
+                                                                @if ($jobApplication->isPlaced())
+                                                                    <li>
+                                                                        @if ($jobApplication->studentFeedback)
+                                                                            <a class="dropdown-item disabled" href="#" onclick="event.preventDefault();" aria-disabled="true"><i class="fa fa-check" aria-hidden="true"></i> Feedback Submitted</a>
+                                                                        @else
+                                                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ $jobApplication->id }}"><i class="fa fa-comment" aria-hidden="true"></i> Give Feedback</a>
+                                                                        @endif
+                                                                    </li>
+                                                                @endif
                                                                 @if(!empty($jobApplication->job->closing_date) && \Carbon\Carbon::parse($jobApplication->job->closing_date)->lt(\Carbon\Carbon::today()))
                                                                     <li>
                                                                         <a class="dropdown-item disabled" href="#" onclick="event.preventDefault();" aria-disabled="true">
@@ -147,6 +156,48 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                @if ($jobApplication->isPlaced() && !$jobApplication->studentFeedback)
+                                                    <div class="modal fade" id="feedbackModal{{ $jobApplication->id }}" tabindex="-1"
+                                                        aria-labelledby="feedbackModalLabel{{ $jobApplication->id }}" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <form action="{{ route('account.feedback.store', $jobApplication) }}" method="POST">
+                                                                    @csrf
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="feedbackModalLabel{{ $jobApplication->id }}">
+                                                                            Feedback on {{ $jobApplication->job->company_name }}
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                            aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p class="text-muted mb-3">{{ $jobApplication->job->title }} - {{ $jobApplication->job->company_name }}</p>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Your Experience Rating</label>
+                                                                            <select name="rating" class="form-select" required>
+                                                                                <option value="">Select a rating</option>
+                                                                                <option value="5">5 - Excellent</option>
+                                                                                <option value="4">4 - Good</option>
+                                                                                <option value="3">3 - Satisfactory</option>
+                                                                                <option value="2">2 - Needs Improvement</option>
+                                                                                <option value="1">1 - Poor</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Comments</label>
+                                                                            <textarea name="comments" class="form-control" rows="4" maxlength="2000" placeholder="Share your feedback on this company..."></textarea>
+                                                                        </div>
+                                                                        <p class="small text-muted mb-0">This feedback is only visible to administrators and is not shared directly with the employer.</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                             @else
                                             <tr>

@@ -212,7 +212,7 @@ class AccountManagementController extends Controller
                         ->orWhere('location', 'like', $like);
                 });
             })
-            ->with(['job', 'job.JobType', 'job.applications', 'applicationStatus'])
+            ->with(['job', 'job.JobType', 'job.applications', 'applicationStatus', 'studentFeedback'])
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString(); // Retrieve job applications submitted by the authenticated user

@@ -80,4 +80,24 @@ class JobApplication extends Model
      {
          return $this->hasMany(ApplicationStatusHistory::class)->latest('created_at');
      }
+
+     public function feedbacks()
+     {
+         return $this->hasMany(Feedback::class);
+     }
+
+     public function employerFeedback()
+     {
+         return $this->hasOne(Feedback::class)->where('feedback_type', Feedback::TYPE_EMPLOYER_TO_STUDENT);
+     }
+
+     public function studentFeedback()
+     {
+         return $this->hasOne(Feedback::class)->where('feedback_type', Feedback::TYPE_STUDENT_TO_EMPLOYER);
+     }
+
+     public function isPlaced(): bool
+     {
+         return $this->applicationStatus?->name === 'Placed';
+     }
 }

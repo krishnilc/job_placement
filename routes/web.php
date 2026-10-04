@@ -7,10 +7,12 @@ use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\CollegeController;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\EmployerController;
+use App\Http\Controllers\admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\admin\JobApplicationController;
 use App\Http\Controllers\admin\JobController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\MyJobController;
@@ -73,8 +75,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/job-applications', [JobApplicationController::class, 'index'])->name('admin.jobApplications');
     Route::patch('/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('admin.jobApplications.status');
     Route::delete('/job-applications/delete', [JobApplicationController::class, 'destroy'])->name('admin.jobApplications.destroy');
+    // Employers submit feedback about a placed student from this same group (CheckAdmin middleware allows the employer role).
+    Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('admin.jobApplications.feedback.store');
 
     Route::middleware('checkAdminOrSuperAdmin')->group(function () {
+        // Feedback is only ever visible to admins and super admins.
+        Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback');
+
         Route::get('/users/students/create', [StudentController::class, 'create'])->name('admin.users.students.create');
         Route::post('/users/students/store', [StudentController::class, 'store'])->name('admin.users.students.store');
         Route::patch('/users/students/{id}/status', [StudentController::class, 'updateStatus'])->name('admin.users.students.status');
@@ -138,6 +145,8 @@ Route::group(['prefix' => 'account'], function () {
         Route::post('/my-jobs/unblock-job', [MyJobController::class, 'unblockJob'])->name('account.unblockJob');
         Route::get('/my-job-applications', [AccountManagementController::class, 'myJobApplications'])->name('account.myJobApplications');
         Route::post('/remove-job-application', [AccountManagementController::class, 'removeJobApplication'])->name('account.removeJobApplication');
+        // Students submit feedback about the company they were placed with.
+        Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('account.feedback.store');
         Route::get('/saved-jobs', [AccountManagementController::class, 'savedJobs'])->name('account.savedJobs');
         Route::post('/remove-saved-job', [AccountManagementController::class, 'removeSavedJob'])->name('account.removeSavedJob');
     });

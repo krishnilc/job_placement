@@ -55,6 +55,11 @@
                         <i class="fa fa-arrow-right"></i> Manage Applications
                     </a>
                 </li>
+                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.feedback')])>
+                    <a href="{{ route('admin.feedback') }}">
+                        <i class="fa fa-arrow-right"></i> Feedback
+                    </a>
+                </li>
 
                 @if (in_array(Auth::user()->role, ['admin', 'super_admin'], true))
                     <li class="{{ $headingClass }}">Setup</li>

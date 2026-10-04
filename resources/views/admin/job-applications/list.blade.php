@@ -191,6 +191,15 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
                                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusHistoryModal{{ $application->id }}"><i class="fa fa-history" aria-hidden="true"></i> View History</a></li>
+                                                                @if (auth()->user()->role === 'employer' && $application->isPlaced())
+                                                                    <li>
+                                                                        @if ($application->employerFeedback)
+                                                                            <a class="dropdown-item disabled" href="#" onclick="event.preventDefault();" aria-disabled="true"><i class="fa fa-check" aria-hidden="true"></i> Feedback Submitted</a>
+                                                                        @else
+                                                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ $application->id }}"><i class="fa fa-comment" aria-hidden="true"></i> Give Feedback</a>
+                                                                        @endif
+                                                                    </li>
+                                                                @endif
                                                                 @if (auth()->user()->role === 'super_admin')
                                                                     <li><a class="dropdown-item" href="javascript:void(0);" onclick="deleteApplication({{ $application->id }})"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
                                                                 @endif
@@ -250,6 +259,49 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                @if (auth()->user()->role === 'employer' && $application->isPlaced() && !$application->employerFeedback)
+                                    <div class="modal fade" id="feedbackModal{{ $application->id }}" tabindex="-1"
+                                        aria-labelledby="feedbackModalLabel{{ $application->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form action="{{ route('admin.jobApplications.feedback.store', $application) }}" method="POST">
+                                                    @csrf
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="feedbackModalLabel{{ $application->id }}">
+                                                            Feedback on {{ $application->user->name }}
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="text-muted mb-3">{{ $application->job->title }} - {{ $application->user->name }}</p>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Performance Rating</label>
+                                                            <select name="rating" class="form-select" required>
+                                                                <option value="">Select a rating</option>
+                                                                <option value="5">5 - Excellent</option>
+                                                                <option value="4">4 - Good</option>
+                                                                <option value="3">3 - Satisfactory</option>
+                                                                <option value="2">2 - Needs Improvement</option>
+                                                                <option value="1">1 - Poor</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Comments</label>
+                                                            <textarea name="comments" class="form-control" rows="4" maxlength="2000" placeholder="Share your feedback on this student's performance..."></textarea>
+                                                        </div>
+                                                        <p class="small text-muted mb-0">This feedback is only visible to administrators and is not shared directly with the student.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
 
                             <div>
