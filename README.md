@@ -13,6 +13,10 @@ Dashboard tabs use a wrapping grid: four per row on medium and larger screens,
 and two per row on small screens, without a horizontal tab scrollbar.
 The report navigation uses compact icon labels, a navy active state, and visible
 keyboard-focus outlines.
+Overview metrics are grouped into Jobs, Employers, Students, and Applications
+panels with compact metric cards; System Information remains a separate table.
+The selected tab persists on refresh. An explicit tab hash takes precedence over
+the query-string tab and filter-based defaults.
 
 Administrators can open **Dashboard > Job Types** for jobs, applications, placed
 and rejected applications, and placement rates by job type. **By College** opens

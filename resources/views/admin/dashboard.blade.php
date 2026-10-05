@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="col">
                     <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
-                        <ol class="breadcrumb mb-0">                            
+                        <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item active">Dashboard</li>
                         </ol>
                     </nav>
@@ -22,50 +22,71 @@
 
                     <div class="dashboard-report-navigation mb-4">
                         <p class="dashboard-navigation-label" id="dashboard-navigation-label">Dashboard Reports</p>
-                    <ul class="nav nav-pills row g-2 mx-0 mb-0" id="dashboardMainTabs"
-                        role="tablist" aria-labelledby="dashboard-navigation-label">
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button
-                            class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'active' }} w-100 h-100 text-center"
-                                id="tab-overview-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button"
-                                role="tab"><i class="fa fa-th-large" aria-hidden="true"></i><span>Overview</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-applications-btn" data-bs-toggle="tab" data-bs-target="#tab-applications"
-                                type="button" role="tab"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Applications</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button
-                            class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'active' : '' }} w-100 h-100 text-center"
-                                id="tab-placement-btn" data-bs-toggle="tab" data-bs-target="#tab-placement" type="button"
-                                role="tab"><i class="fa fa-graduation-cap" aria-hidden="true"></i><span>Placement</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-job-types-btn" data-bs-toggle="tab" data-bs-target="#tab-job-types"
-                                type="button" role="tab"><i class="fa fa-briefcase" aria-hidden="true"></i><span>Job Types</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-categories-btn" data-bs-toggle="tab" data-bs-target="#tab-categories"
-                                type="button" role="tab"><i class="fa fa-tags" aria-hidden="true"></i><span>Categories</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-rejection-btn" data-bs-toggle="tab" data-bs-target="#tab-rejection" type="button"
-                                role="tab"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Rejection Trends</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-employers-btn" data-bs-toggle="tab" data-bs-target="#tab-employers" type="button"
-                                role="tab"><i class="fa fa-building-o" aria-hidden="true"></i><span>Employers &amp; Funnel</span></button></li>
-                        <li class="nav-item col-6 col-md-3" role="presentation"><button class="nav-link w-100 h-100 text-center"
-                                id="tab-metrics-btn" data-bs-toggle="tab" data-bs-target="#tab-metrics" type="button"
-                                role="tab"><i class="fa fa-bar-chart" aria-hidden="true"></i><span>Reporting Metrics</span></button></li>
+                        <ul class="nav nav-pills row g-2 mx-0 mb-0" id="dashboardMainTabs" role="tablist"
+                            aria-labelledby="dashboard-navigation-label">
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'active' }} w-100 h-100 text-center"
+                                    id="tab-overview-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button"
+                                    role="tab"><i class="fa fa-th-large"
+                                        aria-hidden="true"></i><span>Overview</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-applications-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-applications" type="button" role="tab"><i
+                                        class="fa fa-file-text-o" aria-hidden="true"></i><span>Applications</span></button>
+                            </li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'active' : '' }} w-100 h-100 text-center"
+                                    id="tab-placement-btn" data-bs-toggle="tab" data-bs-target="#tab-placement"
+                                    type="button" role="tab"><i class="fa fa-graduation-cap"
+                                        aria-hidden="true"></i><span>Placement</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-job-types-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-job-types" type="button" role="tab"><i class="fa fa-briefcase"
+                                        aria-hidden="true"></i><span>Job Types</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-categories-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-categories" type="button" role="tab"><i class="fa fa-tags"
+                                        aria-hidden="true"></i><span>Categories</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-rejection-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-rejection" type="button" role="tab"><i
+                                        class="fa fa-line-chart" aria-hidden="true"></i><span>Rejection
+                                        Trends</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-employers-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-employers" type="button" role="tab"><i
+                                        class="fa fa-building-o" aria-hidden="true"></i><span>Employers &amp;
+                                        Funnel</span></button></li>
+                            <li class="nav-item col-6 col-md-3" role="presentation"><button
+                                    class="nav-link w-100 h-100 text-center" id="tab-metrics-btn" data-bs-toggle="tab"
+                                    data-bs-target="#tab-metrics" type="button" role="tab"><i class="fa fa-bar-chart"
+                                        aria-hidden="true"></i><span>Reporting Metrics</span></button></li>
 
-                    </ul>
+                        </ul>
                     </div>
 
                     <div class="tab-content" id="dashboardMainTabsContent">
                         @include('admin.reports.job-types')
                         <!-- Overview Tab -->
-                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'show active' }}" id="tab-overview" role="tabpanel">
-                            <div class="d-flex justify-content-end gap-2 mb-3">             
+                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'show active' }}"
+                            id="tab-overview" role="tabpanel">
+
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                                <div>
+                                    <h5 class="mb-1">Overview Report</h5>
+                                    <p class="text-muted small mb-0">Jobs, users, and application activity at a glance.</p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
                                 <a href="{{ route('admin.reports.export', ['report' => 'overview', 'format' => 'pdf']) }}"
-                                    class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+                                    class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download
+                                    PDF</a>
                                 <a href="{{ route('admin.reports.export', ['report' => 'overview', 'format' => 'excel']) }}"
-                                    class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                                    class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i> Download
+                                    Excel</a>
+                                </div>
                             </div>
-                            <div class="row mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                                     <h5 class="mb-0">Job Report</h5>
                                     <a href="{{ route('admin.jobs') }}" class="btn btn-sm btn-outline-primary">Review
                                         Jobs</a>
@@ -173,7 +194,8 @@
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
                                                     <h7 class="text-muted mb-1">Categories</h7>
-                                                    <h2 class="text-secondary mb-0">{{ $collegeCategoryCounts->sum('categories_count') }}</h2>
+                                                    <h2 class="text-secondary mb-0">
+                                                        {{ $collegeCategoryCounts->sum('categories_count') }}</h2>
                                                 </div>
                                                 <div class="text-secondary" style="font-size: 2rem;"><i
                                                         class="fa fa-th-list"></i></div>
@@ -183,8 +205,8 @@
                                 </div>
                             </div> <!-- End of row -->
 
-                            <div class="row mb-4"> <!-- Start of new row -->
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                                     <h5 class="mb-0">Employer Report</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.users.employers') }}"
@@ -258,8 +280,8 @@
 
                             </div>
 
-                            <div class="row mb-4"> <!-- Start of new row -->
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                                     <h5 class="mb-0">Student Report</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.users.students') }}"
@@ -331,8 +353,8 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-4"> <!-- Start of new row -->
-                                <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                                     <h5 class="mb-0">Application Report</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.jobApplications') }}"
@@ -419,17 +441,53 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr class="table-light"><td colspan="2" class="fw-bold text-uppercase small text-secondary">Users</td></tr>
-                                                    <tr><td>Total Users (SuperAdmin/Admins/Employers/Students)</td><td class="text-end fw-semibold">{{ $totalUsers }}</td></tr>
-                                                    <tr><td>Total Users (Super Admin/Admins)</td><td class="text-end fw-semibold">{{ $totalStaffUsers }}</td></tr>
-                                                    <tr><td>Total Active Users (Super Admin/Admins)</td><td class="text-end fw-semibold">{{ $activeStaffUsers }}</td></tr>
-                                                    <tr><td>Total Super Admin</td><td class="text-end fw-semibold">{{ $totalSuperAdmins }}</td></tr>
-                                                    <tr><td>Total Active Super Admin</td><td class="text-end fw-semibold">{{ $activeSuperAdmins }}</td></tr>
-                                                    <tr><td>Total Admin Users</td><td class="text-end fw-semibold">{{ $totalRegularAdmins }}</td></tr>
-                                                    <tr><td>Total Active Admin Users</td><td class="text-end fw-semibold">{{ $activeRegularAdmins }}</td></tr>
-                                                    <tr class="table-light"><td colspan="2" class="fw-bold text-uppercase small text-secondary">Content</td></tr>
-                                                    <tr><td>Total Colleges/Centers</td><td class="text-end fw-semibold">{{ $collegeCategoryCounts->count() }}</td></tr>
-                                                    <tr><td>Total Categories</td><td class="text-end fw-semibold">{{ $collegeCategoryCounts->sum('categories_count') }}</td></tr>
+                                                    <tr class="table-light">
+                                                        <td colspan="2"
+                                                            class="fw-bold text-uppercase small text-secondary">Users</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Users (SuperAdmin/Admins/Employers/Students)</td>
+                                                        <td class="text-end fw-semibold">{{ $totalUsers }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Users (Super Admin/Admins)</td>
+                                                        <td class="text-end fw-semibold">{{ $totalStaffUsers }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Active Users (Super Admin/Admins)</td>
+                                                        <td class="text-end fw-semibold">{{ $activeStaffUsers }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Super Admin</td>
+                                                        <td class="text-end fw-semibold">{{ $totalSuperAdmins }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Active Super Admin</td>
+                                                        <td class="text-end fw-semibold">{{ $activeSuperAdmins }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Admin Users</td>
+                                                        <td class="text-end fw-semibold">{{ $totalRegularAdmins }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Active Admin Users</td>
+                                                        <td class="text-end fw-semibold">{{ $activeRegularAdmins }}</td>
+                                                    </tr>
+                                                    <tr class="table-light">
+                                                        <td colspan="2"
+                                                            class="fw-bold text-uppercase small text-secondary">Content
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Colleges/Centers</td>
+                                                        <td class="text-end fw-semibold">
+                                                            {{ $collegeCategoryCounts->count() }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total Categories</td>
+                                                        <td class="text-end fw-semibold">
+                                                            {{ $collegeCategoryCounts->sum('categories_count') }}</td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -439,7 +497,8 @@
                         </div>
 
                         <!-- Placement Tab -->
-                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'show active' : '' }}" id="tab-placement" role="tabpanel">
+                        <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? 'show active' : '' }}"
+                            id="tab-placement" role="tabpanel">
                             <div class="card border-0 shadow mb-4">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -690,7 +749,8 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="3" class="text-center text-muted py-4">No Colleges/Centers
+                                                    <td colspan="3" class="text-center text-muted py-4">No
+                                                        Colleges/Centers
                                                         found.</td>
                                                 </tr>
                                             @endforelse
@@ -698,7 +758,8 @@
                                         <tfoot>
                                             <tr class="fw-bold">
                                                 <td colspan="2">Total</td>
-                                                <td class="text-end">{{ $collegeCategoryCounts->sum('categories_count') }}</td>
+                                                <td class="text-end">{{ $collegeCategoryCounts->sum('categories_count') }}
+                                                </td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -716,10 +777,12 @@
                                     </div>
                                 </div>
                                 <div class="card-body border-bottom">
-                                    <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-2 align-items-end">
+                                    <form method="GET" action="{{ route('admin.dashboard') }}"
+                                        class="row g-2 align-items-end">
                                         <input type="hidden" name="tab" value="categories">
                                         <div class="col-md-6 col-lg-4">
-                                            <label for="category_college" class="form-label">Filter by College/Center</label>
+                                            <label for="category_college" class="form-label">Filter by
+                                                College/Center</label>
                                             <select name="category_college" id="category_college" class="form-select">
                                                 <option value="">All Colleges/Centers</option>
                                                 @foreach ($collegeOptions as $college)
@@ -730,8 +793,10 @@
                                             </select>
                                         </div>
                                         <div class="col-auto">
-                                            <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Apply</button>
-                                            <a href="{{ route('admin.dashboard') }}?tab=categories" class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
+                                            <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i>
+                                                Apply</button>
+                                            <a href="{{ route('admin.dashboard') }}?tab=categories"
+                                                class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
                                         </div>
                                     </form>
                                 </div>
@@ -754,11 +819,12 @@
                                             @endphp
                                             @forelse($groupedCategories as $collegeName => $reports)
                                                 <tr class="table-light">
-                                                    <td colspan="7" class="fw-bold text-uppercase small text-secondary">
+                                                    <td colspan="7"
+                                                        class="fw-bold text-uppercase small text-secondary">
                                                         <i class="fa fa-university me-1"></i> {{ $collegeName }}
                                                     </td>
                                                 </tr>
-                                                @foreach($reports as $report)
+                                                @foreach ($reports as $report)
                                                     <tr>
                                                         <td class="fw-semibold ps-4">{{ $report->name }}</td>
                                                         <td class="text-muted">{{ $report->college_name }}</td>
@@ -780,7 +846,8 @@
                                                 @endforeach
                                             @empty
                                                 <tr>
-                                                    <td colspan="7" class="text-center text-muted py-4">No category data
+                                                    <td colspan="7" class="text-center text-muted py-4">No category
+                                                        data
                                                         available.</td>
                                                 </tr>
                                             @endforelse
@@ -854,8 +921,10 @@
                                                     <tr>
                                                         <td>{{ $row['year'] }}</td>
                                                         <td class="text-end">{{ number_format($row['submitted']) }}</td>
-                                                        <td class="text-end">{{ number_format($row['shortlisted']) }}</td>
-                                                        <td class="text-end">{{ number_format($row['interviewed']) }}</td>
+                                                        <td class="text-end">{{ number_format($row['shortlisted']) }}
+                                                        </td>
+                                                        <td class="text-end">{{ number_format($row['interviewed']) }}
+                                                        </td>
                                                         <td class="text-end text-success">
                                                             {{ number_format($row['placed']) }}
                                                         </td>
@@ -919,7 +988,8 @@
                                                         @forelse($rejectionByYear as $report)
                                                             <tr>
                                                                 <td>{{ $report->year }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 2) }}%
@@ -951,7 +1021,8 @@
                                                         @forelse($rejectionByMonth as $report)
                                                             <tr>
                                                                 <td>{{ $report->month }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 2) }}%
@@ -983,7 +1054,8 @@
                                                         @forelse($rejectionByCollege as $report)
                                                             <tr>
                                                                 <td>{{ $report->college_name }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 2) }}%
@@ -1015,7 +1087,8 @@
                                                         @forelse($rejectionByProgramme as $report)
                                                             <tr>
                                                                 <td>{{ $report->degree }}</td>
-                                                                <td class="text-end">{{ $report->application_count }}</td>
+                                                                <td class="text-end">{{ $report->application_count }}
+                                                                </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
                                                                     {{ number_format($report->rejection_rate, 2) }}%
@@ -1202,7 +1275,8 @@
                                             <div class="d-flex justify-content-between">
                                                 <span class="fw-semibold">{{ $stage['name'] }}</span>
                                                 <span>{{ number_format($stage['count']) }} <small
-                                                        class="text-muted">({{ number_format($stage['conversion_from_start'], 2) }}% of
+                                                        class="text-muted">({{ number_format($stage['conversion_from_start'], 2) }}%
+                                                        of
                                                         {{ $funnelReports[0]['name'] }})</small></span>
                                             </div>
                                             <div class="progress" style="height: 20px;">
@@ -1302,7 +1376,9 @@
                                             </table>
                                             <p class="text-muted small mb-0">View Industrial Attachment (IA) jobs,
                                                 applications, and placements by college in
-                                                <a href="{{ route('admin.dashboard', ['tab' => 'job-types']) }}">Job Type Reports</a>.</p>
+                                                <a href="{{ route('admin.dashboard', ['tab' => 'job-types']) }}">Job Type
+                                                    Reports</a>.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -1317,9 +1393,11 @@
                                     <h5 class="mb-0">Application Status Reports</h5>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.reports.export', ['report' => 'applications', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+                                            class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o"></i>
+                                            Download PDF</a>
                                         <a href="{{ route('admin.reports.export', ['report' => 'applications', 'format' => 'excel']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
-                                            class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                                            class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o"></i>
+                                            Download Excel</a>
                                         <a href="{{ route('admin.jobApplications') }}"
                                             class="btn btn-sm btn-outline-primary">Review Applications</a>
                                     </div>
@@ -1342,7 +1420,8 @@
                                                         $percentage =
                                                             $applicationStatusReportTotal > 0
                                                                 ? round(
-                                                                    ($report->application_count / $applicationStatusReportTotal) *
+                                                                    ($report->application_count /
+                                                                        $applicationStatusReportTotal) *
                                                                         100,
                                                                     2,
                                                                 )
@@ -1449,31 +1528,40 @@
                 return params.has(key) && params.get(key) !== '';
             });
             var tabParam = params.get('tab');
-            var tabParamSelector = tabParam && document.querySelector('#tab-' + tabParam) ? '#tab-' + tabParam : null;
+            var tabButtons = Array.from(document.querySelectorAll('#dashboardMainTabs button[data-bs-toggle="tab"]'));
+            var isTabTarget = function(selector) {
+                return tabButtons.some(function(button) {
+                    return button.getAttribute('data-bs-target') === selector;
+                });
+            };
+            var tabParamSelector = isTabTarget('#tab-' + tabParam) ? '#tab-' + tabParam : null;
+            var hashSelector = isTabTarget(window.location.hash) ? window.location.hash : null;
 
-            var targetSelector = tabParamSelector ||
-                (window.location.hash && document.querySelector(window.location.hash) ?
-                window.location.hash :
+            var targetSelector = hashSelector || tabParamSelector ||
                 (hasJobTypeReportFilters ? '#tab-job-types' :
-                (hasCategoryCollege ? '#tab-categories' : (hasFilters ? '#tab-placement' : null))));
+                    (hasCategoryCollege ? '#tab-categories' : (hasFilters ? '#tab-placement' : null)));
 
             if (targetSelector) {
                 var trigger = document.querySelector('#dashboardMainTabs [data-bs-target="' + targetSelector +
-                '"]');
+                    '"]');
                 if (trigger) {
                     if (window.location.hash === '#job-type-colleges') {
                         trigger.addEventListener('shown.bs.tab', function() {
                             document.getElementById('job-type-colleges').scrollIntoView();
-                        }, { once: true });
+                        }, {
+                            once: true
+                        });
                     }
                     new bootstrap.Tab(trigger).show();
                 }
             }
 
-            document.querySelectorAll('#dashboardMainTabs button[data-bs-toggle="tab"]').forEach(function(button) {
+            tabButtons.forEach(function(button) {
                 button.addEventListener('shown.bs.tab', function(event) {
-                    history.replaceState(null, '', window.location.pathname + window.location
-                        .search + event.target.getAttribute('data-bs-target'));
+                    var target = event.target.getAttribute('data-bs-target');
+                    var updatedParams = new URLSearchParams(window.location.search);
+                    updatedParams.set('tab', target.substring('#tab-'.length));
+                    history.replaceState(null, '', window.location.pathname + '?' + updatedParams.toString() + target);
                 });
             });
         })();

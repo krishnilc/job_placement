@@ -1,3 +1,32 @@
+#tab-overview .overview-report-group .card {
+    background: #f8f9fa;
+    box-shadow: none !important;
+    border-radius: 8px;
+}
+
+#tab-overview .overview-report-group .card-body > .d-flex {
+    align-items: flex-start !important;
+}
+
+#tab-overview .overview-report-group h7 {
+    display: block;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#tab-overview .overview-report-group h2 {
+    margin-top: 6px;
+    font-size: 28px;
+}
+
+#tab-overview .overview-report-group h2::after {
+    content: none;
+}
+
+#tab-overview .overview-report-group .card-body .fa {
+    font-size: 18px;
+}
+
 .dashboard-report-navigation {
     padding: 16px;
     background: #fff;

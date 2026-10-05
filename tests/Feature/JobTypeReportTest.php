@@ -183,6 +183,21 @@ class JobTypeReportTest extends TestCase
         $this->assertStringNotContainsString('text-nowrap', $matches[0]);
     }
 
+    public function test_overview_groups_metrics_without_losing_reports_or_actions(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
+        $this->assertSame(4, substr_count($response->getContent(), 'shadow-sm overview-report-group'));
+        foreach (['Overview Report', 'Job Report', 'Employer Report', 'Student Report', 'Application Report', 'System Information'] as $heading) {
+            $response->assertSee($heading);
+        }
+        foreach (['admin.jobs', 'admin.users.employers', 'admin.users.students', 'admin.jobApplications'] as $route) {
+            $response->assertSee(route($route));
+        }
+        foreach (['pdf', 'excel'] as $format) {
+            $response->assertSee(route('admin.reports.export', ['report' => 'overview', 'format' => $format]));
+        }
+    }
+
     public function test_percentage_precision_is_consistent_in_excel_and_pdf_reports(): void
     {
         $this->actingAs($this->admin);
