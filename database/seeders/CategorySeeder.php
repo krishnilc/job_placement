@@ -23,7 +23,7 @@ class CategorySeeder extends Seeder
                 'Aquaculture',
                 'Dairy',
                 'Poultry',
-                'Industry Attachment (IA) - CAFF',
+                // 'Industry Attachment (IA) - CAFF',
             ],
             'CBHTS' => [
                 'Accounting',
@@ -47,7 +47,7 @@ class CategorySeeder extends Seeder
                 'Food and Beverage Services',
                 'Library and Information Systems',
                 'Contact Centre Operations',
-                'Industry Attachment (IA) - CBHTS',
+                // 'Industry Attachment (IA) - CBHTS',
             ],
             'CETVET' => [
                 'Information Technology',
@@ -79,7 +79,7 @@ class CategorySeeder extends Seeder
                 'Telecommunication and Networking Technicians',
                 'Instrumentation and Control Technicians',
                 'Electrical Engineers',
-                'Industry Attachment (IA) - CETVET',
+                // 'Industry Attachment (IA) - CETVET',
             ],
             'CHEL' => [
                 'Counsellors',
@@ -88,7 +88,7 @@ class CategorySeeder extends Seeder
                 'Film and Television Professionals',
                 'Graphic Artist and Designers',
                 'Teachers',
-                'Industry Attachment (IA) - CHEL',
+                // 'Industry Attachment (IA) - CHEL',
             ],
             'CMNHS' => [
                 'Doctors',
@@ -100,7 +100,7 @@ class CategorySeeder extends Seeder
                 'Radiologists',
                 'Pharmacists',
                 'Medical Lab Technicians',
-                'Industry Attachment (IA) - CMNHS',
+                // 'Industry Attachment (IA) - CMNHS',
             ],
         ];
 

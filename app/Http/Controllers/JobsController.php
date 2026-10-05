@@ -67,7 +67,7 @@ class JobsController extends Controller
       }
 
       //Search using experience
-      if (!empty($request->experience)) {
+      if ($request->filled('experience')) {
          $jobs = $jobs->where('experience', $request->experience);
       }
 

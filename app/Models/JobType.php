@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobType extends Model
 {
-    //
-     use HasFactory;
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'status',
+    ];
+
+    public function jobs()
+    {
+        return $this->hasMany(Job::class);
+    }
 }

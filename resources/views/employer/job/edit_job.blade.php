@@ -137,6 +137,7 @@
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Experience <span class="req">*</span></label>
                                     <select name="experience" id="experience" class="form-control">
+                                        <option {{ $job->experience == '0' ? 'selected' : '' }} value="0">No Experience Required</option>
                                         <option {{ $job->experience == '1' ? 'selected' : '' }} value="1">1 Year
                                         </option>
                                         <option {{ $job->experience == '2' ? 'selected' : '' }} value="2">2 Years

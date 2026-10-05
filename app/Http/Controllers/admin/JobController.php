@@ -69,7 +69,7 @@ class JobController extends Controller
         return view('admin.jobs.create', [
             'colleges' => College::active()->orderBy('name')->get(),
             'categories' => Category::orderBy('name', 'ASC')->get(),
-            'jobTypes' => JobType::orderBy('name', 'ASC')->get(),
+            'jobTypes' => JobType::where('status', 1)->orderBy('name', 'ASC')->get(),
         ]);
     }
 

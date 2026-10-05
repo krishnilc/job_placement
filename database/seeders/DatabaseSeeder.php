@@ -46,9 +46,10 @@ class DatabaseSeeder extends Seeder
             'Full Time',
             'Part Time',
             'Contract',
-            'Remote',
-            'Freelance',
-            'Attachment',
+            'Industrial Attachment',
+            'Internship',
+            'Apprenticeship',
+            
         ];
 
         foreach ($jobTypes as $type) {
@@ -59,34 +60,34 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $categories = [
-            'Administration & Office Support',
-            'Agriculture & Environment',
-            'Accounting, Banking, & Finance',
-            'Information Technology (IT) & Computing',
-            'Engineering & Technical Fields',
-            'Health & Medical Services',
-            'Education & Training',
-            'Hospitality & Tourism',
-            'Creative Arts, Media & Design',
-            'Trades & Skilled Services',
-            'Science & Research',
-            'Government, Legal & Community Services',
-            'Student & Graduate Opportunities',
-            'Sales, Marketing & Customer Service',
-            'Logistics, Transport & Supply Chain',
-            'Executive & Management Roles',
-            'Other Opportunities',
+        // $categories = [
+        //     'Administration & Office Support',
+        //     'Agriculture & Environment',
+        //     'Accounting, Banking, & Finance',
+        //     'Information Technology (IT) & Computing',
+        //     'Engineering & Technical Fields',
+        //     'Health & Medical Services',
+        //     'Education & Training',
+        //     'Hospitality & Tourism',
+        //     'Creative Arts, Media & Design',
+        //     'Trades & Skilled Services',
+        //     'Science & Research',
+        //     'Government, Legal & Community Services',
+        //     'Student & Graduate Opportunities',
+        //     'Sales, Marketing & Customer Service',
+        //     'Logistics, Transport & Supply Chain',
+        //     'Executive & Management Roles',
+        //     'Other Opportunities',
 
-        ];
+        // ];
 
-        foreach ($categories as $category) {
-            Category::firstOrCreate([
-                'name' => $category,
-            ], [
-                'status' => 1,
-            ]);
-        }
+        // foreach ($categories as $category) {
+        //     Category::firstOrCreate([
+        //         'name' => $category,
+        //     ], [
+        //         'status' => 1,
+        //     ]);
+        // }
 
         //Job::factory(20)->create();
 

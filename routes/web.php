@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\EmployerController;
 use App\Http\Controllers\admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\admin\JobApplicationController;
 use App\Http\Controllers\admin\JobController;
+use App\Http\Controllers\admin\JobTypeController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\FeedbackController;
@@ -102,6 +103,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
         Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])->name('admin.categories.edit');
         Route::put('/categories/update/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
         Route::delete('/categories/delete', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+        Route::get('/job-types', [JobTypeController::class, 'index'])->name('admin.jobTypes');
+        Route::get('/job-types/create', [JobTypeController::class, 'create'])->name('admin.jobTypes.create');
+        Route::post('/job-types/store', [JobTypeController::class, 'store'])->name('admin.jobTypes.store');
+        Route::get('/job-types/edit/{id}', [JobTypeController::class, 'edit'])->name('admin.jobTypes.edit');
+        Route::put('/job-types/update/{id}', [JobTypeController::class, 'update'])->name('admin.jobTypes.update');
+        Route::delete('/job-types/delete', [JobTypeController::class, 'destroy'])->name('admin.jobTypes.destroy');
     });
 });
 

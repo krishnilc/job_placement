@@ -73,6 +73,11 @@
                             <i class="fa fa-arrow-right"></i> Manage Categories
                         </a>
                     </li>
+                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.jobTypes', 'admin.jobTypes.create', 'admin.jobTypes.edit')])>
+                        <a href="{{ route('admin.jobTypes') }}">
+                            <i class="fa fa-arrow-right"></i> Manage Job Types
+                        </a>
+                    </li>
                 @endif
             @endif
         </ul>

@@ -165,6 +165,7 @@
                                             <label for="" class="mb-2">Experience <span
                                                     class="req">*</span></label>
                                             <select name="experience" id="experience" class="form-control">
+                                                <option value="0">No Experience Required</option>
                                                 <option  value="1">1
                                                     Year</option>
                                                 <option  value="2">2

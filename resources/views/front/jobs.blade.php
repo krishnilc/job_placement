@@ -10,8 +10,8 @@
                 <div class="col-6 col-md-2">
                     <div class="align-end">
                         <select name="sort" id="sort" class="form-control">
-                            <option value="1" {{ (Request::get('sort')) == '1' ? 'selected' : '' }}>Latest</option>
-                            <option value="0" {{ (Request::get('sort')) == '0' ? 'selected' : '' }}>Oldest</option>
+                            <option value="1" {{ Request::get('sort') == '1' ? 'selected' : '' }}>Latest</option>
+                            <option value="0" {{ Request::get('sort') == '0' ? 'selected' : '' }}>Oldest</option>
                         </select>
                     </div>
                 </div>
@@ -62,13 +62,16 @@
                                 </select>
                             </div>
 
-                            <div class="mb-4">                                
+                            <div class="mb-4">
                                 <h2>Job Type</h2>
                                 @if ($jobTypes->isNotEmpty())
                                     @foreach ($jobTypes as $jobType)
                                         <div class="form-check mb-2">
-                                            <input {{ (in_array($jobType->id, $jobTypeArray)) ? 'checked' : '' }} class="form-check-input " name="job_type" type="checkbox" value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
-                                            <label class="form-check-label " for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
+                                            <input {{ in_array($jobType->id, $jobTypeArray) ? 'checked' : '' }}
+                                                class="form-check-input " name="job_type" type="checkbox"
+                                                value="{{ $jobType->id }}" id="job_type_{{ $jobType->id }}">
+                                            <label class="form-check-label "
+                                                for="job_type_{{ $jobType->id }}">{{ $jobType->name }}</label>
                                         </div>
                                     @endforeach
                                 @endif
@@ -80,6 +83,8 @@
                                 <select value="{{ Request::get('experience') }}" name="experience" id="experience"
                                     class="form-control">
                                     <option value="">Select Experience</option>
+                                    <option value="0" {{ Request::get('experience') === '0' ? 'selected' : '' }}>
+                                        No Experience Required</option>
                                     <option value="1" {{ Request::get('experience') == '1' ? 'selected' : '' }}>1 Year
                                     </option>
                                     <option value="2" {{ Request::get('experience') == '2' ? 'selected' : '' }}>2
@@ -100,7 +105,7 @@
                                         Years</option>
                                     <option value="10" {{ Request::get('experience') == '10' ? 'selected' : '' }}>10
                                         Years</option>
-                                    <option value="11" {{ Request::get('experience') == '11' ? 'selected' : '' }}>10+
+                                    <option value="10_plus" {{ Request::get('experience') == '10_plus' ? 'selected' : '' }}>10+
                                         Years</option>
                                 </select>
                             </div>
@@ -119,7 +124,8 @@
                                             <div class="card border-0 p-3 shadow mb-4">
                                                 <div class="card-body">
                                                     <h3 class="border-0 fs-5 pb-2 mb-0">{{ $job->title }}</h3>
-                                                    <p>{{ Str::words(strip_tags($job->description), $words = 15, '...') }}</p>
+                                                    <p>{{ Str::words(strip_tags($job->description), $words = 15, '...') }}
+                                                    </p>
                                                     <div class="bg-light p-3 border">
                                                         <p class="mb-0">
                                                             <span class="fw-bolder"><i class="fa fa-map-marker"></i></span>
@@ -130,9 +136,9 @@
                                                             <span class="ps-1">{{ $job->jobType?->name ?? 'N/A' }}</span>
                                                         </p>
                                                         <!-- <p>Keywords: {{ $job->keywords ?? 'N/A' }}</p>
-                                                        <p>Category: {{ $job->category?->name ?? 'N/A' }}</p>
-                                                        <p>Experience: {{ $job->experience ?? 'N/A' }}</p>
-                                                        <p>Job Type: {{ $job->jobType?->name ?? 'N/A' }}</p> -->
+                                                            <p>Category: {{ $job->category?->name ?? 'N/A' }}</p>
+                                                            <p>Experience: {{ $job->experience ?? 'N/A' }}</p>
+                                                            <p>Job Type: {{ $job->jobType?->name ?? 'N/A' }}</p> -->
 
                                                         @if (is_null($job->salary))
                                                             <p class="mb-0">
@@ -148,7 +154,8 @@
                                                     </div>
 
                                                     <div class="d-grid mt-3">
-                                                        <a href="{{ route('jobDetail', $job->id) }}" class="btn btn-primary btn-lg">Details</a>
+                                                        <a href="{{ route('jobDetail', $job->id) }}"
+                                                            class="btn btn-primary btn-lg">Details</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -158,7 +165,7 @@
                                         {{ $jobs->withQueryString()->links() }}
                                     </div>
                                 @else
-                                     <div class="col-md-12">No jobs found.</div>
+                                    <div class="col-md-12">No jobs found.</div>
                                 @endif
                             </div>
                         </div>
