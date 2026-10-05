@@ -9,11 +9,18 @@
 
 ## Dashboard job type reporting
 
+Dashboard tabs use a wrapping grid: four per row on medium and larger screens,
+and two per row on small screens, without a horizontal tab scrollbar.
+The report navigation uses compact icon labels, a navy active state, and visible
+keyboard-focus outlines.
+
 Administrators can open **Dashboard > Job Types** for jobs, applications, placed
 and rejected applications, and placement rates by job type. **By College** opens
 the selected type's college breakdown; Industrial Attachment (IA) is selected by
 default when that job type exists. Both tables support PDF and Excel-compatible
 CSV downloads.
+The college drill-down job type dropdown lists only active job types; historical
+inactive types remain included in the summary reports.
 
 The college is the **job category's college**, not the student's college. The
 college filter applies to both tables and their exports. These reports use their
@@ -36,6 +43,14 @@ submissions retain the selected order. The default is newest submissions first.
 pages in the selected sort order. Excel downloads use UTF-8, Excel-compatible CSV
 with formula-like text treated as plain text. Downloads are restricted to admins
 and super admins, just like the feedback list.
+
+## Report timestamps
+
+PDF download/generated timestamps and feedback submission timestamps in the
+list and PDF/CSV exports use `Pacific/Fiji`, with the timezone shown next to the
+time. Set `REPORT_TIMEZONE` to another IANA timezone if needed. Stored timestamps
+and the application's UTC timezone are unchanged. After changing configuration
+on a deployment with cached configuration, rebuild it with `php artisan config:cache`.
 
 ## About Laravel
 

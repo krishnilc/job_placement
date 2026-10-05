@@ -120,6 +120,17 @@ class JobTypeReportTest extends TestCase
             ->assertViewHas('jobTypeCollegeReports', fn ($rows) => $rows->count() === 2 && $rows->sum('job_count') === 0);
     }
 
+    public function test_job_type_dropdown_only_lists_active_types_without_hiding_historical_reports(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
+        $response->assertViewHas('jobTypeReportOptions', fn ($types) => $types->pluck('id')->all() === [$this->ia->id]);
+        $response->assertViewHas('jobTypeReports', fn ($rows) => $rows->contains('name', 'Inactive Type'));
+        preg_match('/<select[^>]*id="report_job_type".*?<\/select>/s', $response->getContent(), $matches);
+        $this->assertNotEmpty($matches);
+        $this->assertStringContainsString('Industrial Attachment', $matches[0]);
+        $this->assertStringNotContainsString('Inactive Type', $matches[0]);
+    }
+
     public function test_placement_filters_do_not_change_job_category_college_reporting(): void
     {
         $this->actingAs($this->admin)
@@ -155,6 +166,21 @@ class JobTypeReportTest extends TestCase
         $this->assertStringContainsString('0.00%', $text);
         $this->assertStringContainsString('100.00%', $text);
         $this->assertPercentagePrecision($text);
+    }
+
+    public function test_dashboard_tabs_use_a_wrapping_responsive_grid(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
+        preg_match('/<ul[^>]*id="dashboardMainTabs".*?<\/ul>/s', $response->getContent(), $matches);
+        $this->assertNotEmpty($matches);
+        $this->assertSame(8, substr_count($matches[0], 'nav-item col-6 col-md-3'));
+        $this->assertSame(8, substr_count($matches[0], 'w-100 h-100 text-center'));
+        $this->assertSame(8, substr_count($matches[0], 'aria-hidden="true"'));
+        $response->assertSee('assets/css/dashboard-tabs.css', false);
+        $response->assertSee('Dashboard Reports');
+        $this->assertStringNotContainsString('overflow-auto', $matches[0]);
+        $this->assertStringNotContainsString('flex-nowrap', $matches[0]);
+        $this->assertStringNotContainsString('text-nowrap', $matches[0]);
     }
 
     public function test_percentage_precision_is_consistent_in_excel_and_pdf_reports(): void

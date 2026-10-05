@@ -554,7 +554,7 @@ class DashboardController extends Controller
         return [
             'jobTypeReports' => $typeReports,
             'jobTypeCollegeReports' => $collegeReports,
-            'jobTypeReportOptions' => $types,
+            'jobTypeReportOptions' => $types->where('status', 1)->values(),
             'jobTypeCollegeOptions' => $colleges,
             'selectedReportJobType' => $selectedType,
         ];
@@ -728,7 +728,7 @@ class DashboardController extends Controller
         }
 
         $downloadedBy = $request && $request->user() ? $request->user()->name . ' (' . $request->user()->email . ')' : 'System';
-        $downloadedAt = now()->format('F j, Y \a\t g:i A');
+        $downloadedAt = now()->timezone(config('reporting.timezone'))->format('F j, Y \a\t g:i A e');
 
         return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'
             . '@page{size:A4 landscape;margin:40px 40px 60px 40px}'

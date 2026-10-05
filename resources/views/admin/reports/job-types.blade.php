@@ -99,7 +99,7 @@
         @endif
     </div>
     @if (!$selectedReportJobType)
-        <div class="alert alert-info">No Industrial Attachment job type is configured. Select a job type above to view its college breakdown.</div>
+        <div class="alert alert-info">Select a job type above to view its college breakdown.</div>
     @else
         <div class="card border-0 shadow">
             <div class="table-responsive">

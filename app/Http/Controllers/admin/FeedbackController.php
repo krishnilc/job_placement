@@ -37,7 +37,7 @@ class FeedbackController extends Controller
             return Pdf::loadView('admin.feedback.export', [
                 'headers' => $headers,
                 'rows' => $query->get()->map(fn (Feedback $feedback) => $this->exportRow($feedback)),
-                'generatedAt' => now()->format('M d, Y g:i A'),
+                'generatedAt' => now()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e'),
             ])->setPaper('a4', 'landscape')->download('feedback-report.pdf');
         }
 
@@ -79,7 +79,7 @@ class FeedbackController extends Controller
             $feedback->givenTo?->name ?? 'N/A',
             $feedback->rating ?: 'N/A',
             $feedback->comments ?: '',
-            $feedback->created_at?->format('M d, Y g:i A') ?? 'N/A',
+            $feedback->created_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e') ?? 'N/A',
         ];
     }
 

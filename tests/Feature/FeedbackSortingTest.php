@@ -8,7 +8,9 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class FeedbackSortingTest extends TestCase
@@ -176,5 +178,31 @@ class FeedbackSortingTest extends TestCase
         }
         $this->actingAs(User::factory()->create(['role' => 'admin']))
             ->get(route('admin.feedback.export', ['format' => 'unknown']))->assertNotFound();
+    }
+
+    public function test_feedback_timestamps_use_fiji_time_in_list_pdf_and_excel(): void
+    {
+        config(['reporting.timezone' => 'Pacific/Fiji']);
+        $this->travelTo(Carbon::parse('2026-10-05 03:08:00', 'UTC'));
+        $admin = User::factory()->create(['role' => 'admin']);
+        $feedback = $this->makeFeedback('Alpha', Feedback::TYPE_EMPLOYER_TO_STUDENT, 1);
+        $feedback->created_at = '2026-10-05 03:08:00';
+        $feedback->save();
+        $expected = 'Oct 05, 2026 3:08 PM Pacific/Fiji';
+        $this->actingAs($admin)->get(route('admin.feedback'))->assertOk()->assertSee($expected);
+        $csv = $this->get(route('admin.feedback.export', ['format' => 'excel']))->assertOk();
+        $this->assertStringContainsString($expected, $csv->streamedContent());
+
+        Pdf::shouldReceive('loadView')->once()->andReturnUsing(function ($view, $data) use ($expected) {
+            $this->assertSame($expected, $data['generatedAt']);
+            $this->assertSame($expected, $data['rows']->first()[7]);
+            $pdf = new \Barryvdh\DomPDF\PDF(app('dompdf'), app('config'), app('files'), app('view'));
+
+            return $pdf->loadView($view, $data);
+        });
+        $this->get(route('admin.feedback.export', ['format' => 'pdf']))
+            ->assertOk()->assertDownload('feedback-report.pdf');
+        $this->assertSame('2026-10-05 03:08:00', $feedback->fresh()->getRawOriginal('created_at'));
+        $this->travelBack();
     }
 }

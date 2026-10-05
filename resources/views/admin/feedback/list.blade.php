@@ -124,7 +124,7 @@
                                                     @endif
                                                 </td>
                                                 <td style="max-width: 280px; white-space: normal;">{{ $feedback->comments ?: '—' }}</td>
-                                                <td>{{ optional($feedback->created_at)->format('M d, Y g:i A') ?? 'N/A' }}</td>
+                                                <td>{{ $feedback->created_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e') ?? 'N/A' }}</td>
                                             </tr>
                                         @empty
                                             <tr>
