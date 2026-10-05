@@ -17,6 +17,8 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\MyJobController;
+use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\admin\OrganizationController as AdminOrganizationController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -35,6 +37,7 @@ Route::get('/download-application/{application}/{type}', [JobsController::class,
     ->name('application.download');
 
 Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->name('account.forgotPassword');
+Route::get('/organizations/search', [OrganizationController::class, 'search'])->middleware('throttle:60,1')->name('organizations.search');
 
 // Route::get('/account/register', [AccountController::class, 'registration'])->name('account.registration');
 // Route::post('/account/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');
@@ -80,6 +83,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('admin.jobApplications.feedback.store');
 
     Route::middleware('checkAdminOrSuperAdmin')->group(function () {
+        Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('admin.organizations.index');
+        Route::get('/organizations/create', [AdminOrganizationController::class, 'create'])->name('admin.organizations.create');
+        Route::post('/organizations', [AdminOrganizationController::class, 'store'])->name('admin.organizations.store');
+        Route::get('/organizations/{organization}/edit', [AdminOrganizationController::class, 'edit'])->name('admin.organizations.edit');
+        Route::put('/organizations/{organization}', [AdminOrganizationController::class, 'update'])->name('admin.organizations.update');
+        Route::get('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'review'])->name('admin.organizations.review');
+        Route::patch('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'resolve'])->name('admin.organizations.resolve');
         // Feedback is only ever visible to admins and super admins.
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback');
         Route::get('/feedback/export/{format}', [AdminFeedbackController::class, 'export'])->name('admin.feedback.export');

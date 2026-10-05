@@ -43,6 +43,12 @@ class DashboardController extends Controller
             };
         }
         $title = ucfirst(str_replace('-', ' ', $report));
+        if ($report === 'job-types' && $dashboard['selectedReportCollege']) {
+            $title .= ' - '.$dashboard['selectedReportCollege']->name;
+            if ($rows === []) {
+                array_unshift($headers, 'College/Center');
+            }
+        }
 
         if ($format === 'pdf') {
             $html = $this->renderPdfHtml($title, $rows, $request, $headers);
@@ -540,7 +546,10 @@ class DashboardController extends Controller
             ];
         };
 
-        $typeReports = $types->map(fn ($type) => $makeReport($type->id, $type->name, $typeCounts->get($type->id)));
+        $typeReports = $types
+            ->when($request->filled('report_job_type'), fn ($rows) => $rows->where('id', (int) $request->input('report_job_type')))
+            ->map(fn ($type) => $makeReport($type->id, $type->name, $typeCounts->get($type->id)))
+            ->values();
         $collegeReports = $selectedType
             ? $colleges
                 ->when($request->filled('report_college'), fn ($rows) => $rows->where('id', (int) $request->input('report_college')))
@@ -554,8 +563,10 @@ class DashboardController extends Controller
         return [
             'jobTypeReports' => $typeReports,
             'jobTypeCollegeReports' => $collegeReports,
-            'jobTypeReportOptions' => $types->where('status', 1)->values(),
             'jobTypeCollegeOptions' => $colleges,
+            'selectedReportCollege' => $request->filled('report_college')
+                ? $colleges->firstWhere('id', (int) $request->input('report_college'))
+                : null,
             'selectedReportJobType' => $selectedType,
         ];
     }
@@ -581,6 +592,7 @@ class DashboardController extends Controller
     {
         return match ($report) {
             'job-types' => $dashboard['jobTypeReports']->map(fn ($row) => [
+                ...($dashboard['selectedReportCollege'] ? ['College/Center' => $dashboard['selectedReportCollege']->name] : []),
                 'Job Type' => $row->name,
                 'Jobs' => $row->job_count,
                 'Applications' => $row->application_count,

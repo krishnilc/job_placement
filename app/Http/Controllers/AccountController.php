@@ -7,10 +7,13 @@ use App\Models\JobApplication;
 use App\Models\SavedJob;
 use App\Models\User;
 use App\Models\Job;
+use App\Models\Organization;
+use App\Models\OrganizationRequest;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -75,35 +78,56 @@ class AccountController extends Controller
             'date_of_birth' => $isStudentType ? 'required|date|before:today' : 'nullable|date',
             'graduation_year' => $isAlumni ? 'required|integer|min:1950|max:' . date('Y') : 'nullable|integer|min:1950|max:' . date('Y'),
             'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
-            'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
-            'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
+            'organization_mode' => $role === 'employer' ? 'required|in:existing,request' : 'nullable',
+            'organization_id' => $role === 'employer' && $request->input('organization_mode') === 'existing'
+                ? 'required|integer|exists:organizations,id' : 'nullable',
+            'company_name' => $role === 'employer' && $request->input('organization_mode') === 'request'
+                ? ['required', 'string', 'max:255', 'regex:/\S/u'] : 'nullable',
+            'company_address' => $role === 'employer' && $request->input('organization_mode') === 'request'
+                ? 'required|string|max:1000' : 'nullable',
         ], [
             'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
+        $validator->after(function ($validator) use ($request, $role) {
+            if ($role === 'employer' && $request->input('organization_mode') === 'request'
+                && is_string($request->company_name)
+                && Organization::where('name_key', Organization::nameKey($request->company_name))->exists()) {
+                $validator->errors()->add('company_name', 'This organization already exists. Search for it and select the existing record.');
+            }
+        });
 
         if ($validator->passes()) {
-            $user = new User();
-
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->password = Hash::make($request->password); // Hash the password before saving
-            // Set the role based on the selected option in the radio button (student or employer)
-            $user->role = $dbRole;
-            $user->status = 'pending';
-            if ($isStudentType) {
-                $user->student_id = $request->student_id;
-                $user->date_of_birth = $request->date_of_birth;
-                if ($isAlumni) {
-                    $user->designation = 'Alumni';
-                    $user->graduation_year = $request->graduation_year;
+            DB::transaction(function () use ($request, $isStudentType, $isAlumni, $dbRole) {
+                $user = new User();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->mobile = $request->mobile;
+                $user->password = Hash::make($request->password);
+                $user->role = $dbRole;
+                $user->status = 'pending';
+                if ($isStudentType) {
+                    $user->student_id = $request->student_id;
+                    $user->date_of_birth = $request->date_of_birth;
+                    if ($isAlumni) {
+                        $user->designation = 'Alumni';
+                        $user->graduation_year = $request->graduation_year;
+                    }
+                } else {
+                    $user->designation = $request->designation;
                 }
-            } else {
-                $user->designation = $request->designation;
-                $user->company_name = $request->company_name;
-                $user->company_address = $request->company_address;
-            }
-            $user->save();
+                $user->save();
+                if (!$isStudentType) {
+                    $user->employerProfile()->create([
+                        'organization_id' => $request->input('organization_mode') === 'existing' ? $request->integer('organization_id') : null,
+                    ]);
+                    if ($request->input('organization_mode') === 'request') {
+                        OrganizationRequest::create([
+                            'user_id' => $user->id, 'name' => $request->company_name,
+                            'address' => $request->company_address,
+                        ]);
+                    }
+                }
+            });
 
             session()->flash('success', 'Registration successful! Your account is pending administrator approval.');
 

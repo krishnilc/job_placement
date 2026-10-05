@@ -104,17 +104,24 @@
                                         placeholder="e.g. HR Manager">
                                     <p class="text-danger" id="designationError"></p>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="company_name" class="mb-2">Company Name*</label>
-                                    <input type="text" name="company_name" id="company_name" class="form-control"
-                                        placeholder="Enter company name">
-                                    <p class="text-danger" id="companyNameError"></p>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="company_address" class="mb-2">Company Address*</label>
-                                    <textarea name="company_address" id="company_address" class="form-control"
-                                        placeholder="Enter company address" rows="3"></textarea>
-                                    <p class="text-danger" id="companyAddressError"></p>
+                                <input type="hidden" id="organization_mode" name="organization_mode" value="existing" disabled>
+                                @include('organizations.picker')
+                                <button type="button" class="btn btn-link p-0 mb-3" id="requestOrganizationButton">Can't find your organization? Request a new organization.</button>
+                                <p class="text-danger" id="organization_modeError"></p>
+                                <div id="newOrganizationFields" style="display: none;">
+                                    <p class="text-muted small">Your contact account will remain pending while an administrator reviews the organization request.</p>
+                                    <div class="mb-3">
+                                        <label for="company_name" class="mb-2">Organization Name*</label>
+                                        <input type="text" name="company_name" id="company_name" class="form-control"
+                                            placeholder="Enter organization name">
+                                        <p class="text-danger" id="companyNameError"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="company_address" class="mb-2">Organization Address*</label>
+                                        <textarea name="company_address" id="company_address" class="form-control"
+                                            placeholder="Enter organization address" rows="3"></textarea>
+                                        <p class="text-danger" id="companyAddressError"></p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -131,14 +138,31 @@
 @endsection
 
 @section('customJS')
+    <script src="{{ asset('assets/js/organization-picker.js') }}"></script>
     <script>
         $(function() {
+            function toggleOrganizationFields() {
+                var employer = $('input[name="role"]:checked').val() === 'employer';
+                var newOrganization = $('#organization_mode').val() === 'request';
+                $('#organization_mode').prop('disabled', !employer);
+                $('#organization_id').prop('disabled', !employer || newOrganization).prop('required', employer && !newOrganization);
+                $('#organizationPicker').toggle(!newOrganization);
+                $('#newOrganizationFields').toggle(newOrganization);
+                $('#company_name, #company_address').prop('disabled', !employer || !newOrganization).prop('required', employer && newOrganization);
+                $('#requestOrganizationButton').text(newOrganization
+                    ? 'Search existing organizations instead'
+                    : "Can't find your organization? Request a new organization.");
+            }
+            $('#requestOrganizationButton').on('click', function() {
+                $('#organization_mode').val($('#organization_mode').val() === 'existing' ? 'request' : 'existing');
+                toggleOrganizationFields();
+            });
             function toggleStudentField() {
                 var role = $('input[name="role"]:checked').val();
 
                 if (role === 'employer') {
                     // Employer: hide student/alumni fields
-                    $('#roleSectionLabel').text('Company details');
+                    $('#roleSectionLabel').text('Employer contact and organization');
                     $('#studentIdGroup').hide();
                     $('#student_id').removeAttr('required');
                     $('#studentIdError').text('');
@@ -149,7 +173,7 @@
                     $('#graduation_year').removeAttr('required');
                     $('#graduationYearError').text('');
                     $('#employerFields').show();
-                    $('#designation, #company_name, #company_address').attr('required', true);
+                    $('#designation').attr('required', true);
                 } else if (role === 'alumni') {
                     // Alumni: student_id optional, DOB + graduation year mandatory
                     $('#roleSectionLabel').text('Alumni details');
@@ -178,6 +202,7 @@
                     $('#employerFields').hide();
                     $('#designation, #company_name, #company_address').removeAttr('required');
                 }
+                toggleOrganizationFields();
             }
 
             toggleStudentField();
@@ -207,7 +232,8 @@
                         $("#mobileError").text('');
                         $("#designationError").text('');
                         $("#companyNameError").text('');
-                            $("#companyAddressError").text('');
+                        $("#companyAddressError").text('');
+                        $("#organization_idError, #organization_modeError").text('');
 
                         if (response.status == false) {
                             var errors = response.errors;
@@ -244,10 +270,19 @@
                             if (errors.company_address) {
                                 $("#companyAddressError").text(errors.company_address[0]);
                             }
+                            if (errors.organization_id) {
+                                $("#organization_idError").text(errors.organization_id[0]);
+                            }
+                            if (errors.organization_mode) {
+                                $("#organization_modeError").text(errors.organization_mode[0]);
+                            }
                         } else {
                             window.location.href = "{{ route('account.login') }}";
                             $("#registrationForm")[0].reset();
                         }
+                    },
+                    error: function() {
+                        alert('Unable to register. Please try again.');
                     }
                 });
             });

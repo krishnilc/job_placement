@@ -7,7 +7,48 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Organizations and employer contacts
+
+Organizations are shared records, separate from employer contact accounts.
+One organization can have several contacts, each with their own login, personal
+details, approval status, and existing job/application permissions.
+
+During employer registration, search for an organization and select an existing
+record. If it is missing, use **Can't find your organization? Request a new
+organization.** Enter its name and address. Registration creates a pending
+contact and an organization request, not an automatically approved organization.
+
+Admins and super admins use **Manage Organizations** to search existing records
+and review pending requests. They can approve a new organization, link a request
+to an existing organization, or reject it with a reason. The reviewer, review
+time, decision, and notes are recorded. Organization approval does not activate
+the contact: approve the contact separately in **Manage Employers**. Contacts
+without a linked organization or with an unresolved request cannot be activated.
+Admins can also add organizations directly and select them when creating contacts.
+
+Only admins and super admins edit shared organization names, addresses, website,
+description, and social pages. Contacts can update their own personal details
+but cannot edit shared details or change their organization themselves.
+
+The organization migration groups existing employer company names after
+trimming, collapsing whitespace, and ignoring case. It keeps the first
+non-empty shared value in contact-ID order, fills missing fields from later
+contacts, and retains original employer-profile company values for auditing
+conflicts and rollback. Existing job company names remain historical snapshots;
+jobs are linked to organizations without changing their contact ownership.
+Existing employers without a company name require an administrator to link an
+organization before any new activation.
+
+Apply the new schema with `php artisan migrate`. Review conflicting legacy
+company details before deployment and back up the database first.
+
 ## Dashboard job type reporting
+
+All eight dashboard report tabs have Blade partials in
+`resources/views/admin/reports/`: `overview`, `applications`, `placement`,
+`job-types`, `categories`, `rejection`, `employers`, and `metrics`.
+`resources/views/admin/dashboard.blade.php` owns the shared layout, tab navigation,
+and tab-persistence script and includes each report partial.
 
 Dashboard tabs use a wrapping grid: four per row on medium and larger screens,
 and two per row on small screens, without a horizontal tab scrollbar.
@@ -19,18 +60,21 @@ The selected tab persists on refresh. An explicit tab hash takes precedence over
 the query-string tab and filter-based defaults.
 
 Administrators can open **Dashboard > Job Types** for jobs, applications, placed
-and rejected applications, and placement rates by job type. **By College** opens
-the selected type's college breakdown; Industrial Attachment (IA) is selected by
-default when that job type exists. Both tables support PDF and Excel-compatible
-CSV downloads.
-The college drill-down job type dropdown lists only active job types; historical
-inactive types remain included in the summary reports.
+and rejected applications, and placement rates in **Summary by Job Type**.
+The summary supports PDF and Excel-compatible CSV downloads.
+The only filter dropdown is **Job category's College/Center**. Clicking **Apply**
+filters the summary and its downloads by college. **Reset** restores the
+all-types summary, including historical inactive types.
+The summary heading names the selected college/center (or **All colleges/centers**).
+Filtered PDF reports also name the college in their title, and filtered CSV/PDF
+tables include a **College/Center** column.
 
 The college is the **job category's college**, not the student's college. The
-college filter applies to both tables and their exports. These reports use their
+college filter applies to the summary and its exports. These reports use their
 own filters, independently of Placement tab filters. All job statuses and active
 or inactive job types/colleges are included, with zero counts where applicable.
-Jobs without an assigned category college appear under **Unassigned college**.
+Jobs without an assigned category college are included when all colleges/centers
+are selected.
 Placements and rejections use current application statuses; placement rate is
 placed applications divided by total applications (not distinct students).
 All dashboard percentages and their PDF/CSV report exports display two decimal

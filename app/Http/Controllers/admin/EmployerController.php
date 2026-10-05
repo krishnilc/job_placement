@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\ApplicationStatus;
 use App\Models\Job;
 use App\Models\JobApplication;
+use App\Models\Organization;
+use App\Models\EmployerProfile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class EmployerController extends Controller
 {
@@ -28,6 +32,8 @@ class EmployerController extends Controller
         $search = trim((string) $request->query('search', ''));
 
         $users = User::where('role', 'employer')
+            ->with(['employerProfile.organization', 'organizationRequest'])
+            ->when($request->filled('organization_id'), fn ($query) => $query->whereHas('employerProfile', fn ($profile) => $profile->where('organization_id', $request->input('organization_id'))))
             ->when($search !== '', function ($query) use ($search) {
                 $like = '%' . $search . '%';
                 $query->where(function ($q) use ($like) {
@@ -35,10 +41,13 @@ class EmployerController extends Controller
                         ->orWhere('email', 'like', $like)
                         ->orWhere('mobile', 'like', $like)
                         ->orWhere('designation', 'like', $like)
-                        ->orWhereHas('employerProfile', fn ($p) => $p->where('company_name', 'like', $like));
+                        ->orWhereHas('employerProfile.organization', fn ($organization) => $organization->where('name', 'like', $like))
+                        ->orWhereHas('organizationRequest', fn ($pending) => $pending->where('name', 'like', $like));
                 });
             })
-            ->orderBy($sort, $direction)
+            ->when($sort === 'company_name',
+                fn ($query) => $query->orderBy(Organization::select('name')->where('id', EmployerProfile::select('organization_id')->whereColumn('user_id', 'users.id')->limit(1))->limit(1), $direction),
+                fn ($query) => $query->orderBy($sort, $direction))
             ->paginate(10);
         $users->appends($request->query());
 
@@ -52,6 +61,9 @@ class EmployerController extends Controller
         $request->validate(['status' => 'required|in:pending,active,blocked']);
 
         $user = User::where('role', 'employer')->findOrFail($id);
+        if ($request->status === 'active' && (!$user->employerProfile?->organization_id || $user->organizationRequest?->status === 'pending')) {
+            throw ValidationException::withMessages(['status' => 'Approve or link the organization request before activating this contact.']);
+        }
         $user->status = $request->status;
         $user->save();
 
@@ -70,24 +82,24 @@ class EmployerController extends Controller
             'email' => 'required|email|unique:users,email',
             'mobile' => 'required|digits:7',
             'designation' => 'required|string|max:100',
-            'company_name' => 'required|string|max:255',
-            'company_address' => 'required|string|max:1000',
+            'organization_id' => 'required|integer|exists:organizations,id',
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|min:5',
         ]);
 
         if ($validator->passes()) {
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->designation = $request->designation;
-            $user->company_name = $request->company_name;
-            $user->company_address = $request->company_address;
-            $user->password = Hash::make($request->password);
-            $user->role = 'employer';
-            $user->status = 'active';
-            $user->save();
+            DB::transaction(function () use ($request) {
+                $user = new User();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->mobile = $request->mobile;
+                $user->designation = $request->designation;
+                $user->password = Hash::make($request->password);
+                $user->role = 'employer';
+                $user->status = 'active';
+                $user->save();
+                $user->employerProfile()->create(['organization_id' => $request->integer('organization_id')]);
+            });
 
             session()->flash('success', 'Employer created successfully!');
 

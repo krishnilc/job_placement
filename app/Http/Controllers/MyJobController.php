@@ -55,6 +55,7 @@ class MyJobController extends Controller
             $job->category_id = $request->category;
             $job->job_type_id = $request->job_type;
             $job->user_id = Auth::id();
+            $job->organization_id = Auth::user()->employerProfile?->organization_id;
             $job->vacancy = $request->vacancy;
             $job->closing_date = $request->closing_date;
             $job->salary = $request->salary;

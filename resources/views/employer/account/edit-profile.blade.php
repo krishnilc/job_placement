@@ -63,7 +63,9 @@
                                     </div>
                                 </div>
                                 <div class="border-top mt-4 pt-4">
-                                    <h4 class="fs-5 mb-3">Company Details</h4>
+                                    <h4 class="fs-5 mb-3">Organization Details</h4>
+                                    <p class="text-muted">These details are shared with other contacts and managed by administrators. Contact an administrator to request changes.</p>
+                                    <fieldset disabled>
                                     <div class="row g-4">
                                         <div class="col-md-6">
                                             <label for="company_name" class="mb-2">Company Name*</label>
@@ -110,6 +112,7 @@
                                                 placeholder="Tell candidates about your company" required>{{ old('company_description', $user->company_description) }}</textarea>
                                             <p class="text-danger" id="companydescriptionError"></p>
                                         </div>
+                                        </fieldset>
                                     </div>
                                 </div>
                             </div>

@@ -17,6 +17,9 @@ class UserController extends Controller
     public function edit(Request $request, $id)
     {
         $user = User::findOrfail($id);
+        if ($user->role === 'employer') {
+            abort_unless(in_array($request->user()->role, ['admin', 'super_admin'], true), 403);
+        }
 
         $view = match (true) {
             in_array($user->role, ['user', 'student'], true) => 'admin.students.edit',
@@ -46,6 +49,9 @@ class UserController extends Controller
         $isStudent = in_array($user->role, ['user', 'student'], true);
         $isEmployer = $user->role === 'employer';
         $willBeEmployer = $isEmployer || $request->input('role') === 'employer';
+        if ($willBeEmployer) {
+            abort_unless(in_array($request->user()->role, ['admin', 'super_admin'], true), 403);
+        }
 
         // Validation rules for profile update
         $validator = Validator::make($request->all(), [
@@ -74,14 +80,23 @@ class UserController extends Controller
             'role' => ($isStudent || $isEmployer) ? 'nullable' : 'required|in:admin,super_admin,student,employer,user',
             'student_id' => $isStudent ? 'required|string|max:9|unique:student_profiles,student_id,' . $id . ',user_id' : 'nullable',
             'designation' => $isStudent ? 'nullable' : ($willBeEmployer ? 'required|string|max:100' : 'nullable|string|max:100'),
-            'company_name' => $willBeEmployer ? 'required|string|max:255' : 'nullable',
-            'company_address' => $willBeEmployer ? 'required|string|max:1000' : 'nullable',
+            'organization_id' => $willBeEmployer ? 'nullable|integer|exists:organizations,id' : 'nullable',
             'website_url' => 'nullable|url|max:255',
-            'company_description' => $willBeEmployer ? 'required|string|max:2000' : 'nullable',
+            'company_description' => 'nullable',
             'status' => 'nullable|in:pending,active,blocked',
             // 'password' => 'nullable|min:5|same:confirm_password',
             // 'confirm_password' => 'nullable|same:password',
         ]);
+        $validator->after(function ($validator) use ($request, $user, $willBeEmployer) {
+            if ($willBeEmployer && $request->input('status', $user->status) === 'active') {
+                if (!$request->filled('organization_id')) {
+                    $validator->errors()->add('organization_id', 'Select an approved organization before activating this contact.');
+                }
+                if ($user->organizationRequest?->status === 'pending') {
+                    $validator->errors()->add('status', 'Review the organization request before activating this contact.');
+                }
+            }
+        });
 
         if ($validator->passes()) {
             $normalizedRole = $isStudent ? 'student' : ($isEmployer ? 'employer' : ($request->role === 'user' ? 'student' : $request->role));
@@ -114,12 +129,9 @@ class UserController extends Controller
                 $user->mobile_2 = $request->mobile_2;
             }
             if ($normalizedRole === 'employer') {
-                $user->company_name = $request->company_name;
-                $user->company_address = $request->company_address;
-                $user->website_url = $request->website_url;
-                $user->company_description = $request->company_description;
-                $user->linkedin_url = $request->linkedin_url;
-                $user->facebook_url = $request->facebook_url;
+                $user->employerProfile()->updateOrCreate(['user_id' => $user->id], [
+                    'organization_id' => $request->filled('organization_id') ? $request->integer('organization_id') : null,
+                ]);
             }
             if (in_array($normalizedRole, ['student', 'employer'], true)) {
                 $user->status = $request->status ?? $user->status ?? 'pending';

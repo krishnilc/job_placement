@@ -64,7 +64,11 @@ class JobTypeReportTest extends TestCase
     public function test_dashboard_reports_job_types_and_ia_by_job_category_college(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dashboard', ['tab' => 'job-types']));
-        $response->assertOk()->assertSee('Job Type Reports')->assertSee('Industrial Attachment by College/Center');
+        $response->assertOk()->assertSee('Job Type Reports')->assertSee('Summary by Job Type')
+            ->assertDontSee('Industrial Attachment by College/Center')
+            ->assertDontSee('By College')
+            ->assertDontSee('id="job-type-colleges"', false)
+            ->assertDontSee('<th>Drill-down</th>', false);
         $response->assertViewHas('selectedReportJobType', fn ($type) => $type->id === $this->ia->id);
         $response->assertViewHas('jobTypeReports', function ($rows) {
             $ia = $rows->firstWhere('id', $this->ia->id);
@@ -97,17 +101,88 @@ class JobTypeReportTest extends TestCase
         $filters = ['report_college' => $this->college->id, 'report_job_type' => $this->ia->id];
         $this->actingAs($this->admin)->get(route('admin.dashboard', $filters))
             ->assertOk()
-            ->assertViewHas('jobTypeReports', fn ($rows) => $rows->firstWhere('id', $this->ia->id)->job_count === 1)
+            ->assertSee('Summary by Job Type - Engineering')
+            ->assertViewHas('jobTypeReports', fn ($rows) => $rows->count() === 1 && $rows->first()->id === $this->ia->id && $rows->first()->job_count === 1)
             ->assertViewHas('jobTypeCollegeReports', fn ($rows) => $rows->count() === 1 && $rows->first()->id === $this->college->id);
 
         $summary = $this->get(route('admin.reports.export', array_merge($filters, ['report' => 'job-types', 'format' => 'excel'])));
-        $summary->assertOk()->assertSee('"Industrial Attachment",1,3,1,1,33.33%', false);
+        $summary->assertOk()->assertSee('Engineering,"Industrial Attachment",1,3,1,1,33.33%', false)
+            ->assertSee('College/Center,"Job Type",Jobs,Applications,Placed,Rejected,"Placement Rate"', false)
+            ->assertDontSee('Inactive Type');
         $drillDown = $this->get(route('admin.reports.export', array_merge($filters, ['report' => 'job-type-colleges', 'format' => 'excel'])));
         $drillDown->assertOk()
             ->assertHeader('Content-Disposition', 'attachment; filename="job-type-colleges-report.csv"')
             ->assertSee('"Job Type",College,Jobs,Applications,Placed,Rejected,"Placement Rate"', false)
             ->assertSee('"Industrial Attachment",Engineering,1,3,1,1,33.33%', false)
             ->assertDontSee('Business')->assertDontSee('Unassigned college');
+    }
+
+    public function test_college_name_identifies_summary_and_pdf_and_reset_clears_it(): void
+    {
+        $this->actingAs($this->admin)->get(route('admin.dashboard', [
+            'tab' => 'job-types', 'report_college' => $this->otherCollege->id,
+        ]))->assertOk()->assertSee('Summary by Job Type - Business');
+
+        Pdf::shouldReceive('loadHTML')->once()->andReturnUsing(function ($html) {
+            $this->assertStringContainsString('Job types - Business Report', $html);
+            $this->assertStringContainsString('<th>College/Center</th>', $html);
+            $this->assertStringContainsString('<td>Business</td>', $html);
+
+            $pdf = new \Barryvdh\DomPDF\PDF(app('dompdf'), app('config'), app('files'), app('view'));
+
+            return $pdf->loadHTML($html);
+        });
+        $this->get(route('admin.reports.export', [
+            'report' => 'job-types', 'format' => 'pdf', 'report_college' => $this->otherCollege->id,
+        ]))->assertOk()->assertHeader('Content-Type', 'application/pdf');
+
+        $this->get(route('admin.dashboard', ['tab' => 'job-types']))
+            ->assertOk()->assertSee('Summary by Job Type - All colleges/centers');
+    }
+
+    public function test_selected_job_type_filters_summary_and_exports(): void
+    {
+        $type = JobType::create(['name' => 'Graduate Job', 'status' => 1]);
+        $category = Category::factory()->create(['college_id' => $this->college->id]);
+        Job::factory()->create([
+            'user_id' => $this->admin->id, 'job_type_id' => $type->id,
+            'category_id' => $category->id,
+        ]);
+        $filters = ['tab' => 'job-types', 'report_job_type' => $type->id];
+
+        $this->actingAs($this->admin)->get(route('admin.dashboard', $filters))
+            ->assertOk()
+            ->assertViewHas('jobTypeReports', function ($rows) use ($type) {
+                $this->assertSame([$type->id], $rows->pluck('id')->all());
+                $this->assertSame(1, $rows->first()->job_count);
+                $this->assertSame(0, $rows->first()->application_count);
+
+                return true;
+            })
+            ->assertViewHas('jobTypeCollegeReports', fn ($rows) => $rows->sum('job_count') === 1);
+
+        $csv = $this->get(route('admin.reports.export', array_merge($filters, ['report' => 'job-types', 'format' => 'excel'])))
+            ->assertOk()
+            ->assertSee('"Graduate Job",1,0,0,0,0.00%', false)
+            ->assertDontSee('Industrial Attachment')
+            ->assertDontSee('Inactive Type');
+        $this->assertCount(2, explode("\n", trim($csv->getContent())));
+
+        Pdf::shouldReceive('loadHTML')->once()->andReturnUsing(function ($html) {
+            $this->assertStringContainsString('Graduate Job', $html);
+            $this->assertStringNotContainsString('Industrial Attachment', $html);
+            $this->assertStringNotContainsString('Inactive Type', $html);
+
+            $pdf = new \Barryvdh\DomPDF\PDF(app('dompdf'), app('config'), app('files'), app('view'));
+
+            return $pdf->loadHTML($html);
+        });
+        $this->get(route('admin.reports.export', array_merge($filters, ['report' => 'job-types', 'format' => 'pdf'])))
+            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
+
+        $this->get(route('admin.dashboard', ['tab' => 'job-types']))
+            ->assertOk()
+            ->assertViewHas('jobTypeReports', fn ($rows) => $rows->count() === 3);
     }
 
     public function test_drill_down_can_select_another_type_and_zero_counts(): void
@@ -117,18 +192,33 @@ class JobTypeReportTest extends TestCase
             ->get(route('admin.dashboard', ['report_job_type' => $type->id]))
             ->assertOk()
             ->assertViewHas('selectedReportJobType', fn ($selected) => $selected->id === $type->id)
+            ->assertViewHas('jobTypeReports', fn ($rows) => $rows->count() === 1 && $rows->first()->id === $type->id && $rows->first()->job_count === 0)
             ->assertViewHas('jobTypeCollegeReports', fn ($rows) => $rows->count() === 2 && $rows->sum('job_count') === 0);
     }
 
-    public function test_job_type_dropdown_only_lists_active_types_without_hiding_historical_reports(): void
+    public function test_report_form_only_has_college_dropdown_and_summary_exports_match(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
-        $response->assertViewHas('jobTypeReportOptions', fn ($types) => $types->pluck('id')->all() === [$this->ia->id]);
+        $filters = ['tab' => 'job-types', 'report_college' => $this->college->id];
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard', $filters))->assertOk();
         $response->assertViewHas('jobTypeReports', fn ($rows) => $rows->contains('name', 'Inactive Type'));
-        preg_match('/<select[^>]*id="report_job_type".*?<\/select>/s', $response->getContent(), $matches);
+        preg_match('/<form[^>]*>\\s*<div class="card-body row g-3">.*?<\/form>/s', $response->getContent(), $matches);
         $this->assertNotEmpty($matches);
-        $this->assertStringContainsString('Industrial Attachment', $matches[0]);
-        $this->assertStringNotContainsString('Inactive Type', $matches[0]);
+        $this->assertSame(1, substr_count($matches[0], '<select'));
+        $this->assertStringContainsString('name="report_college"', $matches[0]);
+        $this->assertStringNotContainsString('name="report_job_type"', $matches[0]);
+        foreach (['pdf', 'excel'] as $format) {
+            $response->assertSee(route('admin.reports.export', [
+                'report_college' => $this->college->id, 'report' => 'job-types', 'format' => $format,
+            ]));
+        }
+        $this->get(route('admin.reports.export', [
+            'report_college' => $this->college->id, 'report' => 'job-types', 'format' => 'excel',
+        ]))->assertOk()->assertSee('Industrial Attachment')->assertSee('Inactive Type');
+
+        $response = $this->get(route('admin.dashboard', array_merge($filters, ['report_job_type' => $this->ia->id])))
+            ->assertOk();
+        $response->assertSee('<input type="hidden" name="report_job_type" value="'.$this->ia->id.'">', false);
+        $response->assertDontSee('<select name="report_job_type"', false);
     }
 
     public function test_placement_filters_do_not_change_job_category_college_reporting(): void
@@ -198,6 +288,36 @@ class JobTypeReportTest extends TestCase
         }
     }
 
+    public function test_all_report_partials_render_once_with_filters_and_export_links(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard', [
+            'tab' => 'placement', 'college' => $this->college->id,
+            'category_college' => $this->college->id, 'report_college' => $this->college->id,
+        ]))->assertOk();
+
+        foreach (['overview', 'applications', 'placement', 'job-types', 'categories', 'rejection', 'employers', 'metrics'] as $tab) {
+            $this->assertTrue(view()->exists('admin.reports.'.$tab));
+            $this->assertSame(1, substr_count($response->getContent(), 'id="tab-'.$tab.'"'));
+            $response->assertSee('data-bs-target="#tab-'.$tab.'"', false);
+        }
+
+        foreach (['overview', 'applications', 'placement', 'job-types', 'categories', 'rejection', 'employer', 'funnel'] as $report) {
+            foreach (['pdf', 'excel'] as $format) {
+                $response->assertSee(route('admin.reports.export', ['report' => $report, 'format' => $format]));
+            }
+        }
+
+        $response->assertSee('Summary by Job Type - Engineering')
+            ->assertSee('Employer-Level Reporting')
+            ->assertSee('Recruitment Funnel')
+            ->assertSee('Application-Level vs Student-Level Metrics')
+            ->assertSee('Application Status Reports')
+            ->assertSee('id="rejectionTrendsTabs"', false)
+            ->assertSee('name="college"', false)
+            ->assertSee('name="category_college"', false)
+            ->assertSee('name="report_college"', false);
+    }
+
     public function test_percentage_precision_is_consistent_in_excel_and_pdf_reports(): void
     {
         $this->actingAs($this->admin);
@@ -229,12 +349,13 @@ class JobTypeReportTest extends TestCase
         }
     }
 
-    public function test_missing_ia_is_explicit_and_empty_exports_keep_headers(): void
+    public function test_empty_summary_and_exports_keep_headers(): void
     {
         Job::query()->delete();
         JobType::query()->delete();
         $this->actingAs($this->admin)->get(route('admin.dashboard', ['tab' => 'job-types']))
-            ->assertOk()->assertSee('No Industrial Attachment job type is configured.')
+            ->assertOk()->assertSee('No job types configured.')
+            ->assertDontSee('By College')
             ->assertViewHas('jobTypeCollegeReports', fn ($rows) => $rows->isEmpty());
         $response = $this->get(route('admin.reports.export', ['report' => 'job-types', 'format' => 'excel']));
         $response->assertOk();

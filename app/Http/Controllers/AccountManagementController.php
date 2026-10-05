@@ -80,15 +80,15 @@ class AccountManagementController extends Controller
             'designation' => in_array($role, ['admin', 'super_admin', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
-            'company_name' => $role === 'employer' ? 'required|string|max:255' : 'nullable',
-            'company_address' => $role === 'employer' ? 'required|string|max:1000' : 'nullable',
-            'website_url' => $role === 'employer' ? 'nullable|url|max:255' : 'nullable',
-            'company_description' => $role === 'employer' ? 'required|string|max:2000' : 'nullable',
-            'postal_address' => $role === 'employer' ? 'required|string|max:255' : 'nullable|string|max:255',
+            'organization_id' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_name' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_address' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'website_url' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_description' => $role === 'employer' ? 'prohibited' : 'nullable',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|string|max:20',
             'residential_address' => 'nullable|string|max:255',
-            'postal_address' => 'nullable|string|max:255',
+            'postal_address' => $role === 'employer' ? 'prohibited' : 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'high_school' => 'nullable|string|max:255',
@@ -99,8 +99,8 @@ class AccountManagementController extends Controller
             'graduation_year' => 'nullable|string|max:10',
             'skills' => 'nullable|string|max:1000',
             'bio' => 'nullable|string|max:1000',
-            'linkedin_url' => ['nullable', 'url', 'max:255'],
-            'facebook_url' => ['nullable', 'url', 'max:255'],
+            'linkedin_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
+            'facebook_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
             'availability' => 'nullable|string|max:255',
         ]);
 
@@ -113,31 +113,25 @@ class AccountManagementController extends Controller
             $user->email_2 = $request->email_2;
             $user->mobile_2 = $request->mobile_2;
             $user->designation = $request->designation;
-            if ($role === 'employer') {
-                $user->company_name = $request->company_name;
-                $user->company_address = $request->company_address;
-                $user->website_url = $request->website_url;
-                $user->company_description = $request->company_description;
-                // postal_address is mapped to studentProfile on the User model, so set it on the employer profile directly
-                $user->employerProfile()->updateOrCreate(['user_id' => $user->id], ['postal_address' => $request->postal_address]);
+            if ($role !== 'employer') {
+                $user->date_of_birth = $request->date_of_birth;
+                $user->gender = $request->gender;
+                $user->residential_address = $request->residential_address;
+                $user->postal_address = $request->postal_address;
+                $user->city = $request->city;
+                $user->country = $request->country;
+                $user->high_school = $request->high_school;
+                $user->high_school_graduation_year = $request->high_school_graduation_year;
+                $user->college_id = $request->college_id;
+                $user->degree = $request->degree;
+                $user->major = $request->major;
+                $user->graduation_year = $request->graduation_year;
+                $user->skills = $request->skills;
+                $user->bio = $request->bio;
+                $user->linkedin_url = $request->linkedin_url;
+                $user->facebook_url = $request->facebook_url;
+                $user->availability = $request->availability;
             }
-            $user->date_of_birth = $request->date_of_birth;
-            $user->gender = $request->gender;
-            $user->residential_address = $request->residential_address;
-            $user->postal_address = $request->postal_address;
-            $user->city = $request->city;
-            $user->country = $request->country;
-            $user->high_school = $request->high_school;
-            $user->high_school_graduation_year = $request->high_school_graduation_year;
-            $user->college_id = $request->college_id;
-            $user->degree = $request->degree;
-            $user->major = $request->major;
-            $user->graduation_year = $request->graduation_year;
-            $user->skills = $request->skills;
-            $user->bio = $request->bio;
-            $user->linkedin_url = $request->linkedin_url;
-            $user->facebook_url = $request->facebook_url;
-            $user->availability = $request->availability;
 
             $user->save();
 

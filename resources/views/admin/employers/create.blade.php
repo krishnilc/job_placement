@@ -47,16 +47,8 @@
                                             <input type="text" name="designation" id="designation" class="form-control">
                                             <p class="text-danger" id="designationError"></p>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="company_name" class="mb-2">Company Name*</label>
-                                            <input type="text" name="company_name" id="company_name" class="form-control">
-                                            <p class="text-danger" id="company_nameError"></p>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="company_address" class="mb-2">Company Address*</label>
-                                            <textarea name="company_address" id="company_address" class="form-control" rows="3"></textarea>
-                                            <p class="text-danger" id="company_addressError"></p>
-                                        </div>
+                                        @include('organizations.picker')
+                                        <p class="text-muted">Missing an organization? <a href="{{ route('admin.organizations.index') }}">Search or add it in Manage Organizations</a> first.</p>
                                         <div class="mb-4">
                                             <label for="password" class="mb-2">Password*</label>
                                             <input type="password" name="password" id="password" class="form-control">
@@ -84,6 +76,7 @@
 @endsection
 
 @section('customJS')
+    <script src="{{ asset('assets/js/organization-picker.js') }}"></script>
     <script>
         $('#employerForm').submit(function(e) {
             e.preventDefault();
@@ -99,6 +92,7 @@
                     $("#emailError").text('');
                     $("#mobileError").text('');
                     $("#designationError").text('');
+                    $("#organization_idError").text('');
                     $("#company_nameError").text('');
                     $("#company_addressError").text('');
                     $("#passwordError").text('');
@@ -108,6 +102,9 @@
                         window.location.href = "{{ route('admin.users.employers') }}";
                     } else {
                         var errors = response.errors;
+                        if (errors.organization_id) {
+                            $("#organization_idError").text(errors.organization_id[0]);
+                        }
 
                         if (errors.name) {
                             $("#nameError").text(errors.name[0]);

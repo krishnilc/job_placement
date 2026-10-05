@@ -41,6 +41,7 @@
                             <form method="GET" action="{{ route('admin.users.employers') }}" class="row g-2 my-3">
                                 <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
                                 <input type="hidden" name="direction" value="{{ request()->query('direction') }}">
+                                <input type="hidden" name="organization_id" value="{{ request()->query('organization_id') }}">
                                 <div class="col-md-6 col-lg-4">
                                     <input type="text" name="search" value="{{ request()->query('search') }}"
                                         class="form-control" placeholder="Search name, email, mobile, company...">
@@ -73,6 +74,7 @@
                                                 'direction' => $nextDirection,
                                                 'page' => 1,
                                                 'search' => request()->query('search'),
+                                                'organization_id' => request()->query('organization_id'),
                                             ]);
                                     };
                                 @endphp
@@ -146,7 +148,12 @@
                                                     <td>{{ $user->id }}</td>
                                                     <td>{{ $user->name }}</td>
                                                     <td>{{ $user->designation }}</td>
-                                                    <td>{{ $user->company_name ?? '-' }}</td>
+                                                    <td>
+                                                        {{ $user->company_name ?? $user->organizationRequest?->name ?? '-' }}
+                                                        @if ($user->organizationRequest && in_array(auth()->user()->role, ['admin', 'super_admin'], true))
+                                                            <div><a href="{{ route('admin.organizations.review', $user->organizationRequest) }}">Organization request: {{ $user->organizationRequest->status }}</a></div>
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
                                                     <td>
@@ -245,10 +252,11 @@
                     $('#statusAlertText').text(name + "'s status has been changed to " + label + '.');
                     $('#statusAlert').removeClass('d-none');
                 },
-                error: function() {
+                error: function(xhr) {
                     select.val(previous);
                     applyStatusColor(select);
-                    alert('Could not update the status. Please try again.');
+                    var errors = xhr.responseJSON && xhr.responseJSON.errors;
+                    alert(errors && errors.status ? errors.status[0] : 'Could not update the status. Please try again.');
                 },
                 complete: function() {
                     select.prop('disabled', false);

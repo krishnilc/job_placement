@@ -63,6 +63,11 @@
 
                 @if (in_array(Auth::user()->role, ['admin', 'super_admin'], true))
                     <li class="{{ $headingClass }}">Setup</li>
+                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.organizations.*')])>
+                        <a href="{{ route('admin.organizations.index') }}">
+                            <i class="fa fa-arrow-right"></i> Manage Organizations
+                        </a>
+                    </li>
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
                         <a href="{{ route('admin.colleges') }}">
                             <i class="fa fa-arrow-right"></i> Manage Colleges/Centers

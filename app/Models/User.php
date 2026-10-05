@@ -96,6 +96,11 @@ class User extends Authenticatable
         return $this->hasOne(EmployerProfile::class);
     }
 
+    public function organizationRequest()
+    {
+        return $this->hasOne(OrganizationRequest::class);
+    }
+
     public function college()
     {
         return $this->hasOneThrough(College::class, StudentProfile::class, 'user_id', 'id', 'id', 'college_id');
@@ -110,6 +115,9 @@ class User extends Authenticatable
 
         if ($value === null && isset(static::$profileAttributeMap[$key])) {
             $relation = static::$profileAttributeMap[$key];
+            if ($this->role === 'employer' && in_array($key, ['postal_address', 'linkedin_url', 'facebook_url'], true)) {
+                $relation = 'employerProfile';
+            }
             // Only resolve via relationship when the column truly no longer exists on users
             if (!array_key_exists($key, $this->attributes)) {
                 $related = $this->getRelationValue($relation);

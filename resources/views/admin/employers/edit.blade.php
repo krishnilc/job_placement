@@ -60,40 +60,14 @@
                                             </div>
                                         </div>
                                         <div class="border-top mt-4 pt-4">
-                                            <h4 class="fs-5 mb-3">Company Details</h4>
-                                            <div class="row g-4">
-                                                <div class="col-md-6">
-                                                    <label for="company_name" class="mb-2">Company Name*</label>
-                                                    <input type="text" name="company_name" id="company_name" class="form-control" value="{{ $user->company_name }}">
-                                                    <p class="text-danger" id="company_nameError"></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="website_url" class="mb-2">Website</label>
-                                                    <input type="url" name="website_url" id="website_url" class="form-control" value="{{ $user->website_url }}" placeholder="https://example.com">
-                                                    <p class="text-danger" id="website_urlError"></p>
-                                                </div>
-                                                <div class="col-12">
-                                                    <label for="company_address" class="mb-2">Company Address*</label>
-                                                    <textarea name="company_address" id="company_address" rows="3" class="form-control">{{ $user->company_address }}</textarea>
-                                                    <p class="text-danger" id="company_addressError"></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="linkedin_url" class="mb-2">LinkedIn Page</label>
-                                                    <input type="url" name="linkedin_url" id="linkedin_url" class="form-control" value="{{ $user->linkedin_url }}" placeholder="https://www.linkedin.com/company/...">
-                                                    <p class="text-danger" id="linkedin_urlError"></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="facebook_url" class="mb-2">Facebook Page</label>
-                                                    <input type="url" name="facebook_url" id="facebook_url" class="form-control" value="{{ $user->facebook_url }}" placeholder="https://www.facebook.com/...">
-                                                    <p class="text-danger" id="facebook_urlError"></p>
-                                                </div>
-                                                <div class="col-12">
-                                                    <label for="company_description" class="mb-2">Company Description*</label>
-                                                    <textarea name="company_description" id="company_description" rows="5" class="form-control" placeholder="Tell candidates about your company">{{ $user->company_description }}</textarea>
-                                                    <p class="text-danger" id="company_descriptionError"></p>
-                                                </div>
-                                            </div>
-                                        </div>                                    </div>
+                                            <h4 class="fs-5 mb-3">Organization</h4>
+                                            @include('organizations.picker')
+                                            @if ($user->organizationRequest?->status === 'pending')
+                                                <p><a href="{{ route('admin.organizations.review', $user->organizationRequest) }}">Review this contact's organization request</a> before activation.</p>
+                                            @endif
+                                            <p class="text-muted">Edit shared company details in <a href="{{ route('admin.organizations.index') }}">Manage Organizations</a>.</p>
+                                        </div>
+                                    </div>
                                     <div class="card-footer  p-4">
                                         <button type="submit" class="btn btn-primary">Update Profile</button>
                                         <a href="{{ route('admin.users.employers') }}" class="btn btn-secondary">Cancel</a>
@@ -109,6 +83,7 @@
 @endsection
 
 @section('customJS')
+    <script src="{{ asset('assets/js/organization-picker.js') }}"></script>
     <script>
         $('#userForm').submit(function(e) {
             e.preventDefault();
