@@ -34,6 +34,8 @@ class MyJobController extends Controller
 
     public function saveJob(Request $request)
     {
+        $isEmployer = Auth::user()->role === 'employer';
+
         $rules = [
             'title' => 'required|min:5|max:200',
             'category' => 'required',
@@ -41,52 +43,64 @@ class MyJobController extends Controller
             'vacancy' => 'required|integer',
             'location' => 'required|max:50',
             'description' => 'required',
-            'company_name' => 'required|min:3|max:75',
             'closing_date' => 'nullable|date',
             'experience' => 'required',
         ];
 
+        // Admins/super admins can still type free-form company details; employers' organizational
+        // details are locked to their organization profile and are not accepted from the request.
+        if (!$isEmployer) {
+            $rules['company_name'] = 'required|min:3|max:75';
+        }
+
         $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->passes()) {
-            $job = new Job();
-
-            $job->title = $request->title;
-            $job->category_id = $request->category;
-            $job->job_type_id = $request->job_type;
-            $job->user_id = Auth::id();
-            $job->organization_id = Auth::user()->employerProfile?->organization_id;
-            $job->vacancy = $request->vacancy;
-            $job->closing_date = $request->closing_date;
-            $job->salary = $request->salary;
-            $job->location = $request->location;
-            $job->description = $request->description;
-            $job->responsibilities = $request->responsibilities;
-            $job->qualifications = $request->qualifications;
-            $job->keywords = $request->keywords;
-            $job->experience = $request->experience;
-            $job->company_name = $request->company_name;
-            $job->company_location = $request->company_location;
-            $job->company_website = $request->company_website;
-            $job->status = Auth::user()->role === 'employer' ? 0 : 1;
-
-            $job->save();
-
-            $message = Auth::user()->role === 'employer'
-                ? 'Job submitted successfully and is awaiting admin approval.'
-                : 'Job created successfully!';
-
-            session()->flash('success', $message);
-            return response()->json([
-                'status' => true,
-                'errors' => []
-            ]);
-        } else {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
             ]);
         }
+
+        if ($isEmployer && empty(Auth::user()->company_name)) {
+            return response()->json([
+                'status' => false,
+                'errors' => ['company_name' => ['Please complete your organization profile before posting a job.']]
+            ]);
+        }
+
+        $job = new Job();
+
+        $job->title = $request->title;
+        $job->category_id = $request->category;
+        $job->job_type_id = $request->job_type;
+        $job->user_id = Auth::id();
+        $job->organization_id = Auth::user()->employerProfile?->organization_id;
+        $job->vacancy = $request->vacancy;
+        $job->closing_date = $request->closing_date;
+        $job->salary = $request->salary;
+        $job->location = $request->location;
+        $job->description = $request->description;
+        $job->responsibilities = $request->responsibilities;
+        $job->qualifications = $request->qualifications;
+        $job->keywords = $request->keywords;
+        $job->experience = $request->experience;
+        $job->company_name = $isEmployer ? Auth::user()->company_name : $request->company_name;
+        $job->company_location = $isEmployer ? Auth::user()->company_address : $request->company_location;
+        $job->company_website = $isEmployer ? Auth::user()->website_url : $request->company_website;
+        $job->status = $isEmployer ? 0 : 1;
+
+        $job->save();
+
+        $message = $isEmployer
+            ? 'Job submitted successfully and is awaiting admin approval.'
+            : 'Job created successfully!';
+
+        session()->flash('success', $message);
+        return response()->json([
+            'status' => true,
+            'errors' => []
+        ]);
     }
 
     public function myJobs(Request $request)
@@ -159,6 +173,8 @@ class MyJobController extends Controller
 
     public function updateJob(Request $request, $id)
     {
+        $isEmployer = Auth::user()->role === 'employer';
+
         $rules = [
             'title' => 'required|min:5|max:200',
             'category' => 'required',
@@ -166,45 +182,57 @@ class MyJobController extends Controller
             'vacancy' => 'required|integer',
             'location' => 'required|max:50',
             'description' => 'required',
-            'company_name' => 'required|min:3|max:75',
             'closing_date' => 'nullable|date',
         ];
 
+        // Admins/super admins can still type free-form company details; employers' organizational
+        // details are locked to their organization profile and are not accepted from the request.
+        if (!$isEmployer) {
+            $rules['company_name'] = 'required|min:3|max:75';
+        }
+
         $validator = Validator::make($request->all(), $rules);
 
-        if ($validator->passes()) {
-            $job = job::find($id);
-
-            $job->title = $request->title;
-            $job->category_id = $request->category;
-            $job->job_type_id = $request->job_type;
-            $job->user_id = Auth::id();
-            $job->vacancy = $request->vacancy;
-            $job->closing_date = $request->closing_date;
-            $job->salary = $request->salary;
-            $job->location = $request->location;
-            $job->description = $request->description;
-            $job->responsibilities = $request->responsibilities;
-            $job->qualifications = $request->qualifications;
-            $job->keywords = $request->keywords;
-            $job->experience = $request->experience;
-            $job->company_name = $request->company_name;
-            $job->company_location = $request->company_location;
-            $job->company_website = $request->company_website;
-
-            $job->save();
-
-            session()->flash('success', 'Job updated successfully!');
-            return response()->json([
-                'status' => true,
-                'errors' => []
-            ]);
-        } else {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
             ]);
         }
+
+        if ($isEmployer && empty(Auth::user()->company_name)) {
+            return response()->json([
+                'status' => false,
+                'errors' => ['company_name' => ['Please complete your organization profile before posting a job.']]
+            ]);
+        }
+
+        $job = Job::find($id);
+
+        $job->title = $request->title;
+        $job->category_id = $request->category;
+        $job->job_type_id = $request->job_type;
+        $job->user_id = Auth::id();
+        $job->vacancy = $request->vacancy;
+        $job->closing_date = $request->closing_date;
+        $job->salary = $request->salary;
+        $job->location = $request->location;
+        $job->description = $request->description;
+        $job->responsibilities = $request->responsibilities;
+        $job->qualifications = $request->qualifications;
+        $job->keywords = $request->keywords;
+        $job->experience = $request->experience;
+        $job->company_name = $isEmployer ? Auth::user()->company_name : $request->company_name;
+        $job->company_location = $isEmployer ? Auth::user()->company_address : $request->company_location;
+        $job->company_website = $isEmployer ? Auth::user()->website_url : $request->company_website;
+
+        $job->save();
+
+        session()->flash('success', 'Job updated successfully!');
+        return response()->json([
+            'status' => true,
+            'errors' => []
+        ]);
     }
 
     public function deleteJob(Request $request)

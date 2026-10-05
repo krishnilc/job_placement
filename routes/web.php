@@ -86,10 +86,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
         Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('admin.organizations.index');
         Route::get('/organizations/create', [AdminOrganizationController::class, 'create'])->name('admin.organizations.create');
         Route::post('/organizations', [AdminOrganizationController::class, 'store'])->name('admin.organizations.store');
+        Route::get('/organizations/{organization}', [AdminOrganizationController::class, 'show'])->name('admin.organizations.show');
         Route::get('/organizations/{organization}/edit', [AdminOrganizationController::class, 'edit'])->name('admin.organizations.edit');
         Route::put('/organizations/{organization}', [AdminOrganizationController::class, 'update'])->name('admin.organizations.update');
         Route::get('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'review'])->name('admin.organizations.review');
         Route::patch('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'resolve'])->name('admin.organizations.resolve');
+
+        Route::middleware('checkSuperAdmin')->group(function () {
+            Route::delete('/organizations/{organization}', [AdminOrganizationController::class, 'destroy'])->name('admin.organizations.destroy');
+        });
         // Feedback is only ever visible to admins and super admins.
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback');
         Route::get('/feedback/export/{format}', [AdminFeedbackController::class, 'export'])->name('admin.feedback.export');

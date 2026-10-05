@@ -16,7 +16,7 @@ class OrganizationController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-        $organizations = Organization::withCount('employerProfiles')
+        $organizations = Organization::withCount(['employerProfiles', 'jobs'])
             ->when($search !== '', fn ($query) => $query->whereRaw('LOWER(name) LIKE ?', ['%'.Organization::normalizeName($search).'%']))
             ->orderBy('name')->paginate(15)->withQueryString();
         $requests = OrganizationRequest::with(['user', 'organization', 'reviewer'])
@@ -41,6 +41,13 @@ class OrganizationController extends Controller
         return redirect()->route('admin.organizations.index')->with('success', 'Organization created successfully.');
     }
 
+    public function show(Organization $organization)
+    {
+        $organization->loadCount(['employerProfiles', 'jobs']);
+
+        return view('admin.organizations.show', compact('organization'));
+    }
+
     public function edit(Organization $organization)
     {
         return view('admin.organizations.form', compact('organization'));
@@ -59,6 +66,19 @@ class OrganizationController extends Controller
         }
 
         return redirect()->route('admin.organizations.index')->with('success', 'Organization updated for all linked contacts.');
+    }
+
+    public function destroy(Organization $organization)
+    {
+        $organization->loadCount(['employerProfiles', 'jobs']);
+        if ($organization->employer_profiles_count > 0 || $organization->jobs_count > 0) {
+            return redirect()->route('admin.organizations.index')
+                ->with('error', 'Cannot delete this organization: it still has linked employees or job postings.');
+        }
+
+        $organization->delete();
+
+        return redirect()->route('admin.organizations.index')->with('success', 'Organization deleted successfully.');
     }
 
     private function validatedOrganization(Request $request): array

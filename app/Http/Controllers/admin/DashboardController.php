@@ -8,6 +8,8 @@ use App\Models\College;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
+use App\Models\Organization;
+use App\Models\OrganizationRequest;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
@@ -111,6 +113,10 @@ class DashboardController extends Controller
         $activeEmployers = User::where('role', 'employer')->where('status', 'active')->count();
         $pendingEmployers = User::where('role', 'employer')->where('status', 'pending')->count();
         $blockedEmployers = User::where('role', 'employer')->where('status', 'blocked')->count();
+        $totalOrganizations = Organization::count();
+        $organizationsWithEmployees = Organization::has('employerProfiles')->count();
+        $organizationsWithJobs = Organization::has('jobs')->count();
+        $pendingOrganizationRequests = OrganizationRequest::where('status', 'pending')->count();
         $totalStudents = User::where('role', 'student')->count();
         $activeStudents = User::where('role', 'student')->where('status', 'active')->count();
         $pendingApprovalStudents = User::where('role', 'student')->where('status', 'pending')->count();
@@ -259,32 +265,64 @@ class DashboardController extends Controller
             ->sortKeysDesc()
             ->values();
 
+        // Group by the authoritative organization record (jobs.organization_id) rather than the
+        // free-text jobs.company_name, so jobs posted under slightly different spellings or by
+        // different employer users for the same organization are consolidated into a single row.
+        // Jobs with no linked organization (legacy data) still fall back to grouping by their raw
+        // company_name so distinct, unlinked companies are not merged together.
         $employerJobsQuery = (clone $applicationQuery)
             ->join('jobs', 'jobs.id', '=', 'job_applications.job_id')
-            ->join('users as employer_users', 'employer_users.id', '=', 'jobs.user_id');
+            ->leftJoin('organizations', 'organizations.id', '=', 'jobs.organization_id');
+        $legacyCompanyNameExpr = 'CASE WHEN jobs.organization_id IS NULL THEN jobs.company_name ELSE NULL END';
+        $employerGroupKey = fn ($row) => $row->organization_id !== null
+            ? 'org:' . $row->organization_id
+            : 'name:' . $row->organization_name;
         $employerPerformanceReports = (clone $employerJobsQuery)
-            ->select('employer_users.id as employer_id', 'jobs.company_name as employer_name', DB::raw('COUNT(job_applications.id) as application_count'))
-            ->groupBy('employer_users.id', 'jobs.company_name')
+            ->select(
+                'jobs.organization_id as organization_id',
+                DB::raw('MIN(COALESCE(organizations.name, jobs.company_name)) as organization_name'),
+                DB::raw('COUNT(job_applications.id) as application_count')
+            )
+            ->groupBy('jobs.organization_id', DB::raw($legacyCompanyNameExpr))
             ->get();
         $employerInterviewedCounts = (clone $employerJobsQuery)
             ->whereIn('job_applications.id', $interviewedApplicationIds)
-            ->select('employer_users.id as employer_id', DB::raw('COUNT(job_applications.id) as interviewed_count'))
-            ->groupBy('employer_users.id')
-            ->pluck('interviewed_count', 'employer_id');
+            ->select(
+                'jobs.organization_id as organization_id',
+                DB::raw('MIN(COALESCE(organizations.name, jobs.company_name)) as organization_name'),
+                DB::raw('COUNT(job_applications.id) as interviewed_count')
+            )
+            ->groupBy('jobs.organization_id', DB::raw($legacyCompanyNameExpr))
+            ->get()
+            ->keyBy($employerGroupKey)
+            ->map->interviewed_count;
         $employerPlacedCounts = (clone $employerJobsQuery)
             ->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Placed'))
-            ->select('employer_users.id as employer_id', DB::raw('COUNT(job_applications.id) as placed_count'))
-            ->groupBy('employer_users.id')
-            ->pluck('placed_count', 'employer_id');
+            ->select(
+                'jobs.organization_id as organization_id',
+                DB::raw('MIN(COALESCE(organizations.name, jobs.company_name)) as organization_name'),
+                DB::raw('COUNT(job_applications.id) as placed_count')
+            )
+            ->groupBy('jobs.organization_id', DB::raw($legacyCompanyNameExpr))
+            ->get()
+            ->keyBy($employerGroupKey)
+            ->map->placed_count;
         $employerRejectedCounts = (clone $employerJobsQuery)
             ->whereHas('applicationStatus', fn ($query) => $query->where('name', 'Rejected'))
-            ->select('employer_users.id as employer_id', DB::raw('COUNT(job_applications.id) as rejected_count'))
-            ->groupBy('employer_users.id')
-            ->pluck('rejected_count', 'employer_id');
-        $employerPerformanceReports->each(function ($report) use ($employerInterviewedCounts, $employerPlacedCounts, $employerRejectedCounts) {
-            $report->interviewed_count = $employerInterviewedCounts[$report->employer_id] ?? 0;
-            $report->placed_count = $employerPlacedCounts[$report->employer_id] ?? 0;
-            $report->rejected_count = $employerRejectedCounts[$report->employer_id] ?? 0;
+            ->select(
+                'jobs.organization_id as organization_id',
+                DB::raw('MIN(COALESCE(organizations.name, jobs.company_name)) as organization_name'),
+                DB::raw('COUNT(job_applications.id) as rejected_count')
+            )
+            ->groupBy('jobs.organization_id', DB::raw($legacyCompanyNameExpr))
+            ->get()
+            ->keyBy($employerGroupKey)
+            ->map->rejected_count;
+        $employerPerformanceReports->each(function ($report) use ($employerInterviewedCounts, $employerPlacedCounts, $employerRejectedCounts, $employerGroupKey) {
+            $key = $employerGroupKey($report);
+            $report->interviewed_count = $employerInterviewedCounts[$key] ?? 0;
+            $report->placed_count = $employerPlacedCounts[$key] ?? 0;
+            $report->rejected_count = $employerRejectedCounts[$key] ?? 0;
         });
         $employerPerformanceReports = $employerPerformanceReports->sortByDesc('application_count')->values();
 
@@ -469,6 +507,10 @@ class DashboardController extends Controller
             'activeEmployers' => $activeEmployers,
             'pendingEmployers' => $pendingEmployers,
             'blockedEmployers' => $blockedEmployers,
+            'totalOrganizations' => $totalOrganizations,
+            'organizationsWithEmployees' => $organizationsWithEmployees,
+            'organizationsWithJobs' => $organizationsWithJobs,
+            'pendingOrganizationRequests' => $pendingOrganizationRequests,
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
             'pendingApprovalStudents' => $pendingApprovalStudents,
@@ -622,6 +664,11 @@ class DashboardController extends Controller
                 ['Active Employers', $dashboard['activeEmployers']],
                 ['Approval Pending Employers', $dashboard['pendingEmployers']],
                 ['Blocked Employers', $dashboard['blockedEmployers']],
+                ['--- ORGANIZATION REPORT ---', ''],
+                ['Total Organizations', $dashboard['totalOrganizations']],
+                ['Organizations With Linked Employees', $dashboard['organizationsWithEmployees']],
+                ['Organizations With Job Postings', $dashboard['organizationsWithJobs']],
+                ['Pending Organization Requests', $dashboard['pendingOrganizationRequests']],
                 ['--- STUDENT REPORT ---', ''],
                 ['Total Students', $dashboard['totalStudents']],
                 ['Active Students', $dashboard['activeStudents']],
@@ -642,6 +689,7 @@ class DashboardController extends Controller
                 ['Total Active Admin Users', $dashboard['activeRegularAdmins']],
                 ['Total Colleges/Centers', $dashboard['collegeCategoryCounts']->count()],
                 ['Total Categories', $dashboard['collegeCategoryCounts']->sum('categories_count')],
+                ['Total Organizations', $dashboard['totalOrganizations']],
             ],
             'placement' => [
                 ['Metric', 'Value'],
@@ -677,7 +725,7 @@ class DashboardController extends Controller
                 ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
             ],
             'employer' => collect($dashboard['employerPerformanceReports'])->map(fn ($row) => [
-                'Employer' => $row->employer_name,
+                'Organization' => $row->organization_name,
                 'Applications' => $row->application_count,
                 'Interviewed' => $row->interviewed_count,
                 'Placed' => $row->placed_count,

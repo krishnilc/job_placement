@@ -2,7 +2,7 @@
 <div class="tab-pane fade" id="tab-employers" role="tabpanel">
     <div class="card border-0 shadow mb-4">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Employer-Level Reporting</h5>
+            <h5 class="mb-0">Organization-Level Reporting</h5>
             <div class="d-flex gap-2">
                 <a href="{{ route('admin.reports.export', ['report' => 'employer', 'format' => 'pdf']) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
                     class="btn btn-sm btn-outline-danger"> Download PDF</a>
@@ -14,7 +14,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Employer</th>
+                        <th>Organization</th>
                         <th class="text-end">Applications</th>
                         <th class="text-end">Interviewed</th>
                         <th class="text-end">Placed</th>
@@ -24,7 +24,7 @@
                 <tbody>
                     @forelse($employerPerformanceReports as $report)
                         <tr>
-                            <td>{{ $report->employer_name }}</td>
+                            <td>{{ $report->organization_name }}</td>
                             <td class="text-end">{{ number_format($report->application_count) }}
                             </td>
                             <td class="text-end">{{ number_format($report->interviewed_count) }}
@@ -38,7 +38,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No employer
+                            <td colspan="5" class="text-center text-muted py-4">No organization
                                 data for
                                 the selected filters.</td>
                         </tr>

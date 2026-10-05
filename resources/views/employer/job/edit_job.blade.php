@@ -165,28 +165,44 @@
                                 </div>
 
                                 <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
+                                @if (auth()->user()->role === 'employer')
+                                    <p class="text-muted small">
+                                        These details are linked to your organization profile and cannot be
+                                        changed here.
+                                    </p>
+                                @endif
 
                                 <div class="row">
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Name<span class="req">*</span></label>
-                                        <input value="{{ $job->company_name }}" type="text"
-                                            placeholder="Company Name" id="company_name" name="company_name"
-                                            class="form-control">
+                                        <input
+                                            value="{{ auth()->user()->role === 'employer' ? auth()->user()->company_name : $job->company_name }}"
+                                            type="text" placeholder="Company Name" id="company_name"
+                                            name="company_name"
+                                            class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                            @readonly(auth()->user()->role === 'employer')>
                                         <p class="text-danger" id="companyNameError"></p>
                                     </div>
 
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location</label>
-                                        <input value="{{ $job->company_location }}" type="text"
-                                            placeholder="Company Location" id="company_location" name="company_location"
-                                            class="form-control">
+                                        <input
+                                            value="{{ auth()->user()->role === 'employer' ? auth()->user()->company_address : $job->company_location }}"
+                                            type="text" placeholder="Company Location" id="company_location"
+                                            name="company_location"
+                                            class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                            @readonly(auth()->user()->role === 'employer')>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Website</label>
-                                    <input value="{{ $job->company_website }}" type="text" placeholder="Website"
-                                        id="company_website" name="company_website" class="form-control">
+                                    <input
+                                        value="{{ auth()->user()->role === 'employer' ? auth()->user()->website_url : $job->company_website }}"
+                                        type="text" placeholder="Website" id="company_website"
+                                        name="company_website"
+                                        class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                        @readonly(auth()->user()->role === 'employer')>
                                 </div>
                             </div>
                             <div class="card-footer  p-4">

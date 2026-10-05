@@ -65,7 +65,7 @@
                                             @if ($user->organizationRequest?->status === 'pending')
                                                 <p><a href="{{ route('admin.organizations.review', $user->organizationRequest) }}">Review this contact's organization request</a> before activation.</p>
                                             @endif
-                                            <p class="text-muted">Edit shared company details in <a href="{{ route('admin.organizations.index') }}">Manage Organizations</a>.</p>
+                                            <p class="text-muted">Edit company details in <a href="{{ route('admin.organizations.index') }}">Manage Organizations</a>.</p>
                                         </div>
                                     </div>
                                     <div class="card-footer  p-4">

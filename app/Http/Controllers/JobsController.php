@@ -102,7 +102,7 @@ class JobsController extends Controller
       }
 
       $isOwner = Auth::check() && Auth::id() === $job->user_id;
-      $isAdmin = Auth::check() && Auth::user()->role === 'admin';
+      $isAdmin = Auth::check() && in_array(Auth::user()->role, ['admin', 'super_admin']);
 
       if ($job->status !== 1 && !$isOwner && !$isAdmin) {
          abort(404);

@@ -53,7 +53,21 @@
                                     </div>
 
                                 </div>
+
                                 <div class="row">
+                                    <div class="col-md-6  mb-4">
+                                        <label for="college" class="mb-2">College/Center</label>
+                                        <select name="college" id="college" class="form-control">
+                                            <option value="">Select a College/Center</option>
+                                            @if ($colleges->isNotEmpty())
+                                                @foreach ($colleges as $college)
+                                                    <option value="{{ $college->id }}">{{ $college->name }}
+                                                        ({{ $college->code }})
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
                                     <div class="col-md-6  mb-4">
                                         <label for="" class="mb-2">Category<span class="req">*</span></label>
                                         <select name="category" id="category" class="form-control">
@@ -68,22 +82,7 @@
                                         </select>
                                         <p class="text-danger" id="categoryError"></p>
                                     </div>
-                                    <div class="col-md-6  mb-4">
-                                        <label for="college" class="mb-2">College/Center</label>
-                                        <select name="college" id="college" class="form-control">
-                                            <option value="">Select a College/Center</option>
-                                            @if ($colleges->isNotEmpty())
-                                                @foreach ($colleges as $college)
-                                                    <option value="{{ $college->id }}">{{ $college->name }}
-                                                        ({{ $college->code }})
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-
-
-                                </div>
+                                                         </div>
                                 <div class="row">
                                     <div class="col-md-6  mb-4">
                                         <label for="" class="mb-2">No. of Vacancies<span
@@ -158,29 +157,41 @@
                                 </div>
 
                                 <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
+                                @if (auth()->user()->role === 'employer')
+                                    <p class="text-muted small">
+                                        These details are linked to your organization profile and cannot be
+                                        changed here. 
+                                    </p>
+                                @endif
 
                                 <div class="row">
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Name<span class="req">*</span></label>
                                         <input type="text" placeholder="Company Name" id="company_name"
-                                            name="company_name" class="form-control"
-                                            value="{{ old('company_name', auth()->user()->role === 'employer' ? auth()->user()->company_name : '') }}">
+                                            name="company_name"
+                                            class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                            value="{{ old('company_name', auth()->user()->role === 'employer' ? auth()->user()->company_name : '') }}"
+                                            @readonly(auth()->user()->role === 'employer')>
                                         <p class="text-danger" id="companyNameError"></p>
                                     </div>
 
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Location</label>
                                         <input type="text" placeholder="Company Location" id="company_location"
-                                            name="company_location" class="form-control"
-                                            value="{{ old('company_location', auth()->user()->role === 'employer' ? auth()->user()->company_address : '') }}">
+                                            name="company_location"
+                                            class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                            value="{{ old('company_location', auth()->user()->role === 'employer' ? auth()->user()->company_address : '') }}"
+                                            @readonly(auth()->user()->role === 'employer')>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="" class="mb-2">Company Website</label>
                                     <input type="text" placeholder="Company Website (including http://)"
-                                        id="company_website" name="company_website" class="form-control"
-                                        value="{{ old('company_website', auth()->user()->role === 'employer' ? auth()->user()->website_url : '') }}">
+                                        id="company_website" name="company_website"
+                                        class="form-control {{ auth()->user()->role === 'employer' ? 'bg-light' : '' }}"
+                                        value="{{ old('company_website', auth()->user()->role === 'employer' ? auth()->user()->website_url : '') }}"
+                                        @readonly(auth()->user()->role === 'employer')>
                                 </div>
                             </div>
                             <div class="card-footer  p-4">
