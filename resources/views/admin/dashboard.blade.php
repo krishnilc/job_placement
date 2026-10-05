@@ -33,6 +33,9 @@
                                 id="tab-placement-btn" data-bs-toggle="tab" data-bs-target="#tab-placement" type="button"
                                 role="tab">Placement</button></li>
                         <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
+                                id="tab-job-types-btn" data-bs-toggle="tab" data-bs-target="#tab-job-types"
+                                type="button" role="tab">Job Types</button></li>
+                        <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
                                 id="tab-categories-btn" data-bs-toggle="tab" data-bs-target="#tab-categories"
                                 type="button" role="tab">Categories</button></li>
                         <li class="nav-item flex-shrink-0" role="presentation"><button class="nav-link text-nowrap"
@@ -51,6 +54,7 @@
                     </ul>
 
                     <div class="tab-content" id="dashboardMainTabsContent">
+                        @include('admin.reports.job-types')
                         <!-- Overview Tab -->
                         <div class="tab-pane fade {{ collect(['college', 'programme', 'employer', 'year', 'opportunity_type', 'category'])->contains(fn($key) => request($key) !== null && request($key) !== '') ? '' : 'show active' }}" id="tab-overview" role="tabpanel">
                             <div class="d-flex justify-content-end gap-2 mb-3">
@@ -547,7 +551,7 @@
                                     <div class="card border-0 shadow h-100">
                                         <div class="card-body">
                                             <p class="text-muted mb-1">Placement Rate</p>
-                                            <h2 class="text-primary mb-0">{{ number_format($placementRate, 1) }}%</h2>
+                                            <h2 class="text-primary mb-0">{{ number_format($placementRate, 2) }}%</h2>
                                         </div>
                                     </div>
                                 </div>
@@ -574,7 +578,7 @@
                                                     <td class="text-end">{{ $report->placed_count }}</td>
                                                     <td class="text-end">{{ $report->application_count }}</td>
                                                     <td class="text-end fw-semibold">
-                                                        {{ number_format($report->placement_rate, 1) }}%
+                                                        {{ number_format($report->placement_rate, 2) }}%
                                                     </td>
                                                 </tr>
                                             @empty
@@ -618,14 +622,14 @@
                                                 <div class="card-body">
                                                     <p class="text-muted mb-1">Interview &rarr; Placement</p>
                                                     <h3 class="text-primary mb-0">
-                                                        {{ number_format($interviewConversionRate, 1) }}%
+                                                        {{ number_format($interviewConversionRate, 2) }}%
                                                     </h3>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <p class="text-muted small mb-3">Of students who reached the interview stage,
-                                        {{ number_format($interviewConversionRate, 1) }}% eventually secured placement.
+                                        {{ number_format($interviewConversionRate, 2) }}% eventually secured placement.
                                     </p>
                                     <div class="table-responsive">
                                         <table class="table table-hover align-middle mb-0">
@@ -644,7 +648,7 @@
                                                         <td class="text-end">{{ $report->interviewed_count }}</td>
                                                         <td class="text-end">{{ $report->placed_count }}</td>
                                                         <td class="text-end fw-semibold">
-                                                            {{ number_format($report->conversion_rate, 1) }}%
+                                                            {{ number_format($report->conversion_rate, 2) }}%
                                                         </td>
                                                     </tr>
                                                 @empty
@@ -769,7 +773,7 @@
                                                         </td>
                                                         <td class="text-end">
                                                             <span
-                                                                class="badge {{ $report->placement_rate >= 50 ? 'bg-success' : ($report->placement_rate >= 25 ? 'bg-warning text-dark' : 'bg-danger') }}">{{ number_format($report->placement_rate, 1) }}%</span>
+                                                                class="badge {{ $report->placement_rate >= 50 ? 'bg-success' : ($report->placement_rate >= 25 ? 'bg-warning text-dark' : 'bg-danger') }}">{{ number_format($report->placement_rate, 2) }}%</span>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -814,7 +818,7 @@
                                                 <div class="card-body">
                                                     <p class="text-muted mb-1">Rejection Rate</p>
                                                     <h3 class="text-primary mb-0">
-                                                        {{ number_format($rejectionRate, 1) }}%
+                                                        {{ number_format($rejectionRate, 2) }}%
                                                     </h3>
                                                 </div>
                                             </div>
@@ -917,7 +921,7 @@
                                                                 <td class="text-end">{{ $report->application_count }}</td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -949,7 +953,7 @@
                                                                 <td class="text-end">{{ $report->application_count }}</td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -981,7 +985,7 @@
                                                                 <td class="text-end">{{ $report->application_count }}</td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -1013,7 +1017,7 @@
                                                                 <td class="text-end">{{ $report->application_count }}</td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -1046,7 +1050,7 @@
                                                                 </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -1079,7 +1083,7 @@
                                                                 </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -1112,7 +1116,7 @@
                                                                 </td>
                                                                 <td class="text-end">{{ $report->rejected_count }}</td>
                                                                 <td class="text-end fw-semibold">
-                                                                    {{ number_format($report->rejection_rate, 1) }}%
+                                                                    {{ number_format($report->rejection_rate, 2) }}%
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -1197,7 +1201,7 @@
                                             <div class="d-flex justify-content-between">
                                                 <span class="fw-semibold">{{ $stage['name'] }}</span>
                                                 <span>{{ number_format($stage['count']) }} <small
-                                                        class="text-muted">({{ $stage['conversion_from_start'] }}% of
+                                                        class="text-muted">({{ number_format($stage['conversion_from_start'], 2) }}% of
                                                         {{ $funnelReports[0]['name'] }})</small></span>
                                             </div>
                                             <div class="progress" style="height: 20px;">
@@ -1211,7 +1215,7 @@
                                             @php $nextStage = $funnelReports[$index + 1]; @endphp
                                             <div class="text-center text-muted small mb-2">
                                                 &darr; dropped off: {{ number_format($nextStage['drop_off']) }}
-                                                ({{ $nextStage['drop_off_rate'] }}%)
+                                                ({{ number_format($nextStage['drop_off_rate'], 2) }}%)
                                             </div>
                                         @endif
                                     @empty
@@ -1247,25 +1251,25 @@
                                                     <tr>
                                                         <td>Shortlisting Rate</td>
                                                         <td class="text-end fw-semibold">
-                                                            {{ $applicationMetrics['shortlisting_rate'] }}%
+                                                            {{ number_format($applicationMetrics['shortlisting_rate'], 2) }}%
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td>Interview Conversion</td>
                                                         <td class="text-end fw-semibold">
-                                                            {{ $applicationMetrics['interview_conversion_rate'] }}%
+                                                            {{ number_format($applicationMetrics['interview_conversion_rate'], 2) }}%
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td>Rejection Rate</td>
                                                         <td class="text-end fw-semibold">
-                                                            {{ $applicationMetrics['rejection_rate'] }}%
+                                                            {{ number_format($applicationMetrics['rejection_rate'], 2) }}%
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td>Offer Conversion</td>
                                                         <td class="text-end fw-semibold">
-                                                            {{ $applicationMetrics['offer_conversion_rate'] }}%
+                                                            {{ number_format($applicationMetrics['offer_conversion_rate'], 2) }}%
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -1290,13 +1294,14 @@
                                                     <tr>
                                                         <td>Graduate Employment Rate</td>
                                                         <td class="text-end fw-semibold text-primary">
-                                                            {{ $studentMetrics['graduate_employment_rate'] }}%
+                                                            {{ number_format($studentMetrics['graduate_employment_rate'], 2) }}%
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <p class="text-muted small mb-0">Industrial Attachment (IA) tracking isn't
-                                                part of the current data model, so it isn't reported here yet.</p>
+                                            <p class="text-muted small mb-0">View Industrial Attachment (IA) jobs,
+                                                applications, and placements by college in
+                                                <a href="{{ route('admin.dashboard', ['tab' => 'job-types']) }}">Job Type Reports</a>.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1338,6 +1343,7 @@
                                                                 ? round(
                                                                     ($report->application_count / $applicationStatusReportTotal) *
                                                                         100,
+                                                                    2,
                                                                 )
                                                                 : 0;
                                                     @endphp
@@ -1357,7 +1363,7 @@
                                                                         aria-valuemin="0" aria-valuemax="100"></div>
                                                                 </div>
                                                                 <small
-                                                                    class="text-muted text-nowrap">{{ $percentage }}%</small>
+                                                                    class="text-muted text-nowrap">{{ number_format($percentage, 2) }}%</small>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1369,7 +1375,7 @@
                                                     <td></td>
                                                     <td class="text-end">{{ $applicationStatusReportTotal }}</td>
                                                     <td class="text-end">
-                                                        <small class="text-muted text-nowrap">100%</small>
+                                                        <small class="text-muted text-nowrap">100.00%</small>
                                                     </td>
                                                 </tr>
                                             </tfoot>
@@ -1438,18 +1444,27 @@
                 return params.has(key) && params.get(key) !== '';
             });
             var hasCategoryCollege = params.has('category_college') && params.get('category_college') !== '';
+            var hasJobTypeReportFilters = ['report_job_type', 'report_college'].some(function(key) {
+                return params.has(key) && params.get(key) !== '';
+            });
             var tabParam = params.get('tab');
             var tabParamSelector = tabParam && document.querySelector('#tab-' + tabParam) ? '#tab-' + tabParam : null;
 
             var targetSelector = tabParamSelector ||
                 (window.location.hash && document.querySelector(window.location.hash) ?
                 window.location.hash :
-                (hasCategoryCollege ? '#tab-categories' : (hasFilters ? '#tab-placement' : null)));
+                (hasJobTypeReportFilters ? '#tab-job-types' :
+                (hasCategoryCollege ? '#tab-categories' : (hasFilters ? '#tab-placement' : null))));
 
             if (targetSelector) {
                 var trigger = document.querySelector('#dashboardMainTabs [data-bs-target="' + targetSelector +
                 '"]');
                 if (trigger) {
+                    if (window.location.hash === '#job-type-colleges') {
+                        trigger.addEventListener('shown.bs.tab', function() {
+                            document.getElementById('job-type-colleges').scrollIntoView();
+                        }, { once: true });
+                    }
                     new bootstrap.Tab(trigger).show();
                 }
             }

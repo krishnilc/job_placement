@@ -7,6 +7,36 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Dashboard job type reporting
+
+Administrators can open **Dashboard > Job Types** for jobs, applications, placed
+and rejected applications, and placement rates by job type. **By College** opens
+the selected type's college breakdown; Industrial Attachment (IA) is selected by
+default when that job type exists. Both tables support PDF and Excel-compatible
+CSV downloads.
+
+The college is the **job category's college**, not the student's college. The
+college filter applies to both tables and their exports. These reports use their
+own filters, independently of Placement tab filters. All job statuses and active
+or inactive job types/colleges are included, with zero counts where applicable.
+Jobs without an assigned category college appear under **Unassigned college**.
+Placements and rejections use current application statuses; placement rate is
+placed applications divided by total applications (not distinct students).
+All dashboard percentages and their PDF/CSV report exports display two decimal
+places, including zero and whole-number percentages (for example, `0.00%` and
+`100.00%`).
+
+## Feedback list sorting
+
+In **Dashboard > Feedback**, click a table heading to sort all matching feedback,
+then click again to reverse the direction. Job and Company sort independently.
+Search and type filters are retained when sorting; pagination and filter
+submissions retain the selected order. The default is newest submissions first.
+**Download PDF** and **Download Excel** export all matching feedback across all
+pages in the selected sort order. Excel downloads use UTF-8, Excel-compatible CSV
+with formula-like text treated as plain text. Downloads are restricted to admins
+and super admins, just like the feedback list.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

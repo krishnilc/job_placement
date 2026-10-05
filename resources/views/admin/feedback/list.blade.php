@@ -30,7 +30,15 @@
                                         admins.</p>
                                 </div>
                             </div>
+                            <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                                <a href="{{ route('admin.feedback.export', array_merge(request()->only(['search', 'type']), ['sort' => $sort, 'direction' => $direction, 'format' => 'pdf'])) }}"
+                                    class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Download PDF</a>
+                                <a href="{{ route('admin.feedback.export', array_merge(request()->only(['search', 'type']), ['sort' => $sort, 'direction' => $direction, 'format' => 'excel'])) }}"
+                                    class="btn btn-sm btn-outline-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> Download Excel</a>
+                            </div>
                             <form method="GET" action="{{ route('admin.feedback') }}" class="row g-2 my-3">
+                                <input type="hidden" name="sort" value="{{ $sort }}">
+                                <input type="hidden" name="direction" value="{{ $direction }}">
                                 <div class="col-md-6 col-lg-4">
                                     <input type="text" name="search" value="{{ request()->query('search') }}"
                                         class="form-control" placeholder="Search name, job title, company...">
@@ -49,17 +57,43 @@
                                             class="fa fa-times"></i> Clear</a>
                                 </div>
                             </form>
+                            @php
+                                $sortUrl = function ($column) use ($sort, $direction) {
+                                    return route('admin.feedback', array_merge(request()->except('page'), [
+                                        'sort' => $column,
+                                        'direction' => $sort === $column && $direction === 'asc' ? 'desc' : 'asc',
+                                    ]));
+                                };
+                                $sortIcon = fn ($column) => $sort === $column
+                                    ? ($direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down')
+                                    : 'fa-sort';
+                                $headings = [
+                                    'feedback_type' => 'Type',
+                                    'given_by' => 'From',
+                                    'given_to' => 'About',
+                                    'rating' => 'Rating',
+                                    'comments' => 'Comments',
+                                    'created_at' => 'Submitted',
+                                ];
+                            @endphp
                             <div class="table-responsive">
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Job / Company</th>
-                                            <th scope="col">Type</th>
-                                            <th scope="col">From</th>
-                                            <th scope="col">About</th>
-                                            <th scope="col">Rating</th>
-                                            <th scope="col">Comments</th>
-                                            <th scope="col">Submitted</th>
+                                            <th scope="col" aria-sort="{{ in_array($sort, ['title', 'company_name'], true) ? ($direction === 'asc' ? 'ascending' : 'descending') : 'none' }}">
+                                                <a href="{{ $sortUrl('title') }}" class="text-decoration-none text-dark" aria-label="Sort by job">
+                                                    Job <i class="fa {{ $sortIcon('title') }} ms-1" aria-hidden="true"></i></a>
+                                                /
+                                                <a href="{{ $sortUrl('company_name') }}" class="text-decoration-none text-dark" aria-label="Sort by company">
+                                                    Company <i class="fa {{ $sortIcon('company_name') }} ms-1" aria-hidden="true"></i></a>
+                                            </th>
+                                            @foreach ($headings as $column => $label)
+                                                <th scope="col" aria-sort="{{ $sort === $column ? ($direction === 'asc' ? 'ascending' : 'descending') : 'none' }}">
+                                                    <a href="{{ $sortUrl($column) }}" class="text-decoration-none text-dark" aria-label="Sort by {{ strtolower($label) }}">
+                                                        {{ $label }} <i class="fa {{ $sortIcon($column) }} ms-1" aria-hidden="true"></i>
+                                                    </a>
+                                                </th>
+                                            @endforeach
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">

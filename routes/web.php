@@ -82,6 +82,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::middleware('checkAdminOrSuperAdmin')->group(function () {
         // Feedback is only ever visible to admins and super admins.
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback');
+        Route::get('/feedback/export/{format}', [AdminFeedbackController::class, 'export'])->name('admin.feedback.export');
 
         Route::get('/users/students/create', [StudentController::class, 'create'])->name('admin.users.students.create');
         Route::post('/users/students/store', [StudentController::class, 'store'])->name('admin.users.students.store');

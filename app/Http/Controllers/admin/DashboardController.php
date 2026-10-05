@@ -7,8 +7,10 @@ use App\Models\ApplicationStatus;
 use App\Models\College;
 use App\Models\Job;
 use App\Models\JobApplication;
+use App\Models\JobType;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -28,11 +30,22 @@ class DashboardController extends Controller
         }
 
         $dashboard = $this->buildDashboardData($request);
+        if ($report === 'job-type-colleges' && ! $dashboard['selectedReportJobType']) {
+            abort(422, 'Select a job type to export its college breakdown.');
+        }
         $rows = $this->buildExportRows($report, $dashboard);
+        $headers = array_keys($rows[0] ?? []);
+        if (! $headers) {
+            $headers = match ($report) {
+                'job-types' => ['Job Type', 'Jobs', 'Applications', 'Placed', 'Rejected', 'Placement Rate'],
+                'job-type-colleges' => ['Job Type', 'College', 'Jobs', 'Applications', 'Placed', 'Rejected', 'Placement Rate'],
+                default => [],
+            };
+        }
         $title = ucfirst(str_replace('-', ' ', $report));
 
         if ($format === 'pdf') {
-            $html = $this->renderPdfHtml($title, $rows, $request);
+            $html = $this->renderPdfHtml($title, $rows, $request, $headers);
 
             $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
             $pdf->render();
@@ -53,7 +66,6 @@ class DashboardController extends Controller
         }
 
         $csv = fopen('php://temp', 'r+');
-        $headers = array_keys($rows[0] ?? []);
         if ($headers) {
             fputcsv($csv, $headers);
             foreach ($rows as $row) {
@@ -72,6 +84,11 @@ class DashboardController extends Controller
 
     private function buildDashboardData(Request $request): array
     {
+        $request->validate([
+            'report_job_type' => ['nullable', 'integer', 'exists:job_types,id'],
+            'report_college' => ['nullable', 'integer', 'exists:colleges,id'],
+        ]);
+
         // Get statistics
         $totalUsers = User::count();
         $totalJobs = Job::count();
@@ -131,7 +148,7 @@ class DashboardController extends Controller
         $collegePlacementReports->each(function ($report) use ($collegePlacedCounts) {
             $report->placed_count = $collegePlacedCounts[$report->college_name] ?? 0;
             $report->placement_rate = $report->application_count > 0
-                ? round(($report->placed_count / $report->application_count) * 100, 1)
+                ? round(($report->placed_count / $report->application_count) * 100, 2)
                 : 0;
         });
         $collegePlacementReports = $collegePlacementReports->sortByDesc('placement_rate')->values();
@@ -168,7 +185,7 @@ class DashboardController extends Controller
         $interviewConversionByProgramme->each(function ($report) use ($programmePlacedCounts) {
             $report->placed_count = $programmePlacedCounts[$report->degree] ?? 0;
             $report->conversion_rate = $report->interviewed_count > 0
-                ? round(($report->placed_count / $report->interviewed_count) * 100, 1)
+                ? round(($report->placed_count / $report->interviewed_count) * 100, 2)
                 : 0;
         });
         $interviewConversionByProgramme = $interviewConversionByProgramme->sortByDesc('conversion_rate')->values();
@@ -292,8 +309,8 @@ class DashboardController extends Controller
             $count = $maxSortOrders->filter(fn ($sortOrder) => $sortOrder >= $status->sort_order)->count();
             $firstStageCount ??= $count;
             $dropOff = $previousStageCount !== null ? $previousStageCount - $count : 0;
-            $dropOffRate = $previousStageCount ? round(($dropOff / $previousStageCount) * 100, 1) : 0;
-            $conversionFromStart = $firstStageCount > 0 ? round(($count / $firstStageCount) * 100, 1) : 0;
+            $dropOffRate = $previousStageCount ? round(($dropOff / $previousStageCount) * 100, 2) : 0;
+            $conversionFromStart = $firstStageCount > 0 ? round(($count / $firstStageCount) * 100, 2) : 0;
             $previousStageCount = $count;
 
             return [
@@ -309,10 +326,10 @@ class DashboardController extends Controller
         $acceptedFunnelCount = $funnelReports->firstWhere('name', 'Accepted')['count'] ?? 0;
         $applicationMetrics = [
             'total_applications' => $placementTotalApplications,
-            'shortlisting_rate' => $placementTotalApplications > 0 ? round(($shortlistedFunnelCount / $placementTotalApplications) * 100, 1) : 0,
-            'interview_conversion_rate' => round($interviewConversionRate, 1),
-            'rejection_rate' => round($rejectionRate, 1),
-            'offer_conversion_rate' => $acceptedFunnelCount > 0 ? round(($placedApplications / $acceptedFunnelCount) * 100, 1) : 0,
+            'shortlisting_rate' => $placementTotalApplications > 0 ? round(($shortlistedFunnelCount / $placementTotalApplications) * 100, 2) : 0,
+            'interview_conversion_rate' => round($interviewConversionRate, 2),
+            'rejection_rate' => round($rejectionRate, 2),
+            'offer_conversion_rate' => $acceptedFunnelCount > 0 ? round(($placedApplications / $acceptedFunnelCount) * 100, 2) : 0,
         ];
 
         $studentsSeekingEmployment = (clone $applicationQuery)->pluck('job_applications.user_id')->unique()->count();
@@ -322,7 +339,7 @@ class DashboardController extends Controller
         $studentMetrics = [
             'students_seeking_employment' => $studentsSeekingEmployment,
             'students_successfully_placed' => $studentsSuccessfullyPlaced,
-            'graduate_employment_rate' => $studentsSeekingEmployment > 0 ? round(($studentsSuccessfullyPlaced / $studentsSeekingEmployment) * 100, 1) : 0,
+            'graduate_employment_rate' => $studentsSeekingEmployment > 0 ? round(($studentsSuccessfullyPlaced / $studentsSeekingEmployment) * 100, 2) : 0,
         ];
 
         $collegeOptions = College::active()->orderBy('name')->get(['id', 'name']);
@@ -392,7 +409,7 @@ class DashboardController extends Controller
                     'application_count' => $applicationCount,
                     'placed_count' => $placedCount,
                     'rejected_count' => $categoryRejectedCounts[$category->id] ?? 0,
-                    'placement_rate' => $applicationCount > 0 ? round(($placedCount / $applicationCount) * 100, 1) : 0,
+                    'placement_rate' => $applicationCount > 0 ? round(($placedCount / $applicationCount) * 100, 2) : 0,
                 ];
             })
             ->sortBy([['college_name', 'asc'], ['job_count', 'desc'], ['name', 'asc']])
@@ -426,7 +443,7 @@ class DashboardController extends Controller
             ])
             ->values();
 
-        return [
+        return array_merge($this->buildJobTypeReports($request), [
             'totalUsers' => $totalUsers,
             'totalAdmins' => $totalAdmins,
             'totalSuperAdmins' => $totalSuperAdmins,
@@ -489,12 +506,97 @@ class DashboardController extends Controller
             'funnelReports' => $funnelReports,
             'applicationMetrics' => $applicationMetrics,
             'studentMetrics' => $studentMetrics,
+        ]);
+    }
+
+    private function buildJobTypeReports(Request $request): array
+    {
+        $types = JobType::orderBy('name')->get(['id', 'name', 'status']);
+        $colleges = College::orderBy('name')->get(['id', 'name']);
+        $selectedType = $request->filled('report_job_type')
+            ? $types->firstWhere('id', (int) $request->input('report_job_type'))
+            : $types->first(fn ($type) => strtolower(trim($type->name)) === 'industrial attachment');
+
+        $jobs = Job::query()
+            ->leftJoin('categories', 'categories.id', '=', 'jobs.category_id')
+            ->when($request->filled('report_college'), fn ($query) => $query->where('categories.college_id', $request->input('report_college')));
+        $typeCounts = $this->jobReportCounts(clone $jobs, 'jobs.job_type_id')->keyBy('group_id');
+        $collegeCounts = $selectedType
+            ? $this->jobReportCounts((clone $jobs)->where('jobs.job_type_id', $selectedType->id), 'categories.college_id')->keyBy('group_id')
+            : collect();
+
+        $makeReport = function ($id, $name, $counts) {
+            $applications = (int) ($counts?->application_count ?? 0);
+            $placed = (int) ($counts?->placed_count ?? 0);
+
+            return (object) [
+                'id' => $id,
+                'name' => $name,
+                'job_count' => (int) ($counts?->job_count ?? 0),
+                'application_count' => $applications,
+                'placed_count' => $placed,
+                'rejected_count' => (int) ($counts?->rejected_count ?? 0),
+                'placement_rate' => $applications > 0 ? round($placed / $applications * 100, 2) : 0,
+            ];
+        };
+
+        $typeReports = $types->map(fn ($type) => $makeReport($type->id, $type->name, $typeCounts->get($type->id)));
+        $collegeReports = $selectedType
+            ? $colleges
+                ->when($request->filled('report_college'), fn ($rows) => $rows->where('id', (int) $request->input('report_college')))
+                ->map(fn ($college) => $makeReport($college->id, $college->name, $collegeCounts->get($college->id)))
+                ->values()
+            : collect();
+        if ($selectedType && $collegeCounts->has('')) {
+            $collegeReports->push($makeReport(null, 'Unassigned college', $collegeCounts->get('')));
+        }
+
+        return [
+            'jobTypeReports' => $typeReports,
+            'jobTypeCollegeReports' => $collegeReports,
+            'jobTypeReportOptions' => $types,
+            'jobTypeCollegeOptions' => $colleges,
+            'selectedReportJobType' => $selectedType,
         ];
+    }
+
+    private function jobReportCounts(Builder $jobs, string $groupColumn)
+    {
+        // Count jobs separately from application rows so multiple applicants do not inflate jobs.
+        return $jobs
+            ->leftJoin('job_applications as report_applications', 'report_applications.job_id', '=', 'jobs.id')
+            ->leftJoin('application_statuses as report_statuses', 'report_statuses.id', '=', 'report_applications.application_status_id')
+            ->select(
+                $groupColumn . ' as group_id',
+                DB::raw('COUNT(DISTINCT jobs.id) as job_count'),
+                DB::raw('COUNT(report_applications.id) as application_count'),
+                DB::raw("SUM(CASE WHEN report_statuses.name = 'Placed' THEN 1 ELSE 0 END) as placed_count"),
+                DB::raw("SUM(CASE WHEN report_statuses.name = 'Rejected' THEN 1 ELSE 0 END) as rejected_count")
+            )
+            ->groupBy($groupColumn)
+            ->get();
     }
 
     private function buildExportRows(string $report, array $dashboard): array
     {
         return match ($report) {
+            'job-types' => $dashboard['jobTypeReports']->map(fn ($row) => [
+                'Job Type' => $row->name,
+                'Jobs' => $row->job_count,
+                'Applications' => $row->application_count,
+                'Placed' => $row->placed_count,
+                'Rejected' => $row->rejected_count,
+                'Placement Rate' => number_format($row->placement_rate, 2) . '%',
+            ])->toArray(),
+            'job-type-colleges' => $dashboard['jobTypeCollegeReports']->map(fn ($row) => [
+                'Job Type' => $dashboard['selectedReportJobType']->name,
+                'College' => $row->name,
+                'Jobs' => $row->job_count,
+                'Applications' => $row->application_count,
+                'Placed' => $row->placed_count,
+                'Rejected' => $row->rejected_count,
+                'Placement Rate' => number_format($row->placement_rate, 2) . '%',
+            ])->toArray(),
             'overview' => [
                 ['Metric', 'Value'],
                 ['--- JOB REPORT ---', ''],
@@ -533,32 +635,32 @@ class DashboardController extends Controller
                 ['Metric', 'Value'],
                 ['Total Applications', $dashboard['placementTotalApplications']],
                 ['Students Placed', $dashboard['placedApplications']],
-                ['Placement Rate', number_format($dashboard['placementRate'], 1) . '%'],
+                ['Placement Rate', number_format($dashboard['placementRate'], 2) . '%'],
                 ['Interviewed Applications', $dashboard['interviewedApplications']],
-                ['Interview Conversion Rate', number_format($dashboard['interviewConversionRate'], 1) . '%'],
+                ['Interview Conversion Rate', number_format($dashboard['interviewConversionRate'], 2) . '%'],
             ],
             'applications' => collect($dashboard['applicationStatusReports'])->map(function ($row) use ($dashboard) {
                 $percentage = $dashboard['applicationStatusReportTotal'] > 0
-                    ? round(($row->application_count / $dashboard['applicationStatusReportTotal']) * 100)
+                    ? ($row->application_count / $dashboard['applicationStatusReportTotal']) * 100
                     : 0;
                 return [
                     'Status' => $row->name,
                     'Category' => $row->category,
                     'Applications' => $row->application_count,
-                    'Share of Applications' => $percentage . '%',
+                    'Share of Applications' => number_format($percentage, 2) . '%',
                 ];
             })
                 ->push([
                     'Status' => 'Total',
                     'Category' => '',
                     'Applications' => $dashboard['applicationStatusReportTotal'],
-                    'Share of Applications' => '100%',
+                    'Share of Applications' => '100.00%',
                 ])
                 ->toArray(),
             'rejection' => [
                 ['Metric', 'Value'],
                 ['Rejected Applications', $dashboard['rejectedApplications']],
-                ['Rejection Rate', number_format($dashboard['rejectionRate'], 1) . '%'],
+                ['Rejection Rate', number_format($dashboard['rejectionRate'], 2) . '%'],
                 ['Active Applications', $dashboard['activeApplications']],
                 ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
             ],
@@ -573,8 +675,8 @@ class DashboardController extends Controller
                 'Stage' => $row['name'],
                 'Count' => $row['count'],
                 'Drop Off' => $row['drop_off'],
-                'Drop Off Rate' => $row['drop_off_rate'] . '%',
-                'Progression from Start' => $row['conversion_from_start'] . '%',
+                'Drop Off Rate' => number_format($row['drop_off_rate'], 2) . '%',
+                'Progression from Start' => number_format($row['conversion_from_start'], 2) . '%',
             ])->toArray(),
             'categories' => collect($dashboard['categoryReports'])->map(fn ($row) => [
                 'Category' => $row->name,
@@ -583,7 +685,7 @@ class DashboardController extends Controller
                 'Applications' => $row->application_count,
                 'Placed' => $row->placed_count,
                 'Rejected' => $row->rejected_count,
-                'Placement Rate' => number_format($row->placement_rate, 1) . '%',
+                'Placement Rate' => number_format($row->placement_rate, 2) . '%',
             ])->toArray(),
             default => [
                 ['Report', 'Value'],
@@ -593,7 +695,7 @@ class DashboardController extends Controller
         };
     }
 
-    private function renderPdfHtml(string $title, array $rows, ?Request $request = null): string
+    private function renderPdfHtml(string $title, array $rows, ?Request $request = null, array $headers = []): string
     {
         // If rows are associative (keyed), use the keys as table headers
         $firstRow = $rows[0] ?? null;
@@ -602,9 +704,9 @@ class DashboardController extends Controller
         $headerHtml = '';
         $bodyRows = $rows;
 
-        if ($isAssoc) {
+        if ($isAssoc || ($firstRow === null && $headers !== [])) {
             $headerHtml = '<thead><tr>'
-                . collect(array_keys($firstRow))->map(fn ($h) => '<th>' . e($h) . '</th>')->implode('')
+                . collect($isAssoc ? array_keys($firstRow) : $headers)->map(fn ($h) => '<th>' . e($h) . '</th>')->implode('')
                 . '</tr></thead>';
         } else {
             // First numeric row is a header if it looks like one (e.g. ['Metric','Value'])
@@ -684,7 +786,7 @@ class DashboardController extends Controller
         return $totals->map(function ($row) use ($rejectedCounts, $alias) {
             $row->rejected_count = $rejectedCounts[$row->$alias] ?? 0;
             $row->rejection_rate = $row->application_count > 0
-                ? round(($row->rejected_count / $row->application_count) * 100, 1)
+                ? round(($row->rejected_count / $row->application_count) * 100, 2)
                 : 0;
             return $row;
         })->sortByDesc('rejection_rate')->values();
