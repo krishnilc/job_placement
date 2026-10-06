@@ -2,235 +2,242 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\JobApplication;
-use App\Models\SavedJob;
+use App\Models\College;
 use App\Models\User;
-use App\Models\Job;
-use App\Models\Organization;
-use App\Models\OrganizationRequest;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class AccountController extends Controller
 {
-    //This method will show the student dashboard
-    public function index()
+    // This method will show user profile page
+    public function profile()
     {
-        // Total available jobs
-        $totalJobs = Job::where('status', 1)->count();
+        $id = Auth::user()->id;
+        $user = User::find($id);
 
-        // Total saved jobs by logged-in user
-        $savedJobsCount = SavedJob::where('user_id', Auth::user()->id)->count();
-
-        // Total applications submitted by logged-in user
-        $appliedJobsCount = JobApplication::where('user_id', Auth::user()->id)->count();
-
-        // Available jobs count (exclude already applied jobs)
-        $availableJobs = max(0, $totalJobs - $appliedJobsCount);
-
-        // Latest jobs excluding those already applied to by the current user
-        $latestJobs = Job::where('status', 1)
-            ->whereDoesntHave('applications', function ($query) {
-                $query->where('user_id', Auth::user()->id);
-            })
-            ->with(['jobType'])
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
-
-        return view('student.dashboard', [
-            'totalJobs' => $totalJobs,
-            'savedJobsCount' => $savedJobsCount,
-            'appliedJobsCount' => $appliedJobsCount,
-            'availableJobs' => $availableJobs,
-            'latestJobs' => $latestJobs
+        return view('student.account.edit-profile', [
+            'user' => $user,
+            'colleges' => College::active()->orderBy('name')->get(),
         ]);
     }
 
-    //This method will show user registration form
-    public function registration()
+    public function viewProfile()
     {
-        return view('front.account.registration');
+        return view('student.account.profile', [
+            'user' => Auth::user(),
+        ]);
     }
 
-    //This method will save user registration data to database
-    public function processRegistration(Request $request)
+    public function employerProfile()
     {
-        $inputRole = $request->input('role');
-        $role = in_array($inputRole, ['student', 'alumni', 'employer'], true) ? $inputRole : 'student';
-        // Alumni are stored with the 'student' role; isAlumni distinguishes them.
-        $isAlumni = $role === 'alumni';
-        $isStudentType = in_array($role, ['student', 'alumni'], true);
-        $dbRole = $isAlumni ? 'student' : $role;
+        return view('employer.account.edit-profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function employerViewProfile()
+    {
+        return view('employer.account.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function adminProfile()
+    {
+        return view('admin.account.edit-profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function adminViewProfile()
+    {
+        return view('admin.account.profile', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $id = Auth::user()->id;
+
+        // Validation rules for profile update
+        $role = Auth::user()->role;
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'name' => 'required|min:5|max:50',
+            'email' => 'required|email|unique:users,email,'.$id.',id',
             'mobile' => 'required|digits:7',
-            'password' => 'required|min:5|same:confirm_password',
-            'confirm_password' => 'required|same:password',
-            'role' => 'required|in:student,alumni,employer',
-            'student_id' => $role === 'student' ? 'required|string|max:9|unique:student_profiles,student_id' : 'nullable|string|max:9|unique:student_profiles,student_id',
-            'date_of_birth' => $isStudentType ? 'required|date|before:today' : 'nullable|date',
-            'graduation_year' => $isAlumni ? 'required|integer|min:1950|max:' . date('Y') : 'nullable|integer|min:1950|max:' . date('Y'),
-            'designation' => $role === 'employer' ? 'required|string|max:100' : 'nullable',
-            'organization_mode' => $role === 'employer' ? 'required|in:existing,request' : 'nullable',
-            'organization_id' => $role === 'employer' && $request->input('organization_mode') === 'existing'
-                ? 'required|integer|exists:organizations,id' : 'nullable',
-            'company_name' => $role === 'employer' && $request->input('organization_mode') === 'request'
-                ? ['required', 'string', 'max:255', 'regex:/\S/u'] : 'nullable',
-            'company_address' => $role === 'employer' && $request->input('organization_mode') === 'request'
-                ? 'required|string|max:1000' : 'nullable',
-            'company_phone' => $role === 'employer' && $request->input('organization_mode') === 'request'
-                ? 'required|string|max:50' : 'nullable',
-        ], [
-            'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
+            'email_2' => 'nullable|email|max:255',
+            'mobile_2' => 'nullable|digits:7',
+            'designation' => in_array($role, ['admin', 'super_admin', 'management', 'employer'], true)
+                ? 'required|string|max:100'
+                : 'required|in:Full-time Student,Part-time Student,Alumni',
+            'organization_id' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_name' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_address' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'website_url' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'company_description' => $role === 'employer' ? 'prohibited' : 'nullable',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'nullable|string|max:20',
+            'residential_address' => 'nullable|string|max:255',
+            'postal_address' => $role === 'employer' ? 'prohibited' : 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'high_school' => 'nullable|string|max:255',
+            'high_school_graduation_year' => 'nullable|string|max:10',
+            'college_id' => 'nullable|exists:colleges,id',
+            'degree' => 'nullable|string|max:255',
+            'major' => 'nullable|string|max:255',
+            'graduation_year' => 'nullable|string|max:10',
+            'skills' => 'nullable|string|max:1000',
+            'bio' => 'nullable|string|max:1000',
+            'linkedin_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
+            'facebook_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
+            'availability' => 'nullable|string|max:255',
         ]);
-        $validator->after(function ($validator) use ($request, $role) {
-            if ($role === 'employer' && $request->input('organization_mode') === 'request'
-                && is_string($request->company_name)
-                && Organization::where('name_key', Organization::nameKey($request->company_name))->exists()) {
-                $validator->errors()->add('company_name', 'This organization already exists. Search for it and select the existing record.');
-            }
-        });
 
         if ($validator->passes()) {
-            $user = DB::transaction(function () use ($request, $isStudentType, $isAlumni, $dbRole) {
-                $user = new User();
-                $user->name = $request->name;
-                $user->email = $request->email;
-                $user->mobile = $request->mobile;
-                $user->password = Hash::make($request->password);
-                $user->role = $dbRole;
-                $user->status = 'pending';
-                $user->email_verification_required = true;
-                if ($isStudentType) {
-                    $user->student_id = $request->student_id;
-                    $user->date_of_birth = $request->date_of_birth;
-                    if ($isAlumni) {
-                        $user->designation = 'Alumni';
-                        $user->graduation_year = $request->graduation_year;
-                    }
-                } else {
-                    $user->designation = $request->designation;
-                }
-                $user->save();
-                if (!$isStudentType) {
-                    $user->employerProfile()->create([
-                        'organization_id' => $request->input('organization_mode') === 'existing' ? $request->integer('organization_id') : null,
-                    ]);
-                    if ($request->input('organization_mode') === 'request') {
-                        OrganizationRequest::create([
-                            'user_id' => $user->id, 'name' => $request->company_name,
-                            'address' => $request->company_address,
-                            'phone' => $request->company_phone,
-                        ]);
-                    }
-                }
-                return $user;
-            });
+            $user = User::find($id);
 
-            session()->put('verification_email', $user->email);
-            try {
-                $user->sendEmailVerificationNotification();
-                session()->flash('success', 'Registration successful! Please check your email and click the verification link. Your account also requires administrator approval before you can log in.');
-            } catch (TransportExceptionInterface $exception) {
-                report($exception);
-                session()->flash('error', 'Your account was created, but we could not send the verification email. Do not register again. Please use the resend button below to try again later.');
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->email_2 = $request->email_2;
+            $user->mobile_2 = $request->mobile_2;
+            $user->designation = $request->designation;
+            if ($role !== 'employer' && ! $user->isReadOnlyManagement()) {
+                $user->date_of_birth = $request->date_of_birth;
+                $user->gender = $request->gender;
+                $user->residential_address = $request->residential_address;
+                $user->postal_address = $request->postal_address;
+                $user->city = $request->city;
+                $user->country = $request->country;
+                $user->high_school = $request->high_school;
+                $user->high_school_graduation_year = $request->high_school_graduation_year;
+                $user->college_id = $request->college_id;
+                $user->degree = $request->degree;
+                $user->major = $request->major;
+                $user->graduation_year = $request->graduation_year;
+                $user->skills = $request->skills;
+                $user->bio = $request->bio;
+                $user->linkedin_url = $request->linkedin_url;
+                $user->facebook_url = $request->facebook_url;
+                $user->availability = $request->availability;
             }
+
+            $user->save();
+
+            session()->flash('success', 'Profile updated successfully!');
 
             return response()->json([
                 'status' => true,
                 'errors' => [],
-                'redirect' => route('verification.notice'),
             ]);
         } else {
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ]);
         }
     }
 
-    //This method will show user login form
-    public function login()
+    public function updateProfilePic(Request $request)
     {
-        return view('front.account.login');
-    }
+        $id = Auth::user()->id;
 
-    //This method will authenticate user login credentials
-    public function authenticate(Request $request)
-    {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
+            'profile_pic' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->passes()) {
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                if (in_array(Auth::user()->role, ['student', 'employer', 'management'], true) && Auth::user()->status !== 'active') {
-                    $status = Auth::user()->status;
-                    $needsVerification = Auth::user()->needsEmailVerification();
-                    Auth::logout();
+            $image = $request->file('profile_pic'); // Get the uploaded file
+            $extension = $image->getClientOriginalExtension(); // Get the file extension
+            $imageName = $id.'_'.time().'.'.$extension; // Create a unique filename using the current timestamp
+            $image->move(public_path('/profile_pic'), $imageName); // Move the file to the public/profile_pic directory
 
-                    $message = $status === 'blocked'
-                        ? 'Your account has been blocked. Please contact the administrator.'
-                        : 'Your account is pending administrator approval.';
-                    if ($status === 'pending' && $needsVerification) {
-                        $message .= ' Please also verify your email using the link sent during registration.';
-                    }
+            // / Image processing using Intervention Image library - cropping and resizing the uploaded image
+            $sourcePath = public_path('/profile_pic/'.$imageName); // Get the path of the uploaded image
+            $manager = new ImageManager(Driver::class); // Create an instance of the Intervention Image Manager using the GD driver
+            $image = $manager->read($sourcePath); // Read the uploaded image
 
-                    return redirect()->route('account.login')->with('error', $message);
-                }
+            // crop the best fitting 150x150 and save the thumbnail
+            $image->cover(150, 150);
+            $image->toPng()->save(public_path('/profile_pic/thumb/'.$imageName)); // Save the cropped image as a PNG file
 
-                if (Auth::user()->needsEmailVerification()) {
-                    $email = Auth::user()->email;
-                    Auth::logout();
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
+            // Delete old profile picture if exists
+            File::delete(public_path('/profile_pic/'.Auth::user()->image)); // Delete the old profile picture
+            File::delete(public_path('/profile_pic/thumb/'.Auth::user()->image)); // Delete the old thumbnail
 
-                    return redirect()->route('verification.notice')
-                        ->with('verification_email', $email)
-                        ->with('error', 'Please verify your email address before logging in. You can request a new verification link below.');
-                }
+            User::where('id', $id)->update(['image' => $imageName]); // Update the user's profile picture in the database
 
-                $request->session()->regenerate();
+            session()->flash('success', 'Profile picture updated successfully!');
 
-                // Authentication passed. Check user role and redirect accordingly
-                if (Auth::user()->hasAdminAccess()) {
-                    return redirect()->route('admin.dashboard')
-                        ->with('success', 'Login successful! Welcome back.');
-                } elseif (Auth::user()->role === 'employer') {
-                    return redirect()->route('employer.dashboard')
-                        ->with('success', 'Login successful! Welcome back.');
-                } else {
-                    return redirect()->route('student.dashboard')
-                        ->with('success', 'Login successful! Welcome back.');
-                }
-            } else {
-                return redirect()->route('account.login')
-                    ->with('error', 'Invalid credentials. Please try again.');
-            }
+            return response()->json([
+                'status' => true,
+                'errors' => [],
+            ]);
         } else {
-            return redirect()->route('account.login')
-                ->withErrors($validator)
-                ->withInput($request->only('email')); // Redirect back with validation errors and old input
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ]);
         }
     }
 
-    public function logout()
+    // This method will show the password update form
+    public function editPassword()
     {
-        Auth::logout();
-        return redirect()->route('account.login');
+        return view('student.account.edit-password');
     }
 
-    public function forgotPassword()
+    public function employerEditPassword()
     {
-        return view('front.account.forgot-password');
+        return view('employer.account.edit-password');
+    }
+
+    public function adminEditPassword()
+    {
+        return view('admin.account.edit-password');
+    }
+
+    // This method will handle the password update request
+    public function updatePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|min:5|same:confirm_password',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        if ($validator->passes()) {
+            $user = User::find(Auth::id());
+
+            if (Hash::check($request->old_password, $user->password)) {
+                $user->password = Hash::make($request->new_password);
+                $user->save();
+
+                session()->flash('success', 'Password changed successfully!');
+
+                return response()->json([
+                    'status' => true,
+                    'errors' => [],
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'errors' => ['old_password' => ['Old password is incorrect.']],
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ]);
+        }
     }
 }

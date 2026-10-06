@@ -1,30 +1,29 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AccountManagementController;
-use App\Http\Controllers\admin\AdminController;
-use App\Http\Controllers\admin\CategoryController;
-use App\Http\Controllers\admin\CollegeController;
-use App\Http\Controllers\admin\DashboardController;
-use App\Http\Controllers\admin\EmployerController;
-use App\Http\Controllers\admin\FeedbackController as AdminFeedbackController;
-use App\Http\Controllers\admin\JobApplicationController;
-use App\Http\Controllers\admin\JobController;
-use App\Http\Controllers\admin\JobTypeController;
-use App\Http\Controllers\admin\StudentController;
-use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CollegeController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EmployerController;
+use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
+use App\Http\Controllers\Admin\JobApplicationController;
+use App\Http\Controllers\Admin\JobController;
+use App\Http\Controllers\Admin\JobTypeController;
+use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\Employer\JobController as EmployerJobController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\EmailVerificationController;
-use App\Http\Controllers\JobsController;
-use App\Http\Controllers\MyJobController;
+use App\Http\Controllers\JobController as PublicJobController;
 use App\Http\Controllers\OrganizationController;
-use App\Http\Controllers\admin\OrganizationController as AdminOrganizationController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\JobApplicationController as StudentJobApplicationController;
+use App\Http\Controllers\Student\SavedJobController;
 use Illuminate\Support\Facades\Route;
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
@@ -34,39 +33,31 @@ Route::get('/account/verify-email/{id}/{hash}', [EmailVerificationController::cl
     ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 Route::post('/account/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1')->name('verification.send');
-Route::get('/jobs', [JobsController::class, 'index'])->name('front.jobs');
-Route::get('/jobs/detail/{id}', [JobsController::class, 'detail'])->name('jobDetail');
-Route::post('/apply-job', [JobsController::class, 'applyJob'])->middleware('auth')->name('applyJob');
-Route::post('/save-job', [JobsController::class, 'saveJob'])->name('saveJob');
-Route::get('/download-application/{application}/{type}', [JobsController::class, 'downloadApplicationFile'])
+Route::get('/jobs', [PublicJobController::class, 'index'])->name('front.jobs');
+Route::get('/jobs/detail/{id}', [PublicJobController::class, 'detail'])->name('jobDetail');
+Route::post('/apply-job', [PublicJobController::class, 'applyJob'])->middleware('auth')->name('applyJob');
+Route::post('/save-job', [PublicJobController::class, 'saveJob'])->name('saveJob');
+Route::get('/download-application/{application}/{type}', [PublicJobController::class, 'downloadApplicationFile'])
     ->middleware('auth')
     ->name('application.download');
 
-Route::get('/forgot-password', [AccountController::class, 'forgotPassword'])->name('account.forgotPassword');
+Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->name('account.forgotPassword');
 Route::get('/organizations/search', [OrganizationController::class, 'search'])->middleware('throttle:60,1')->name('organizations.search');
 
-// Route::get('/account/register', [AccountController::class, 'registration'])->name('account.registration');
-// Route::post('/account/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');
-// Route::get('/account/login', [AccountController::class, 'login'])->name('account.login');
-// Route::post('/account/authenticate', [AccountController::class, 'authenticate'])->name('account.authenticate');
-// Route::get('/account/profile', [AccountController::class, 'profile'])->name('account.profile');
-// Route::get('/account/logout', [AccountController::class, 'logout'])->name('account.logout');
-
-
-Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/reports/export/{report}/{format}', [DashboardController::class, 'exportReport'])->name('admin.reports.export');
 
     Route::middleware('auth')->prefix('account')->name('admin.account.')->group(function () {
-        Route::get('/profile', [AccountManagementController::class, 'adminViewProfile'])->name('profile');
-        Route::get('/edit-profile', [AccountManagementController::class, 'adminProfile'])->name('editProfile');
-        Route::get('/edit-password', [AccountManagementController::class, 'adminEditPassword'])->name('editPassword');
+        Route::get('/profile', [AccountController::class, 'adminViewProfile'])->name('profile');
+        Route::get('/edit-profile', [AccountController::class, 'adminProfile'])->name('editProfile');
+        Route::get('/edit-password', [AccountController::class, 'adminEditPassword'])->name('editPassword');
     });
     Route::get('/users', [UserController::class, 'index'])->name('admin.users');
     Route::get('/users/students', [StudentController::class, 'index'])->name('admin.users.students');
     Route::get('/users/employers', [EmployerController::class, 'index'])->name('admin.users.employers');
 
-    Route::middleware('checkSuperAdmin')->group(function () {
+    Route::middleware('superAdminAccess')->group(function () {
         Route::get('/users/admins', [AdminController::class, 'index'])->name('admin.users.admins');
         Route::get('/users/admins/create', [AdminController::class, 'create'])->name('admin.users.admins.create');
         Route::post('/users/admins/store', [AdminController::class, 'store'])->name('admin.users.admins.store');
@@ -85,10 +76,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     Route::get('/job-applications', [JobApplicationController::class, 'index'])->name('admin.jobApplications');
     Route::patch('/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('admin.jobApplications.status');
     Route::delete('/job-applications/delete', [JobApplicationController::class, 'destroy'])->name('admin.jobApplications.destroy');
-    // Employers submit feedback about a placed student from this same group (CheckAdmin middleware allows the employer role).
+    // Employers submit feedback about a placed student from this same group (EnsureBackOfficeAccess middleware allows the employer role).
     Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('admin.jobApplications.feedback.store');
 
-    Route::middleware('checkAdminOrSuperAdmin')->group(function () {
+    Route::middleware('adminAccess')->group(function () {
         Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('admin.organizations.index');
         Route::get('/organizations/create', [AdminOrganizationController::class, 'create'])->name('admin.organizations.create');
         Route::post('/organizations', [AdminOrganizationController::class, 'store'])->name('admin.organizations.store');
@@ -98,10 +89,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
         Route::get('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'review'])->name('admin.organizations.review');
         Route::patch('/organization-requests/{organizationRequest}', [AdminOrganizationController::class, 'resolve'])->name('admin.organizations.resolve');
 
-        Route::middleware('checkSuperAdmin')->group(function () {
+        Route::middleware('superAdminAccess')->group(function () {
             Route::delete('/organizations/{organization}', [AdminOrganizationController::class, 'destroy'])->name('admin.organizations.destroy');
         });
-        // Feedback is only ever visible to admins and super admins.
+        // Feedback viewing includes read-only management; writes remain restricted.
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback');
         Route::get('/feedback/export/{format}', [AdminFeedbackController::class, 'export'])->name('admin.feedback.export');
 
@@ -135,51 +126,50 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
     });
 });
 
-Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
+Route::group(['prefix' => 'employer', 'middleware' => 'backOfficeAccess'], function () {
     Route::get('/home', [EmployerController::class, 'dashboard'])->name('employer.dashboard');
     Route::get('/organization', [OrganizationController::class, 'showForEmployer'])
         ->middleware('auth')->name('employer.organization');
 
     Route::middleware('auth')->prefix('account')->name('employer.account.')->group(function () {
-        Route::get('/profile', [AccountManagementController::class, 'employerViewProfile'])->name('profile');
-        Route::get('/edit-profile', [AccountManagementController::class, 'employerProfile'])->name('editProfile');
-        Route::get('/edit-password', [AccountManagementController::class, 'employerEditPassword'])->name('editPassword');
+        Route::get('/profile', [AccountController::class, 'employerViewProfile'])->name('profile');
+        Route::get('/edit-profile', [AccountController::class, 'employerProfile'])->name('editProfile');
+        Route::get('/edit-password', [AccountController::class, 'employerEditPassword'])->name('editPassword');
     });
 });
 
-
 Route::group(['prefix' => 'account'], function () {
-    //Guest routes
+    // Guest routes
     Route::group(['middleware' => 'guest'], function () {
-        Route::get('/register', [AccountController::class, 'registration'])->name('account.registration');
-        Route::post('/process-registration', [AccountController::class, 'processRegistration'])->name('account.processRegistration');
-        Route::get('/login', [AccountController::class, 'login'])->name('account.login');
-        Route::post('/authenticate', [AccountController::class, 'authenticate'])->name('account.authenticate');
+        Route::get('/register', [AuthController::class, 'registration'])->name('account.registration');
+        Route::post('/process-registration', [AuthController::class, 'processRegistration'])->name('account.processRegistration');
+        Route::get('/login', [AuthController::class, 'login'])->name('account.login');
+        Route::post('/authenticate', [AuthController::class, 'authenticate'])->name('account.authenticate');
     });
 
-    //Authenticated user routes
+    // Authenticated user routes
     Route::group(['middleware' => 'auth'], function () {
-        Route::get('/student-dashboard', [AccountController::class, 'index'])->name('student.dashboard');
-        Route::get('/profile', [AccountManagementController::class, 'viewProfile'])->name('account.profile');
-        Route::get('/edit-profile', [AccountManagementController::class, 'profile'])->name('account.editProfile');
-        Route::get('/edit-password', [AccountManagementController::class, 'editPassword'])->name('account.editPassword');
-        Route::post('/update-password', [AccountManagementController::class, 'updatePassword'])->name('account.updatePassword');
-        Route::put('/update-profile', [AccountManagementController::class, 'updateProfile'])->name('account.updateProfile');
-        Route::get('/logout', [AccountController::class, 'logout'])->name('account.logout');
-        Route::post('/update-profile-pic', [AccountManagementController::class, 'updateProfilePic'])->name('account.updateProfilePic');
-        Route::get('/create-job', [MyJobController::class, 'createJob'])->name('account.createJob');
-        Route::post('/save-job', [MyJobController::class, 'saveJob'])->name('account.saveJob');
-        Route::get('/my-jobs', [MyJobController::class, 'myJobs'])->name('account.myJobs');
-        Route::get('/my-jobs/edit-job/{id}', [MyJobController::class, 'editJob'])->name('account.editJob');
-        Route::post('/my-jobs/update-job/{id}', [MyJobController::class, 'updateJob'])->name('account.updateJob');
-        Route::post('/my-jobs/delete-job', [MyJobController::class, 'deleteJob'])->name('account.deleteJob');
-        Route::post('/my-jobs/block-job', [MyJobController::class, 'blockJob'])->name('account.blockJob');
-        Route::post('/my-jobs/unblock-job', [MyJobController::class, 'unblockJob'])->name('account.unblockJob');
-        Route::get('/my-job-applications', [AccountManagementController::class, 'myJobApplications'])->name('account.myJobApplications');
-        Route::post('/remove-job-application', [AccountManagementController::class, 'removeJobApplication'])->name('account.removeJobApplication');
+        Route::get('/student-dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+        Route::get('/profile', [AccountController::class, 'viewProfile'])->name('account.profile');
+        Route::get('/edit-profile', [AccountController::class, 'profile'])->name('account.editProfile');
+        Route::get('/edit-password', [AccountController::class, 'editPassword'])->name('account.editPassword');
+        Route::post('/update-password', [AccountController::class, 'updatePassword'])->name('account.updatePassword');
+        Route::put('/update-profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
+        Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
+        Route::post('/update-profile-pic', [AccountController::class, 'updateProfilePic'])->name('account.updateProfilePic');
+        Route::get('/create-job', [EmployerJobController::class, 'createJob'])->name('account.createJob');
+        Route::post('/save-job', [EmployerJobController::class, 'saveJob'])->name('account.saveJob');
+        Route::get('/my-jobs', [EmployerJobController::class, 'myJobs'])->name('account.myJobs');
+        Route::get('/my-jobs/edit-job/{id}', [EmployerJobController::class, 'editJob'])->name('account.editJob');
+        Route::post('/my-jobs/update-job/{id}', [EmployerJobController::class, 'updateJob'])->name('account.updateJob');
+        Route::post('/my-jobs/delete-job', [EmployerJobController::class, 'deleteJob'])->name('account.deleteJob');
+        Route::post('/my-jobs/block-job', [EmployerJobController::class, 'blockJob'])->name('account.blockJob');
+        Route::post('/my-jobs/unblock-job', [EmployerJobController::class, 'unblockJob'])->name('account.unblockJob');
+        Route::get('/my-job-applications', [StudentJobApplicationController::class, 'index'])->name('account.myJobApplications');
+        Route::post('/remove-job-application', [StudentJobApplicationController::class, 'destroy'])->name('account.removeJobApplication');
         // Students submit feedback about the company they were placed with.
         Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('account.feedback.store');
-        Route::get('/saved-jobs', [AccountManagementController::class, 'savedJobs'])->name('account.savedJobs');
-        Route::post('/remove-saved-job', [AccountManagementController::class, 'removeSavedJob'])->name('account.removeSavedJob');
+        Route::get('/saved-jobs', [SavedJobController::class, 'index'])->name('account.savedJobs');
+        Route::post('/remove-saved-job', [SavedJobController::class, 'destroy'])->name('account.removeSavedJob');
     });
 });

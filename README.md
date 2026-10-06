@@ -7,6 +7,95 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Local setup
+
+Use PHP 8.2 or later with PDO SQLite (or PDO MySQL), GD, DOM, and mbstring,
+Composer, and Node.js 22 LTS. The committed `.env.example` contains placeholders
+only and defaults to SQLite and the log mailer. Existing `.env` files are not
+replaced. For a new installation:
+
+```sh
+composer install
+```
+
+Copy `.env.example` to `.env`, then run:
+
+```sh
+php artisan key:generate
+```
+
+Create `database/database.sqlite` for SQLite, or configure the commented MySQL
+settings in `.env` and create that database first. Then run:
+
+```sh
+php artisan migrate
+```
+
+Alternatively, `composer run setup` provisions the SQLite file, migrates, and
+installs/builds the starter Vite assets. Do not use setup to regenerate the
+application key on an existing production deployment. Configure SMTP before
+expecting actual email delivery; the log mailer does not send messages.
+The queue defaults to `sync` because current notifications run synchronously.
+The domain's `jobs` table contains job postings, not queue payloads; configure
+a separate queue table and its migration before enabling a database queue.
+`composer run dev` starts the PHP server and optional Vite watcher without
+requiring a queue worker or Unix-only log watcher.
+
+## Structure and naming conventions
+
+- PHP classes and namespace directories use PascalCase and match PSR-4 paths,
+  including `app/Http/Controllers/Admin`, `Employer`, and `Student`.
+- `AuthController` handles login/registration; `AccountController` handles
+  personal profile/password settings. Student dashboards, applications, and
+  saved jobs have separate controllers. Public and employer job controllers
+  are distinguished by namespace, not singular/plural naming.
+- Blade filenames use kebab-case. Collection screens use `index.blade.php`;
+  create/edit screens use `create.blade.php` and `edit.blade.php`. Account
+  screens live in each role's `account/` folder. Existing route names and URLs
+  remain unchanged for bookmarks, emails, and integrations.
+- Access middleware describes its purpose: `EnsureBackOfficeAccess` permits
+  administrators, management, and employers; `EnsureAdminAccess` excludes
+  employers; `EnsureSuperAdminAccess` permits only super administrators.
+  `EnsureManagementIsReadOnly` remains the global write restriction.
+- `app/Services/Reporting/DashboardReportService.php` builds dashboard data;
+  `JobReportService.php` builds job/job-type reports. `ReportExportService.php`
+  handles exports, and `ReportPdfRenderer.php` prepares the
+  `resources/views/admin/reports/export.blade.php` PDF template.
+  `app/Http/Requests/DashboardReportRequest.php` validates report filters.
+- `resources/views/components/dashboard/metric-card.blade.php` owns reusable
+  Overview cards. Dashboard tab behavior lives in
+  `public/assets/js/dashboard-tabs.js`, separate from the Blade layout.
+- The current frontend loads assets directly from `public/assets/`. Custom
+  JavaScript/CSS changes belong there. The `resources/js`, `resources/css`, and
+  Vite configuration are starter build infrastructure, not a second source
+  for those custom assets.
+- Applied migration filenames are intentionally unchanged, including legacy
+  typos: Laravel records these names. Give new migrations descriptive names.
+
+Run PHP tests with `composer test`, JavaScript tests with `npm run test:js`,
+and PSR-4 checks with `composer dump-autoload --optimize --strict-psr`.
+`ProjectStructureTest` checks namespace casing, view references, kebab-case view
+names, and the reorganized route targets.
+
+## Uploads and legacy databases
+
+Application documents in `public/assets/applications/` and profile images in
+`public/profile_pic/` (including `thumb/`) are runtime data, not source code.
+They are ignored by Git; committed ignore files preserve the directories on
+fresh checkouts. The cleanup removed existing uploads from Git tracking only,
+not from the local filesystem. Back up and provision uploads separately when
+deploying; do not rely on a fresh checkout to restore them.
+
+The root `job_portal` SQLite file and `job_placement_sql.sql` legacy export are
+also untracked and ignored. Their local names and contents were preserved to
+avoid breaking external references. They are not part of the fresh-install
+workflow. Keep future database backups outside the source tree, or in the
+ignored `database/backups/` directory. Do not rename/move a live database
+without updating the relevant connection configuration.
+
+These changes do not remove historical uploads/database contents from Git
+history; any history cleanup requires a separate coordinated operation.
+
 ## Management read-only access
 
 Super admins can create an upper-management account under **Admins > Add Admin**
@@ -71,14 +160,15 @@ company details before deployment and back up the database first.
 All eight dashboard report tabs have Blade partials in
 `resources/views/admin/reports/`: `overview`, `applications`, `placement`,
 `job-types`, `categories`, `rejection`, `employers`, and `metrics`.
-`resources/views/admin/dashboard.blade.php` owns the shared layout, tab navigation,
-and tab-persistence script and includes each report partial.
+`resources/views/admin/dashboard.blade.php` owns the shared layout and tab
+navigation, loads `public/assets/js/dashboard-tabs.js` for tab persistence, and
+includes each report partial.
 
 Dashboard tabs use a wrapping grid: four per row on medium and larger screens,
 and two per row on small screens, without a horizontal tab scrollbar.
 The report navigation uses compact icon labels, a navy active state, and visible
 keyboard-focus outlines.
-Overview metrics are grouped into Jobs, Employers, Students, and Applications
+Overview metrics are grouped into Jobs, Employers, Organizations, Students, and Applications
 panels with compact metric cards. **Active Internal Users** is a separate table
 showing active Management (Read-only), Administrators, and Super Administrators,
 in that order. Pending and blocked accounts are excluded. Overview PDF/CSV
@@ -117,7 +207,7 @@ submissions retain the selected order. The default is newest submissions first.
 **Download PDF** and **Download Excel** export all matching feedback across all
 pages in the selected sort order. Excel downloads use UTF-8, Excel-compatible CSV
 with formula-like text treated as plain text. Downloads are restricted to admins
-and super admins, just like the feedback list.
+and super admins, plus read-only management, just like the feedback list.
 
 ## Report timestamps
 

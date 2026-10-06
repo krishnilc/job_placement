@@ -8,7 +8,14 @@ const view = fs.readFileSync(
     path.join(__dirname, '..', '..', 'resources', 'views', 'admin', 'dashboard.blade.php'),
     'utf8'
 );
-const script = view.split("@section('customJS')")[1].match(/<script>([\s\S]*?)<\/script>/)[1];
+const script = fs.readFileSync(
+    path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'dashboard-tabs.js'),
+    'utf8'
+);
+
+test('dashboard loads the tab script from its maintained asset', () => {
+    assert.ok(view.includes("asset('assets/js/dashboard-tabs.js')"));
+});
 
 function dashboard(url) {
     const location = new URL(url, 'http://localhost');
@@ -67,11 +74,13 @@ test('filter defaults and explicit tab links still work', () => {
         ['/admin/home?report_job_type=1', '#tab-job-types'],
         ['/admin/home?category_college=1', '#tab-categories'],
         ['/admin/home?college=1', '#tab-placement'],
+        ['/admin/home?report_organization=1', '#tab-employers'],
+        ['/admin/home?funnel_job=1', '#tab-employers'],
         ['/admin/home?tab=overview&report_job_type=1', '#tab-overview'],
         ['/admin/home?tab=job-types#job-type-colleges', '#tab-job-types'],
         ['/admin/home?tab=unknown&college=1#unknown', '#tab-placement'],
     ]) {
         assert.equal(dashboard(url).selected, selected);
     }
-    assert.equal(dashboard('/admin/home?tab=job-types#job-type-colleges').scrolled, true);
+    assert.equal(dashboard('/admin/home?tab=job-types#job-type-colleges').scrolled, false);
 });

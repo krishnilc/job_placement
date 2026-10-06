@@ -267,6 +267,7 @@ class JobTypeReportTest extends TestCase
         $this->assertSame(8, substr_count($matches[0], 'w-100 h-100 text-center'));
         $this->assertSame(8, substr_count($matches[0], 'aria-hidden="true"'));
         $response->assertSee('assets/css/dashboard-tabs.css', false);
+        $response->assertSee('assets/js/dashboard-tabs.js', false);
         $response->assertSee('Dashboard Reports');
         $this->assertStringNotContainsString('overflow-auto', $matches[0]);
         $this->assertStringNotContainsString('flex-nowrap', $matches[0]);
@@ -276,11 +277,11 @@ class JobTypeReportTest extends TestCase
     public function test_overview_groups_metrics_without_losing_reports_or_actions(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
-        $this->assertSame(4, substr_count($response->getContent(), 'shadow-sm overview-report-group'));
-        foreach (['Overview Report', 'Job Report', 'Employer Report', 'Student Report', 'Application Report', 'Active Internal Users'] as $heading) {
+        $this->assertSame(5, substr_count($response->getContent(), 'shadow-sm overview-report-group'));
+        foreach (['Overview Report', 'Job Report', 'Employer Report', 'Organization Report', 'Student Report', 'Application Report', 'Active Internal Users'] as $heading) {
             $response->assertSee($heading);
         }
-        foreach (['admin.jobs', 'admin.users.employers', 'admin.users.students', 'admin.jobApplications'] as $route) {
+        foreach (['admin.jobs', 'admin.users.employers', 'admin.organizations.index', 'admin.users.students', 'admin.jobApplications'] as $route) {
             $response->assertSee(route($route));
         }
         foreach (['pdf', 'excel'] as $format) {
@@ -308,7 +309,7 @@ class JobTypeReportTest extends TestCase
         }
 
         $response->assertSee('Summary by Job Type - Engineering')
-            ->assertSee('Employer-Level Reporting')
+            ->assertSee('Organization-Level Reporting')
             ->assertSee('Recruitment Funnel')
             ->assertSee('Application-Level vs Student-Level Metrics')
             ->assertSee('Application Status Reports')

@@ -31,7 +31,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, gd, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
       - name: Install Composer dependencies
@@ -43,5 +43,16 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
+      - name: Verify class autoloading
+        run: composer dump-autoload --optimize --strict-psr
+
       - name: Execute tests
         run: php artisan test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Execute JavaScript tests
+        run: npm run test:js

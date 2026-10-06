@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/job_portal
+/job_placement_sql.sql
+/database/backups/

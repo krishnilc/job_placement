@@ -23,97 +23,17 @@
                 Jobs</a>
         </div>
 
-        <!-- Total Jobs -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Total Jobs</h7>
-                            <h2 class="text-success mb-0">{{ $totalJobs }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-briefcase"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Total Jobs" :value="$totalJobs" color="success" icon="fa-briefcase" />
 
-        <!-- Approval Pending Jobs -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Approval Pending </h7>
-                            <h2 class="text-warning mb-0">{{ $pendingJobs }}</h2>
-                        </div>
-                        <div class="text-warning" style="font-size: 2rem;"><i class="fa fa-hourglass-half"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Approval Pending" :value="$pendingJobs" color="warning" icon="fa-hourglass-half" />
 
-        <!-- Open Jobs -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Open Jobs</h7>
-                            <h2 class="text-success mb-0">{{ $activeJobs }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-check-circle"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Open Jobs" :value="$activeJobs" color="success" icon="fa-check-circle" />
 
-        <!-- Blocked Jobs -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Blocked Jobs</h7>
-                            <h2 class="text-danger mb-0">{{ $blockedJobs }}</h2>
-                        </div>
-                        <div class="text-danger" style="font-size: 2rem;"><i class="fa fa-ban"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Featured Jobs</h7>
-                            <h2 class="text-primary mb-0">{{ $featuredJobs }}</h2>
-                        </div>
-                        <div class="text-primary" style="font-size: 2rem;"><i class="fa fa-star"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Blocked Jobs" :value="$blockedJobs" color="danger" icon="fa-ban" />
+        <x-dashboard.metric-card label="Featured Jobs" :value="$featuredJobs" color="primary" icon="fa-star" />
 
-        <!-- Total Categories -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Categories</h7>
-                            <h2 class="text-secondary mb-0">
-                                {{ $collegeCategoryCounts->sum('categories_count') }}
-                            </h2>
-                        </div>
-                        <div class="text-secondary" style="font-size: 2rem;"><i class="fa fa-th-list"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- End of row -->
+        <x-dashboard.metric-card label="Categories" :value="$collegeCategoryCounts->sum('categories_count')" color="secondary" icon="fa-th-list" />
+    </div>
 
     <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
@@ -124,65 +44,13 @@
             </div>
         </div>
 
-        <!-- Total Employers -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Total Employers</h7>
-                            <h2 class="text-success mb-0">{{ $totalEmployers }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-briefcase"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Total Employers" :value="$totalEmployers" color="success" icon="fa-briefcase" />
 
-        <!--employers pending approval -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Approval Pending </h7>
-                            <h2 class="text-warning mb-0">{{ $pendingEmployers }}</h2>
-                        </div>
-                        <div class="text-warning" style="font-size: 2rem;"><i class="fa fa-hourglass-half"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Approval Pending" :value="$pendingEmployers" color="warning" icon="fa-hourglass-half" />
 
-        <!-- Active Employers -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Active Employers</h7>
-                            <h2 class="text-success mb-0">{{ $activeEmployers }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-check-circle"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Active Employers" :value="$activeEmployers" color="success" icon="fa-check-circle" />
 
-        <!-- blocked employers -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Blocked Employers</h7>
-                            <h2 class="text-danger mb-0">{{ $blockedEmployers }}</h2>
-                        </div>
-                        <div class="text-danger" style="font-size: 2rem;"><i class="fa fa-ban"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Blocked Employers" :value="$blockedEmployers" color="danger" icon="fa-ban" />
 
     </div>
 
@@ -195,50 +63,11 @@
             </div>
         </div>
 
-        <!-- Total Organizations -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Total Organizations</h7>
-                            <h2 class="text-success mb-0">{{ $totalOrganizations }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-building"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Total Organizations" :value="$totalOrganizations" color="success" icon="fa-building" />
 
-        <!-- Pending organization requests -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Approval Pending</h7>
-                            <h2 class="text-warning mb-0">{{ $pendingOrganizationRequests }}</h2>
-                        </div>
-                        <div class="text-warning" style="font-size: 2rem;"><i class="fa fa-hourglass-half"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-       
-        <!-- Organizations with job postings -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">With Job Postings</h7>
-                            <h2 class="text-success mb-0">{{ $organizationsWithJobs }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-briefcase"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Approval Pending" :value="$pendingOrganizationRequests" color="warning" icon="fa-hourglass-half" />
+
+        <x-dashboard.metric-card label="With Job Postings" :value="$organizationsWithJobs" color="success" icon="fa-briefcase" />
     </div>
 
     <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
@@ -248,65 +77,14 @@
                 <a href="{{ route('admin.users.students') }}" class="btn btn-sm btn-outline-primary">Review Students</a>
             </div>
         </div>
-        <!-- Total Students -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Total Students</h7>
-                            <h2 class="text-success mb-0">{{ $totalStudents }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-briefcase"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Student pending approval -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Approval Pending </h7>
-                            <h2 class="text-warning mb-0">{{ $pendingApprovalStudents }}</h2>
-                        </div>
-                        <div class="text-warning" style="font-size: 2rem;"><i class="fa fa-hourglass-half"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Total Students" :value="$totalStudents" color="success" icon="fa-briefcase" />
 
-        <!-- Active Students -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Active Students</h7>
-                            <h2 class="text-success mb-0">{{ $activeStudents }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-check-circle"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Approval Pending" :value="$pendingApprovalStudents" color="warning" icon="fa-hourglass-half" />
 
-        <!-- blocked students -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Blocked Students</h7>
-                            <h2 class="text-danger mb-0">{{ $blockedStudents }}</h2>
-                        </div>
-                        <div class="text-danger" style="font-size: 2rem;"><i class="fa fa-ban"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Active Students" :value="$activeStudents" color="success" icon="fa-check-circle" />
+
+        <x-dashboard.metric-card label="Blocked Students" :value="$blockedStudents" color="danger" icon="fa-ban" />
     </div>
 
     <div class="row mx-0 p-3 mb-4 bg-white rounded-3 shadow-sm overview-report-group">
@@ -317,65 +95,14 @@
                     Applications</a>
             </div>
         </div>
-        <!-- Total Applications -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Total Applications</h7>
-                            <h2 class="text-success mb-0">{{ $totalApplications }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-briefcase"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Active applications -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Active applications</h7>
-                            <h2 class="text-warning mb-0">{{ $activeApplications }}</h2>
-                        </div>
-                        <div class="text-warning" style="font-size: 2rem;"><i class="fa fa-hourglass-half"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Total Applications" :value="$totalApplications" color="success" icon="fa-briefcase" />
 
-        <!-- Placed applications -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Placed </h7>
-                            <h2 class="text-success mb-0">{{ $placedApplications }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2rem;"><i class="fa fa-check-circle"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Active applications" :value="$activeApplications" color="warning" icon="fa-hourglass-half" />
 
-        <!-- Unsuccessful Applications -->
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">Unsuccessful</h7>
-                            <h2 class="text-danger mb-0">{{ $unsuccessfulApplications }}</h2>
-                        </div>
-                        <div class="text-danger" style="font-size: 2rem;"><i class="fa fa-ban"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-dashboard.metric-card label="Placed" :value="$placedApplications" color="success" icon="fa-check-circle" />
+
+        <x-dashboard.metric-card label="Unsuccessful" :value="$unsuccessfulApplications" color="danger" icon="fa-ban" />
     </div>
 
     <div class="row">
