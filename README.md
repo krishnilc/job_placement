@@ -98,6 +98,12 @@ history; any history cleanup requires a separate coordinated operation.
 
 ## Management read-only access
 
+Administrative job creation/editing is restricted to admins and super admins;
+employers use their own moderated job-posting flow. Only super admins can edit
+staff accounts or delete user accounts. Application downloads require access to
+the application, certificate membership in its saved document list, and a file
+path contained within the configured applications/public storage root.
+
 Super admins can create an upper-management account under **Admins > Add Admin**
 by choosing **Management (Read-only)**, or assign that role when editing an
 existing staff account. Run `php artisan migrate` before using the new role.

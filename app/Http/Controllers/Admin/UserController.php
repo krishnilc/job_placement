@@ -18,9 +18,7 @@ class UserController extends Controller
     public function edit(Request $request, $id)
     {
         $user = User::findOrfail($id);
-        if ($user->role === 'employer') {
-            abort_unless(in_array($request->user()->role, ['admin', 'super_admin'], true), 403);
-        }
+        $this->authorizeAccountEdit($request, $user);
 
         $view = match (true) {
             in_array($user->role, ['user', 'student'], true) => 'admin.students.edit',
@@ -47,6 +45,7 @@ class UserController extends Controller
     {
         // $id = Auth::user()->id;
         $user = User::findOrFail($id);
+        $this->authorizeAccountEdit($request, $user);
         $isStudent = in_array($user->role, ['user', 'student'], true);
         if ($isStudent) {
             abort_unless(in_array($request->user()->role, ['admin', 'super_admin'], true), 403);
@@ -182,12 +181,12 @@ class UserController extends Controller
             ]);
         }
 
-        if (in_array($user->role, ['student', 'user', 'employer'], true) && $request->user()->role !== 'super_admin') {
-            session()->flash('error', 'Only super admins can delete students and employers.');
+        if ($request->user()->role !== 'super_admin') {
+            session()->flash('error', 'Only super admins can delete user accounts.');
 
             return response()->json([
                 'status' => false,
-            ]);
+            ], 403);
         }
 
         $user->delete();
@@ -196,5 +195,13 @@ class UserController extends Controller
         return response()->json([
             'status' => true,
         ]);       
+    }
+
+    private function authorizeAccountEdit(Request $request, User $user): void
+    {
+        $allowedRoles = in_array($user->role, ['student', 'user', 'employer'], true)
+            ? ['admin', 'super_admin']
+            : ['super_admin'];
+        abort_unless(in_array($request->user()?->role, $allowedRoles, true), 403);
     }
 }

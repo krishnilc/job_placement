@@ -68,11 +68,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('/jobs', [JobController::class, 'index'])->name('admin.jobs');
-    Route::get('/jobs/create', [JobController::class, 'create'])->name('admin.jobs.create');
-    Route::post('/jobs/store', [JobController::class, 'store'])->name('admin.jobs.store');
-    Route::get('/jobs/edit/{id}', [JobController::class, 'edit'])->name('admin.jobs.edit');
-    Route::put('/jobs/update/{id}', [JobController::class, 'update'])->name('admin.jobs.update');
-    Route::delete('/jobs/delete', [JobController::class, 'destroy'])->name('admin.jobs.destroy');
+    Route::middleware('adminAccess')->group(function () {
+        Route::get('/jobs/create', [JobController::class, 'create'])->name('admin.jobs.create');
+        Route::post('/jobs/store', [JobController::class, 'store'])->name('admin.jobs.store');
+        Route::get('/jobs/edit/{id}', [JobController::class, 'edit'])->name('admin.jobs.edit');
+        Route::put('/jobs/update/{id}', [JobController::class, 'update'])->name('admin.jobs.update');
+        Route::delete('/jobs/delete', [JobController::class, 'destroy'])->name('admin.jobs.destroy');
+    });
     Route::get('/job-applications', [JobApplicationController::class, 'index'])->name('admin.jobApplications');
     Route::patch('/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('admin.jobApplications.status');
     Route::delete('/job-applications/delete', [JobApplicationController::class, 'destroy'])->name('admin.jobApplications.destroy');

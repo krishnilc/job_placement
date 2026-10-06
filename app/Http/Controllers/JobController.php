@@ -292,17 +292,21 @@ class JobController extends Controller
 
       if ($type === 'certificate') {
          $encodedFile = $request->query('file');
-         if (empty($encodedFile)) {
+         if (!is_string($encodedFile) || $encodedFile === '') {
             abort(404);
          }
          $path = base64_decode($encodedFile, true);
+         $certificates = json_decode($application->certificates_file ?? '[]', true);
+         abort_unless(is_string($path) && is_array($certificates) && in_array($path, $certificates, true), 404);
       } elseif ($type === 'resume') {
          $path = $application->resume_file;
       } else {
          $path = $application->application_file;
       }
 
-      if (empty($path)) {
+      if (!is_string($path) || $path === '' || str_contains($path, "\0")
+         || str_contains($path, ':') || preg_match('~(^|[\\\\/])\\.\\.([\\\\/]|$)~', $path)
+         || preg_match('~^[\\\\/]~', $path)) {
          abort(404);
       }
 
@@ -318,20 +322,22 @@ class JobController extends Controller
       ];
       $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
 
-      // Try applications disk first (public/assets/applications)
-      $applicationsPath = public_path('assets' . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $path);
-      if (is_file($applicationsPath) && is_readable($applicationsPath)) {
-         return response()->download($applicationsPath, basename($path), [
-            'Content-Type' => $mimeType
-         ]);
-      }
-
-      // Try public disk (storage/app/public)
-      $publicPath = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $path);
-      if (is_file($publicPath) && is_readable($publicPath)) {
-         return response()->download($publicPath, basename($path), [
-            'Content-Type' => $mimeType
-         ]);
+      foreach (['applications', 'public'] as $diskName) {
+         $disk = \Illuminate\Support\Facades\Storage::disk($diskName);
+         $root = realpath($disk->path(''));
+         $file = realpath($disk->path($path));
+         if ($root === false || $file === false) {
+            continue;
+         }
+         $prefix = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+         $insideRoot = DIRECTORY_SEPARATOR === '\\'
+            ? strncasecmp($file, $prefix, strlen($prefix)) === 0
+            : str_starts_with($file, $prefix);
+         if ($insideRoot && is_file($file) && is_readable($file)) {
+            return response()->download($file, basename($path), [
+               'Content-Type' => $mimeType
+            ]);
+         }
       }
 
       abort(404);

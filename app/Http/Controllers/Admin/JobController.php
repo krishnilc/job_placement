@@ -67,6 +67,7 @@ class JobController extends Controller
 
     public function create()
     {
+        abort_unless(in_array(auth()->user()?->role, ['admin', 'super_admin'], true), 403);
         return view('admin.jobs.create', [
             'colleges' => College::active()->orderBy('name')->get(),
             'categories' => Category::orderBy('name', 'ASC')->get(),
@@ -76,6 +77,7 @@ class JobController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(in_array($request->user()?->role, ['admin', 'super_admin'], true), 403);
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:5|max:200',
             'category' => 'required',
@@ -133,6 +135,7 @@ class JobController extends Controller
 
     public function edit($id)
     {
+        abort_unless(in_array(auth()->user()?->role, ['admin', 'super_admin'], true), 403);
         $job = Job::findOrFail($id); // Find the job by ID or throw a 404 error if not found
         $colleges = College::active()->orderBy('name')->get(); // Fetch active colleges to populate the college dropdown
         $categories = Category::orderBy('name', 'ASC')->get(); // Fetch all categories to populate the dropdown in the edit form
@@ -148,6 +151,7 @@ class JobController extends Controller
 
      public function update(Request $request, $id)
     {
+        abort_unless(in_array($request->user()?->role, ['admin', 'super_admin'], true), 403);
         $rules = [
             'title' => 'required|min:5|max:200',
             'category' => 'required',

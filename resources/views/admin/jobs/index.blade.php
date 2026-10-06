@@ -26,11 +26,11 @@
                                     <h3 class="fs-4 mb-1">Manage Jobs</h3>
                                 </div>
                                 <div>
-                                    @unless (auth()->user()->isReadOnlyManagement())
+                                    @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
                                     <a href="{{ route('admin.jobs.create') }}" class="btn btn-primary">
                                         <i class="fa fa-plus"></i> Add Job
                                     </a>
-                                    @endunless
+                                    @endif
                                 </div>
                             </div>
                             <ul class="nav nav-pills my-3">
@@ -159,12 +159,12 @@
                                                                         href="{{ route('jobDetail', $job->id) }}"> <i
                                                                             class="fa fa-eye" aria-hidden="true"></i>
                                                                         View</a></li>
-                                                                @unless (auth()->user()->isReadOnlyManagement())
+                                                                @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.jobs.edit', $job->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
-                                                                @endunless
+                                                                @endif
                                                                 @if (auth()->user()->role === 'super_admin')
                                                                     <li><a class="dropdown-item" href="javascript:void(0);"
                                                                             onclick="deleteJob({{ $job->id }})"><i class="fa fa-trash"

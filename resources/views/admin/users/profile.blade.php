@@ -72,10 +72,10 @@
                                     <a href="{{ $isAdmin ? route('admin.users.admins') : ($isEmployer ? route('admin.users.employers') : route('admin.users.students')) }}"
                                         class="btn btn-outline-secondary">Back to
                                         {{ $isAdmin ? 'Admins' : ($isEmployer ? 'Employers' : 'Students') }}</a>
-                                    @unless (auth()->user()->isReadOnlyManagement())
+                                    @if (in_array(auth()->user()->role, $isAdmin ? ['super_admin'] : ['admin', 'super_admin'], true))
                                     <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isAdmin ? 'admins' : ($isEmployer ? 'employers' : 'students')]) }}"
                                         class="btn btn-primary">Edit {{ $isAdmin ? 'Admin' : ($isEmployer ? 'Employer' : 'Student') }}</a>
-                                    @endunless
+                                    @endif
                                 </div>
                             </div>
 
