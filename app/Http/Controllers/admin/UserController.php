@@ -36,7 +36,7 @@ class UserController extends Controller
 
     public function profile($id)
     {
-        $user = User::whereIn('role', ['admin', 'super_admin', 'student', 'employer'])->findOrFail($id);
+        $user = User::whereIn('role', ['admin', 'super_admin', 'management', 'student', 'employer'])->findOrFail($id);
 
         return view('admin.users.profile', [
             'user' => $user,
@@ -82,7 +82,7 @@ class UserController extends Controller
             'linkedin_url' => 'nullable|url|max:255',
             'facebook_url' => 'nullable|url|max:255',
             'availability' => 'nullable|string|max:255',
-            'role' => ($isStudent || $isEmployer) ? 'nullable' : 'required|in:admin,super_admin,student,employer,user',
+            'role' => ($isStudent || $isEmployer) ? 'nullable' : 'required|in:admin,super_admin,management,student,employer,user',
             'student_id' => $isStudent ? 'required|string|max:9|unique:student_profiles,student_id,' . $id . ',user_id' : 'nullable',
             'designation' => $isStudent ? 'nullable' : ($willBeEmployer ? 'required|string|max:100' : 'nullable|string|max:100'),
             'organization_id' => $willBeEmployer ? 'nullable|integer|exists:organizations,id' : 'nullable',

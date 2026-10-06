@@ -13,7 +13,7 @@
                                             aria-hidden="true"></i>
                                         &nbsp;Back to My Jobs
                                     </a>
-                                @elseif (Auth::check() && in_array(Auth::user()->role, ['admin', 'super_admin']))
+                                @elseif (Auth::check() && Auth::user()->hasAdminAccess())
                                     <a href="{{ route('admin.jobs') }}"><i class="fa fa-arrow-left"
                                             aria-hidden="true"></i>
                                         &nbsp;Back to Manage Jobs
@@ -62,7 +62,7 @@
                                         $isClosed = \Carbon\Carbon::parse($job->closing_date)->lt(\Carbon\Carbon::today());
                                     }
                                 @endphp
-                                @if (Auth::check() && !$isOwner && !in_array(Auth::user()->role, ['admin', 'super_admin', 'employer']))
+                                @if (Auth::check() && !$isOwner && !in_array(Auth::user()->role, ['admin', 'super_admin', 'management', 'employer']))
                                     @php
                                         $myApplication = $applications->firstWhere('user_id', Auth::id()) ?? null;
                                         $isSaved = isset($count) && $count == 1;
@@ -109,7 +109,7 @@
                             @endif
 
                             <div class="border-bottom"></div>
-                            @if (!$isOwner && !in_array(Auth::user()->role ?? null, ['admin', 'super_admin', 'employer']))
+                            @if (!$isOwner && !in_array(Auth::user()->role ?? null, ['admin', 'super_admin', 'management', 'employer']))
                                 
 
                                 <div class="pt-3 text-end">

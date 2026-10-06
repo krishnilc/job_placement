@@ -66,7 +66,7 @@
                     </a>
                 </li>
 
-                @if (in_array(Auth::user()->role, ['admin', 'super_admin'], true))
+                @if (Auth::user()->hasAdminAccess())
                     <li class="{{ $headingClass }}"> System Setup</li>                    
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
                         <a href="{{ route('admin.colleges') }}">
@@ -103,7 +103,7 @@
 
         <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
         <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
-        <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->role }}</p>
+        <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->isReadOnlyManagement() ? 'Management (Read-only)' : Auth::user()->role }}</p>
     </div>
 </div>
 @endunless

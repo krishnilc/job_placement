@@ -182,6 +182,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->email_verification_required && !$this->hasVerifiedEmail();
     }
 
+    public function hasAdminAccess(): bool
+    {
+        return in_array($this->role, ['admin', 'super_admin', 'management'], true);
+    }
+
+    public function isReadOnlyManagement(): bool
+    {
+        return $this->role === 'management';
+    }
+
     /**
      * Whether the given attribute is still a real column on the users table.
      */

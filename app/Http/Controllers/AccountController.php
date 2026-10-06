@@ -173,7 +173,7 @@ class AccountController extends Controller
 
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                if (in_array(Auth::user()->role, ['student', 'employer'], true) && Auth::user()->status !== 'active') {
+                if (in_array(Auth::user()->role, ['student', 'employer', 'management'], true) && Auth::user()->status !== 'active') {
                     $status = Auth::user()->status;
                     $needsVerification = Auth::user()->needsEmailVerification();
                     Auth::logout();
@@ -202,7 +202,7 @@ class AccountController extends Controller
                 $request->session()->regenerate();
 
                 // Authentication passed. Check user role and redirect accordingly
-                if (in_array(Auth::user()->role, ['admin', 'super_admin'], true)) {
+                if (Auth::user()->hasAdminAccess()) {
                     return redirect()->route('admin.dashboard')
                         ->with('success', 'Login successful! Welcome back.');
                 } elseif (Auth::user()->role === 'employer') {

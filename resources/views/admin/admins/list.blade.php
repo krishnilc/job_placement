@@ -109,7 +109,7 @@
                                                 <tr class="active">
                                                     <td>{{ $user->id }}</td>
                                                     <td>{{ $user->name }}</td>
-                                                    <td>{{ $user->role === 'super_admin' ? 'Super Admin' : 'Admin' }}</td>
+                                                    <td>{{ $user->isReadOnlyManagement() ? 'Management (Read-only)' : ($user->role === 'super_admin' ? 'Super Admin' : 'Admin') }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
                                                     <td>

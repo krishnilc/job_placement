@@ -19,7 +19,9 @@
                     @include('front.message')
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3">Organizations</h1>
-                        <a href="{{ route('admin.organizations.create') }}" class="btn btn-primary">Add Organization</a>
+                        @unless (auth()->user()->isReadOnlyManagement())
+                            <a href="{{ route('admin.organizations.create') }}" class="btn btn-primary">Add Organization</a>
+                        @endunless
                     </div>
                     <form method="GET" class="row g-2 mb-4">
                         <input type="hidden" name="sort" value="{{ $sort }}">
@@ -79,10 +81,12 @@
                                                                 href="{{ route('admin.organizations.show', $organization) }}"><i
                                                                     class="fa fa-eye" aria-hidden="true"></i>
                                                                 View</a></li>
+                                                        @unless (auth()->user()->isReadOnlyManagement())
                                                         <li><a class="dropdown-item"
                                                                 href="{{ route('admin.organizations.edit', $organization) }}"><i
                                                                     class="fa fa-edit" aria-hidden="true"></i>
                                                                 Edit details</a></li>
+                                                        @endunless
                                                         @if (auth()->user()->role === 'super_admin')
                                                             @if ($organization->employer_profiles_count > 0 || $organization->jobs_count > 0)
                                                                 <li><span class="dropdown-item disabled"

@@ -47,6 +47,7 @@
                                             <select name="role" id="role" class="form-control">
                                                 <option value="admin">Admin</option>
                                                 <option value="super_admin">Super Admin</option>
+                                                <option value="management">Management (Read-only)</option>
                                             </select>
                                             <p class="text-danger" id="roleError"></p>
                                         </div>

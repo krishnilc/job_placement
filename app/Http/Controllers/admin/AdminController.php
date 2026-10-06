@@ -21,7 +21,7 @@ class AdminController extends Controller
             $sort = 'created_at';
         }
 
-        $users = User::whereIn('role', ['admin', 'super_admin'])
+        $users = User::whereIn('role', ['admin', 'super_admin', 'management'])
             ->orderBy($sort, $direction)
             ->paginate(10);
         $users->appends($request->query());
@@ -44,7 +44,7 @@ class AdminController extends Controller
             'password' => 'required|min:5|same:confirm_password',
             'confirm_password' => 'required|min:5',
             'mobile' => 'required|digits:7',
-            'role' => 'required|in:admin,super_admin',
+            'role' => 'required|in:admin,super_admin,management',
         ]);
 
         if ($validator->passes()) {

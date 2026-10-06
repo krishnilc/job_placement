@@ -7,6 +7,30 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Management read-only access
+
+Super admins can create an upper-management account under **Admins > Add Admin**
+by choosing **Management (Read-only)**, or assign that role when editing an
+existing staff account. Run `php artisan migrate` before using the new role.
+
+Management users open the admin dashboard and can view students, employers,
+organizations and requests, jobs (including pending/blocked jobs), applications
+and status histories, feedback, colleges, categories, and job types. Report,
+feedback, and application-document downloads remain available. Super-admin-only
+account management is not available to management users.
+
+Add/edit controls and status selectors are hidden. Server-side middleware also
+returns HTTP 403 for administrative writes and create/edit pages, including
+direct URLs and AJAX requests. Management users cannot create, update, delete,
+approve, reject, apply for, or save jobs or submit feedback. They may change only
+their own personal contact details, profile picture, and password through
+**Account Settings**. Pending or blocked management accounts cannot access the
+portal. Reassign or remove management accounts before rolling back the role
+migration; rollback never promotes them to administrators.
+
+Run the role regression tests with
+`php artisan test --filter=ManagementRoleTest`.
+
 ## Organizations and employer contacts
 
 Organizations are shared records, separate from employer contact accounts.
@@ -55,7 +79,10 @@ and two per row on small screens, without a horizontal tab scrollbar.
 The report navigation uses compact icon labels, a navy active state, and visible
 keyboard-focus outlines.
 Overview metrics are grouped into Jobs, Employers, Students, and Applications
-panels with compact metric cards; System Information remains a separate table.
+panels with compact metric cards. **Active Internal Users** is a separate table
+showing active Management (Read-only), Administrators, and Super Administrators,
+in that order. Pending and blocked accounts are excluded. Overview PDF/CSV
+downloads use the same role labels and active counts.
 The selected tab persists on refresh. An explicit tab hash takes precedence over
 the query-string tab and filter-based defaults.
 

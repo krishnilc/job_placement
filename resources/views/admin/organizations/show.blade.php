@@ -23,7 +23,9 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h1 class="h3 mb-0">{{ $organization->name }}</h1>
                                 <div>
-                                    <a href="{{ route('admin.organizations.edit', $organization) }}" class="btn btn-primary">Edit details</a>
+                                    @unless (auth()->user()->isReadOnlyManagement())
+                                        <a href="{{ route('admin.organizations.edit', $organization) }}" class="btn btn-primary">Edit details</a>
+                                    @endunless
                                     <a href="{{ route('admin.organizations.index') }}" class="btn btn-secondary">Back</a>
                                 </div>
                             </div>

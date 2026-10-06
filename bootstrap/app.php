@@ -3,6 +3,7 @@ use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckAdminOrSuperAdmin;
 use App\Http\Middleware\CheckSuperAdmin;
 use App\Http\Middleware\EnsureRegistrationEmailIsVerified;
+use App\Http\Middleware\EnsureManagementIsReadOnly;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [EnsureRegistrationEmailIsVerified::class]);
+        $middleware->web(append: [EnsureRegistrationEmailIsVerified::class, EnsureManagementIsReadOnly::class]);
 
     //middleware for admin routes
         $middleware->alias([

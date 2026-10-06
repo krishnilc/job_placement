@@ -224,22 +224,7 @@
                 </div>
             </div>
         </div>
-
-        <!-- Organizations with linked employees -->
-        <!-- <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card border-0 shadow h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h7 class="text-muted mb-1">With Linked Employees</h7>
-                            <h2 class="text-primary mb-0">{{ $organizationsWithEmployees }}</h2>
-                        </div>
-                        <div class="text-primary" style="font-size: 2rem;"><i class="fa fa-users"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
+       
         <!-- Organizations with job postings -->
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card border-0 shadow h-100">
@@ -397,67 +382,28 @@
         <div class="col-md-12">
             <div class="card border-0 shadow h-100">
                 <div class="card-header bg-light">
-                    <h6 class="mb-0">System Information</h6>
+                    <h6 class="mb-0">Active Internal Users</h6>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th>Metric</th>
+                                <th>Role</th>
                                 <th class="text-end">Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="table-light">
-                                <td colspan="2" class="fw-bold text-uppercase small text-secondary">Users</td>
+                            <tr>
+                                <td>Management (Read-only)</td>
+                                <td class="text-end fw-semibold">{{ $activeManagementUsers }}</td>
                             </tr>
                             <tr>
-                                <td>Total Users (SuperAdmin/Admins/Employers/Students)</td>
-                                <td class="text-end fw-semibold">{{ $totalUsers }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Users (Super Admin/Admins)</td>
-                                <td class="text-end fw-semibold">{{ $totalStaffUsers }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Active Users (Super Admin/Admins)</td>
-                                <td class="text-end fw-semibold">{{ $activeStaffUsers }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Super Admin</td>
-                                <td class="text-end fw-semibold">{{ $totalSuperAdmins }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Active Super Admin</td>
-                                <td class="text-end fw-semibold">{{ $activeSuperAdmins }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Admin Users</td>
-                                <td class="text-end fw-semibold">{{ $totalRegularAdmins }}</td>
-                            </tr>
-                            <tr>
-                                <td>Total Active Admin Users</td>
+                                <td>Administrators</td>
                                 <td class="text-end fw-semibold">{{ $activeRegularAdmins }}</td>
                             </tr>
-                            <tr class="table-light">
-                                <td colspan="2" class="fw-bold text-uppercase small text-secondary">Content
-                                </td>
-                            </tr>
                             <tr>
-                                <td>Total Colleges/Centers</td>
-                                <td class="text-end fw-semibold">
-                                    {{ $collegeCategoryCounts->count() }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Total Categories</td>
-                                <td class="text-end fw-semibold">
-                                    {{ $collegeCategoryCounts->sum('categories_count') }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Total Organizations</td>
-                                <td class="text-end fw-semibold">{{ $totalOrganizations }}</td>
+                                <td>Super Administrators</td>
+                                <td class="text-end fw-semibold">{{ $activeSuperAdmins }}</td>
                             </tr>
                         </tbody>
                     </table>

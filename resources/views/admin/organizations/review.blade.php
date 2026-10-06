@@ -35,7 +35,7 @@
                         <div class="card mb-2">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div><strong>{{ $organization->name }}</strong><div>{{ $organization->address }}</div></div>
-                                @if ($organizationRequest->status === 'pending')
+                                @if ($organizationRequest->status === 'pending' && ! auth()->user()->isReadOnlyManagement())
                                     <form method="POST" action="{{ route('admin.organizations.resolve', $organizationRequest) }}">
                                         @csrf @method('PATCH')
                                         <input type="hidden" name="decision" value="link">
@@ -48,7 +48,7 @@
                     @endforeach
                     @if ($organizations->isEmpty())<p class="text-muted">No existing organizations match this search.</p>@endif
                     {{ $organizations->links() }}
-                    @if ($organizationRequest->status === 'pending')
+                    @if ($organizationRequest->status === 'pending' && ! auth()->user()->isReadOnlyManagement())
                         <form class="card card-body mt-4" method="POST" action="{{ route('admin.organizations.resolve', $organizationRequest) }}">
                             @csrf @method('PATCH')
                             <label for="review_notes" class="form-label">Review notes (required for rejection)</label>

@@ -150,7 +150,7 @@
                                                     <td>{{ $user->designation }}</td>
                                                     <td>
                                                         {{ $user->company_name ?? $user->organizationRequest?->name ?? '-' }}
-                                                        @if ($user->organizationRequest && in_array(auth()->user()->role, ['admin', 'super_admin'], true))
+                                                        @if ($user->organizationRequest && auth()->user()->hasAdminAccess())
                                                             <div><a href="{{ route('admin.organizations.review', $user->organizationRequest) }}">Organization request: {{ $user->organizationRequest->status }}</a></div>
                                                         @endif
                                                     </td>
@@ -184,10 +184,12 @@
                                                                         href="{{ route('admin.users.profile', $user->id) }}"><i
                                                                             class="fa fa-user" aria-hidden="true"></i>
                                                                         View Profile</a></li>
+                                                                @unless (auth()->user()->isReadOnlyManagement())
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.users.edit', $user->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>
+                                                                @endunless
                                                                 @if (auth()->user()->role === 'super_admin')
                                                                     <li><a class="dropdown-item" href="javascript:void(0);"
                                                                             onclick="deleteUser({{ $user->id }})"><i

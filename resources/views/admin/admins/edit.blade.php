@@ -56,6 +56,7 @@
                                             <select name="role" id="role" class="form-control">
                                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                                                 <option value="super_admin" {{ $user->role == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
+                                                <option value="management" {{ $user->role == 'management' ? 'selected' : '' }}>Management (Read-only)</option>
                                             </select>
                                             <p class="text-danger" id="roleError"></p>
                                         </div>

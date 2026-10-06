@@ -19,7 +19,7 @@ class CheckAdminOrSuperAdmin
             return redirect()->route('home');
         }
 
-        if (!in_array($request->user()->role, ['admin', 'super_admin'], true)) {
+        if (!$request->user()->hasAdminAccess()) {
             session()->flash('error', 'You do not have permission to manage colleges.');
             return redirect()->route('admin.dashboard');
         }

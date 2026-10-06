@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="col-lg-3">
-                    @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
+                    @if (auth()->user()->hasAdminAccess())
                         @include('admin.sidebar')
                     @elseif (auth()->user()->role === 'employer')
                         @include('employer.sidebar')
@@ -110,6 +110,12 @@
                                                     <td>{{ $application->job->company_name }}</td>
                                                     <td>{{ optional($application->applied_at)->format('M d, Y') ?? 'N/A' }}</td>
                                                     <td>
+                                                        @if (auth()->user()->isReadOnlyManagement())
+                                                            <span class="badge bg-secondary">{{ $application->applicationStatus?->name ?? ucfirst($application->status ?? 'Not assigned') }}</span>
+                                                            @if ($application->applicationStatus?->name === 'Under Review')
+                                                                <small class="d-block text-muted mt-1">Changed by: {{ $application->latestStatusHistory?->changedBy?->name ?? 'Unknown' }}</small>
+                                                            @endif
+                                                        @else
                                                         <form action="{{ route('admin.jobApplications.status', $application) }}" method="POST">
                                                             @csrf
                                                             @method('PATCH')
@@ -124,6 +130,7 @@
                                                                 </small>
                                                             @endif
                                                         </form>
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         <div class="action-dots">

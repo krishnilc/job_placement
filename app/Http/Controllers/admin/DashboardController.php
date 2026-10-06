@@ -144,8 +144,9 @@ class DashboardController extends Controller
         $totalActiveUsers = User::where('status', 'active')->count();
         $activeSuperAdmins = User::where('role', 'super_admin')->where('status', 'active')->count();
         $activeRegularAdmins = User::where('role', 'admin')->where('status', 'active')->count();
-        $totalStaffUsers = User::whereIn('role', ['admin', 'super_admin'])->count();
-        $activeStaffUsers = User::whereIn('role', ['admin', 'super_admin'])->where('status', 'active')->count();
+        $activeManagementUsers = User::where('role', 'management')->where('status', 'active')->count();
+        $totalStaffUsers = User::whereIn('role', ['admin', 'super_admin', 'management'])->count();
+        $activeStaffUsers = User::whereIn('role', ['admin', 'super_admin', 'management'])->where('status', 'active')->count();
         $applicationQuery = JobApplication::query();
         $applicationQuery
             ->when($request->filled('college'), fn ($query) => $query->whereHas('user.studentProfile', fn ($p) => $p->where('college_id', $request->college)))
@@ -481,6 +482,7 @@ class DashboardController extends Controller
             'totalActiveUsers' => $totalActiveUsers,
             'activeSuperAdmins' => $activeSuperAdmins,
             'activeRegularAdmins' => $activeRegularAdmins,
+            'activeManagementUsers' => $activeManagementUsers,
             'totalStaffUsers' => $totalStaffUsers,
             'activeStaffUsers' => $activeStaffUsers,
             'totalJobs' => $totalJobs,
@@ -746,17 +748,10 @@ class DashboardController extends Controller
                 ['Active Applications', $dashboard['activeApplications']],
                 ['Placed Applications', $dashboard['placedApplications']],
                 ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
-                ['--- SYSTEM INFORMATION ---', ''],
-                ['Total Users (Super Admin/Admins/Employers/Students)', $dashboard['totalUsers']],
-                ['Total Users (Super Admin/Admins)', $dashboard['totalStaffUsers']],
-                ['Total Active Users (Super Admin/Admins)', $dashboard['activeStaffUsers']],
-                ['Total Super Admin', $dashboard['totalSuperAdmins']],
-                ['Total Active Super Admin', $dashboard['activeSuperAdmins']],
-                ['Total Admin Users', $dashboard['totalRegularAdmins']],
-                ['Total Active Admin Users', $dashboard['activeRegularAdmins']],
-                ['Total Colleges/Centers', $dashboard['collegeCategoryCounts']->count()],
-                ['Total Categories', $dashboard['collegeCategoryCounts']->sum('categories_count')],
-                ['Total Organizations', $dashboard['totalOrganizations']],
+                ['--- ACTIVE INTERNAL USERS ---', ''],
+                ['Management (Read-only)', $dashboard['activeManagementUsers']],
+                ['Administrators', $dashboard['activeRegularAdmins']],
+                ['Super Administrators', $dashboard['activeSuperAdmins']],
             ],
             'placement' => [
                 ['Metric', 'Value'],

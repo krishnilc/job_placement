@@ -1,10 +1,10 @@
 @php
-    $isAdmin = in_array($user->role, ['admin', 'super_admin'], true);
+    $isAdmin = $user->hasAdminAccess();
     $isEmployer = $user->role === 'employer';
     $homeRoute = $isAdmin ? 'admin.dashboard' : ($isEmployer ? 'employer.dashboard' : 'student.dashboard');
     $profileRoute = $isAdmin ? 'admin.account.profile' : ($isEmployer ? 'employer.account.profile' : 'account.profile');
     $editRoute = $isAdmin ? 'admin.account.editProfile' : ($isEmployer ? 'employer.account.editProfile' : 'account.editProfile');
-    $editLabel = $isAdmin ? 'Edit Admin' : ($isEmployer ? 'Edit Employer' : 'Edit Student');
+    $editLabel = $user->isReadOnlyManagement() ? 'Edit My Profile' : ($isAdmin ? 'Edit Admin' : ($isEmployer ? 'Edit Employer' : 'Edit Student'));
 @endphp
 
 <section class="section-5 bg-2">

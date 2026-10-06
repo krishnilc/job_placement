@@ -77,7 +77,7 @@ class AccountManagementController extends Controller
             'mobile' => 'required|digits:7',
             'email_2' => 'nullable|email|max:255',
             'mobile_2' => 'nullable|digits:7',
-            'designation' => in_array($role, ['admin', 'super_admin', 'employer'], true)
+            'designation' => in_array($role, ['admin', 'super_admin', 'management', 'employer'], true)
                 ? 'required|string|max:100'
                 : 'required|in:Full-time Student,Part-time Student,Alumni',
             'organization_id' => $role === 'employer' ? 'prohibited' : 'nullable',
@@ -113,7 +113,7 @@ class AccountManagementController extends Controller
             $user->email_2 = $request->email_2;
             $user->mobile_2 = $request->mobile_2;
             $user->designation = $request->designation;
-            if ($role !== 'employer') {
+            if ($role !== 'employer' && ! $user->isReadOnlyManagement()) {
                 $user->date_of_birth = $request->date_of_birth;
                 $user->gender = $request->gender;
                 $user->residential_address = $request->residential_address;

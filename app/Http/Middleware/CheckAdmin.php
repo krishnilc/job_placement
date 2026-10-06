@@ -19,7 +19,7 @@ class CheckAdmin
             return redirect()->route('home');
         }
        
-        if (!in_array($request->user()->role, ['admin', 'super_admin', 'employer'], true)) {
+        if (!$request->user()->hasAdminAccess() && $request->user()->role !== 'employer') {
             session()->flash('error', 'You do not have permission to access the admin page.');
             return redirect()->route('student.dashboard');
         }

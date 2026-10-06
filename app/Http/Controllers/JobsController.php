@@ -100,7 +100,7 @@ class JobsController extends Controller
       }
 
       $isOwner = Auth::check() && Auth::id() === $job->user_id;
-      $isAdmin = Auth::check() && in_array(Auth::user()->role, ['admin', 'super_admin']);
+      $isAdmin = Auth::check() && Auth::user()->hasAdminAccess();
 
       if ($job->status !== 1 && !$isOwner && !$isAdmin) {
          abort(404);
@@ -281,8 +281,8 @@ class JobsController extends Controller
       $userId = Auth::id();
       $user = Auth::user();
       
-      // Allow if user is the applicant, employer, or an admin/super admin
-      if (!in_array($user->role, ['admin', 'super_admin'], true) && $userId !== $application->user_id && $userId !== $application->employer_id) {
+      // Staff can view application documents across all employers.
+      if (!$user->hasAdminAccess() && $userId !== $application->user_id && $userId !== $application->employer_id) {
          abort(403);
       }
 

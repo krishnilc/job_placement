@@ -277,7 +277,7 @@ class JobTypeReportTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk();
         $this->assertSame(4, substr_count($response->getContent(), 'shadow-sm overview-report-group'));
-        foreach (['Overview Report', 'Job Report', 'Employer Report', 'Student Report', 'Application Report', 'System Information'] as $heading) {
+        foreach (['Overview Report', 'Job Report', 'Employer Report', 'Student Report', 'Application Report', 'Active Internal Users'] as $heading) {
             $response->assertSee($heading);
         }
         foreach (['admin.jobs', 'admin.users.employers', 'admin.users.students', 'admin.jobApplications'] as $route) {

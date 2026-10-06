@@ -2,7 +2,7 @@
 
 @section('main')
     @php($isEmployer = $user->role === 'employer')
-    @php($isAdmin = in_array($user->role, ['admin', 'super_admin'], true))
+    @php($isAdmin = $user->hasAdminAccess())
     <section class="section-5 bg-2">
         <div class="container py-5">
             <div class="row">
@@ -72,8 +72,10 @@
                                     <a href="{{ $isAdmin ? route('admin.users.admins') : ($isEmployer ? route('admin.users.employers') : route('admin.users.students')) }}"
                                         class="btn btn-outline-secondary">Back to
                                         {{ $isAdmin ? 'Admins' : ($isEmployer ? 'Employers' : 'Students') }}</a>
+                                    @unless (auth()->user()->isReadOnlyManagement())
                                     <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isAdmin ? 'admins' : ($isEmployer ? 'employers' : 'students')]) }}"
                                         class="btn btn-primary">Edit {{ $isAdmin ? 'Admin' : ($isEmployer ? 'Employer' : 'Student') }}</a>
+                                    @endunless
                                 </div>
                             </div>
 

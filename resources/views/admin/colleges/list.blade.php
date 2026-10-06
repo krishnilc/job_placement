@@ -26,9 +26,11 @@
                                     <h3 class="fs-4 mb-1">Colleges/Centers</h3>
                                 </div>
                                 <div>
+                                    @unless (auth()->user()->isReadOnlyManagement())
                                     <a href="{{ route('admin.colleges.create') }}" class="btn btn-primary">
                                         <i class="fa fa-plus"></i> Add College/Center
                                     </a>
+                                    @endunless
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -108,6 +110,7 @@
                                                         </span>
                                                     </td>
                                                     <td>
+                                                        @unless (auth()->user()->isReadOnlyManagement())
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
                                                                 aria-expanded="false">
@@ -126,6 +129,7 @@
                                                                 @endif
                                                             </ul>
                                                         </div>
+                                                        @endunless
                                                     </td>
                                                 </tr>
                                             @endforeach

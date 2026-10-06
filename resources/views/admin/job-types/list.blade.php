@@ -23,9 +23,11 @@
                         <div class="card-body card-form">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="fs-4 mb-1">Job Types</h3>
+                                @unless (auth()->user()->isReadOnlyManagement())
                                 <a href="{{ route('admin.jobTypes.create') }}" class="btn btn-primary">
                                     <i class="fa fa-plus"></i> Add Job Type
                                 </a>
+                                @endunless
                             </div>
                             <form method="GET" action="{{ route('admin.jobTypes') }}" class="row g-2 my-3">
                                 <input type="hidden" name="sort" value="{{ request()->query('sort') }}">
@@ -87,6 +89,7 @@
                                                     </span>
                                                 </td>
                                                 <td>
+                                                    @unless (auth()->user()->isReadOnlyManagement())
                                                     <div class="action-dots">
                                                         <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
@@ -101,6 +104,7 @@
                                                             @endif
                                                         </ul>
                                                     </div>
+                                                    @endunless
                                                 </td>
                                             </tr>
                                         @empty

@@ -37,7 +37,7 @@ class JobApplicationController extends Controller
             ->leftJoin('jobs', 'jobs.id', '=', 'job_applications.job_id')
             ->leftJoin('users', 'users.id', '=', 'job_applications.user_id');
 
-        if (in_array($user->role, ['admin', 'super_admin'], true)) {
+        if ($user->hasAdminAccess()) {
         } elseif ($user->role === 'employer') {
             $applicationsQuery->where('jobs.user_id', $user->id);
         } else {

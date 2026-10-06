@@ -26,9 +26,11 @@
                                     <h3 class="fs-4 mb-1">Categories</h3>
                                 </div>
                                 <div>
+                                    @unless (auth()->user()->isReadOnlyManagement())
                                     <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                                         <i class="fa fa-plus"></i> Add Category
                                     </a>
+                                    @endunless
                                 </div>
                             </div>
                             <form method="GET" action="{{ route('admin.categories') }}" class="row g-2 my-3">
@@ -116,6 +118,7 @@
                                                         </span>
                                                     </td>
                                                     <td>
+                                                        @unless (auth()->user()->isReadOnlyManagement())
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
                                                                 aria-expanded="false">
@@ -134,6 +137,7 @@
                                                                 @endif
                                                             </ul>
                                                         </div>
+                                                        @endunless
                                                     </td>
                                                 </tr>
                                             @endforeach
