@@ -5,9 +5,11 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationStatus;
 use App\Models\JobApplication;
+use App\Notifications\ApplicationStatusChanged;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class JobApplicationController extends Controller
 {
@@ -77,25 +79,51 @@ class JobApplicationController extends Controller
         ]);
 
         $user = $request->user();
+        abort_unless(in_array($user->role, ['admin', 'super_admin', 'employer'], true), 403);
         if ($user->role === 'employer' && !$application->job()->where('user_id', $user->id)->exists()) {
             abort(403);
         }
 
         $statusId = (int) $request->input('application_status_id');
-        if ((int) $application->application_status_id !== $statusId) {
-            DB::transaction(function () use ($application, $statusId, $user) {
-                $application->update(['application_status_id' => $statusId]);
+        $newStatus = ApplicationStatus::findOrFail($statusId);
+        $previousStatus = DB::transaction(function () use ($application, $statusId, $user) {
+            $lockedApplication = JobApplication::whereKey($application->id)->lockForUpdate()->firstOrFail();
+            if ((int) $lockedApplication->application_status_id === $statusId) {
+                return null;
+            }
+            $previousStatus = $lockedApplication->applicationStatus?->name
+                ?? ucfirst($lockedApplication->status ?? 'Not assigned');
+            $lockedApplication->update(['application_status_id' => $statusId]);
 
-                DB::table('application_status_history')->insert([
-                    'job_application_id' => $application->id,
-                    'application_status_id' => $statusId,
-                    'changed_by' => $user->id,
-                    'created_at' => now(),
-                ]);
-            });
+            DB::table('application_status_history')->insert([
+                'job_application_id' => $application->id,
+                'application_status_id' => $statusId,
+                'changed_by' => $user->id,
+                'created_at' => now(),
+            ]);
+
+            return $previousStatus;
+        });
+
+        if ($previousStatus === null) {
+            return back()->with('success', 'Application status is unchanged; no notification email was sent.');
         }
 
-        return back()->with('success', 'Application status updated successfully.');
+        $application->load(['user', 'job']);
+        try {
+            $application->user->notify(new ApplicationStatusChanged(
+                $application->job->title,
+                $application->job->company_name,
+                $previousStatus,
+                $newStatus->name,
+            ));
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
+
+            return back()->with('error', 'Application status and history were saved, but the notification email could not be sent. Please contact the applicant directly.');
+        }
+
+        return back()->with('success', 'Application status updated successfully. The applicant has been notified by email.');
     }
 
     public function destroy(Request $request)

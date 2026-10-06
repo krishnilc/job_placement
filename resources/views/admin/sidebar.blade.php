@@ -36,6 +36,11 @@
                         <i class="fa fa-arrow-right"></i> Employers
                     </a>
                 </li>
+                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.organizations.*')])>
+                        <a href="{{ route('admin.organizations.index') }}">
+                            <i class="fa fa-arrow-right"></i> Organizations
+                        </a>
+                    </li>
                 @if (Auth::user()->role === 'super_admin')
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.users.admins', 'admin.users.admins.create') || ($profileRoutes && isset($user) && in_array($user->role, ['admin', 'super_admin'], true))])>
                         <a href="{{ route('admin.users.admins') }}">
@@ -62,12 +67,7 @@
                 </li>
 
                 @if (in_array(Auth::user()->role, ['admin', 'super_admin'], true))
-                    <li class="{{ $headingClass }}"> System Setup</li>
-                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.organizations.*')])>
-                        <a href="{{ route('admin.organizations.index') }}">
-                            <i class="fa fa-arrow-right"></i> Organizations
-                        </a>
-                    </li>
+                    <li class="{{ $headingClass }}"> System Setup</li>                    
                     <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
                         <a href="{{ route('admin.colleges') }}">
                             <i class="fa fa-arrow-right"></i> Colleges/Centers

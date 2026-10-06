@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AccountStatusNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -42,11 +43,15 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, AccountStatusNotifier $notifier)
     {
         // $id = Auth::user()->id;
         $user = User::findOrFail($id);
         $isStudent = in_array($user->role, ['user', 'student'], true);
+        if ($isStudent) {
+            abort_unless(in_array($request->user()->role, ['admin', 'super_admin'], true), 403);
+        }
+        $previousStatus = $user->status;
         $isEmployer = $user->role === 'employer';
         $willBeEmployer = $isEmployer || $request->input('role') === 'employer';
         if ($willBeEmployer) {
@@ -140,12 +145,20 @@ class UserController extends Controller
             }
 
             $user->save();
+            $notificationSent = $notifier->sendIfChanged($user, $previousStatus);
+            $recipientLabel = $user->role === 'employer' ? 'employer' : 'student';
 
-            session()->flash('success', 'User information updated successfully!');
+            if ($notificationSent === false) {
+                session()->flash('error', 'User information and status were saved, but the notification email could not be sent. Please contact the '.$recipientLabel.' directly.');
+            } else {
+                session()->flash('success', 'User information updated successfully!'
+                    .($notificationSent === true ? ' The '.$recipientLabel.' has been notified by email.' : ''));
+            }
 
             return response()->json([
                 'status' => true,
-                'errors' => []
+                'errors' => [],
+                'notification_sent' => $notificationSent,
             ]);
         } else {
             return response()->json([

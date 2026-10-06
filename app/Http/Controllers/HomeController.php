@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactConfirmation;
+use App\Mail\ContactSubmission;
 use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class HomeController extends Controller
 {
@@ -60,18 +63,23 @@ class HomeController extends Controller
         ]);
 
         try {
-            $recipient = config('mail.from.address', env('MAIL_FROM_ADDRESS'));
+            Mail::to(config('mail.contact.address'))->send(new ContactSubmission(
+                $data['name'], $data['email'], $data['subject'], $data['message']
+            ));
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
 
-            Mail::send([], [], function ($message) use ($data, $recipient) {
-                $message->to($recipient)
-                    ->subject('Contact form submission: ' . $data['subject'])
-                    ->setBody("Name: {$data['name']}\nEmail: {$data['email']}\n\n{$data['message']}", 'text/plain')
-                    ->replyTo($data['email']);
-            });
-        } catch (\Exception $exception) {
-            return back()->withInput()->with('error', 'Unable to send your message right now. Please try again later.');
+            return redirect()->route('front.contact')->withInput()->with('error', 'Unable to send your message right now. Please try again later or contact the Placement Officer directly.');
         }
 
-        return back()->with('success', 'Thank you! Your message has been sent successfully.');
+        try {
+            Mail::to($data['email'])->send(new ContactConfirmation($data['name'], $data['subject']));
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
+
+            return redirect()->route('front.contact')->with('warning', 'Your message has been sent to the Placement Officer, but we could not send your confirmation email. You do not need to submit the form again. The Placement Officer will get back to you as soon as possible.');
+        }
+
+        return redirect()->route('front.contact')->with('success', 'Thank you! Your message has been sent to the Placement Officer. A confirmation email has been sent to your email address. The Placement Officer will get back to you as soon as possible.');
     }
 }

@@ -131,6 +131,7 @@
                                 </div>
                             </div>
 
+                            <p class="text-muted small">After registration, verify your email using the link we send you. Your account also requires administrator approval before you can log in.</p>
                             <button class="btn btn-primary mt-2">Register</button>
                         </form>
                     </div>
@@ -287,7 +288,7 @@
                                 $("#organization_modeError").text(errors.organization_mode[0]);
                             }
                         } else {
-                            window.location.href = "{{ route('account.login') }}";
+                            window.location.href = response.redirect;
                             $("#registrationForm")[0].reset();
                         }
                     },

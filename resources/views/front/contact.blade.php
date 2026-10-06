@@ -14,38 +14,19 @@
 
                                     <div class="mb-4">
                                         <h5 class="mb-2">Our contact details</h5>
-                                        <p class="mb-1"><strong>Address:</strong> Fiji National University</p>
-                                        <p class="mb-1"><strong>Email:</strong> <a href="mailto:maraia.naqura@fnu.ac.fj">maraia.naqura@fnu.ac.fj</a></p>
-                                        <p class="mb-0"><strong>Phone:</strong> +679 3394000 ext: 2405</p>
+                                        <p class="mb-1"><strong>Contact Person:</strong> Mr. Krishnil Chand</p>
+                                        <p class="mb-1"><strong>Position:</strong> Placement Officer</p>
+                                        <p class="mb-1"><strong>Address:</strong> Fiji National University (Nasinu Campus)</p>
+                                        <p class="mb-1"><strong>Email:</strong> <a href="mailto:{{ config('mail.contact.address') }}">{{ config('mail.contact.address') }}</a></p>
+                                        <p class="mb-0"><strong>Phone:</strong> +679 3394000 ext: 2402</p>
                                     </div>
                                 </div>
 
                                 <div class="col-lg-6">
-                                    {{-- @if (session('success'))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            {{ session('success') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
+                                    @include('front.message')
+                                    @if (session()->has('warning'))
+                                        <div class="alert alert-warning" role="alert">{{ session('warning') }}</div>
                                     @endif
-
-                                    @if (session('error'))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            {{ session('error') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
-
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <ul class="mb-0">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif --}}
-
                                     <form action="{{ route('front.contact.send') }}" method="POST">
                                         @csrf
                                         <div class="mb-3">

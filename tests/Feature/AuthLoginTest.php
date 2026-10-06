@@ -12,8 +12,6 @@ class AuthLoginTest extends TestCase
 
     public function test_users_can_login_with_valid_credentials(): void
     {
-        $this->withoutMiddleware();
-
         User::factory()->create([
             'email' => 'student@example.com',
             'password' => bcrypt('secret123'),

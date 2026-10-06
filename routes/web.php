@@ -15,6 +15,7 @@ use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\MyJobController;
 use App\Http\Controllers\OrganizationController;
@@ -28,9 +29,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
 Route::post('/contact/send', [HomeController::class, 'submitContact'])->name('front.contact.send');
+Route::get('/account/verify-email', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+Route::get('/account/verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+Route::post('/account/email/verification-notification', [EmailVerificationController::class, 'resend'])
+    ->middleware('throttle:6,1')->name('verification.send');
 Route::get('/jobs', [JobsController::class, 'index'])->name('front.jobs');
 Route::get('/jobs/detail/{id}', [JobsController::class, 'detail'])->name('jobDetail');
-Route::post('/apply-job', [JobsController::class, 'applyJob'])->name('applyJob');
+Route::post('/apply-job', [JobsController::class, 'applyJob'])->middleware('auth')->name('applyJob');
 Route::post('/save-job', [JobsController::class, 'saveJob'])->name('saveJob');
 Route::get('/download-application/{application}/{type}', [JobsController::class, 'downloadApplicationFile'])
     ->middleware('auth')

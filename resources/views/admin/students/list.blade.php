@@ -233,12 +233,13 @@
                     status: select.val(),
                     _token: "{{ csrf_token() }}"
                 },
-                success: function() {
+                success: function(response) {
                     select.data('original', select.val());
                     const label = select.find('option:selected').text();
                     const name = select.closest('tr').find('td').eq(1).text().trim();
-                    $('#statusAlertText').text(name + "'s status has been changed to " + label + '.');
-                    $('#statusAlert').removeClass('d-none');
+                    $('#statusAlertText').text(name + "'s status is " + label + '. ' + response.message);
+                    $('#statusAlert').removeClass('d-none alert-success alert-warning')
+                        .addClass(response.notification_sent === false ? 'alert-warning' : 'alert-success');
                 },
                 error: function() {
                     select.val(previous);

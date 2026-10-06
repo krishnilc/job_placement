@@ -16,6 +16,10 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
+    'contact' => [
+        'address' => env('PLACEMENT_OFFICER_EMAIL', 'krishnil.chand@fnu.ac.fj'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations

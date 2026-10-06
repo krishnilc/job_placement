@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AccountStatusNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -43,15 +44,25 @@ class StudentController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id, AccountStatusNotifier $notifier)
     {
         $request->validate(['status' => 'required|in:pending,active,blocked']);
 
         $user = User::where('role', 'student')->findOrFail($id);
+        $previousStatus = $user->status;
         $user->status = $request->status;
         $user->save();
+        $notificationSent = $notifier->sendIfChanged($user, $previousStatus);
 
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'notification_sent' => $notificationSent,
+            'message' => match ($notificationSent) {
+                true => 'The student has been notified by email.',
+                false => 'The status was saved, but the notification email could not be sent. Please contact the student directly.',
+                null => 'The status is unchanged; no notification email was sent.',
+            },
+        ]);
     }
 
     public function create()

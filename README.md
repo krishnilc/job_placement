@@ -100,6 +100,150 @@ time. Set `REPORT_TIMEZONE` to another IANA timezone if needed. Stored timestamp
 and the application's UTC timezone are unchanged. After changing configuration
 on a deployment with cached configuration, rebuild it with `php artisan config:cache`.
 
+## Contact form email
+
+The public Contact Us form emails the Placement Officer and then sends a
+confirmation email to the address entered in the form. The officer's email
+includes the sender's name, email, subject, and message, with Reply-To set to the
+sender. Confirmation replies go to the Placement Officer.
+
+Set `PLACEMENT_OFFICER_EMAIL` to override the default recipient
+`krishnil.chand@fnu.ac.fj`; the contact page displays the same configured address.
+Configure a working delivery mailer (for example, `MAIL_MAILER=smtp` with
+`MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SCHEME`, and
+`MAIL_FROM_ADDRESS`). The `log` and `array` mailers do not deliver real emails.
+Rebuild cached configuration with `php artisan config:cache` after deployment
+configuration changes.
+
+The page shows a success message after both emails are sent. If sending to the
+officer fails, it preserves form input and displays an error. If only the
+confirmation fails, it warns that the message was sent and must not be
+resubmitted. Delivery failures are reported through Laravel's exception handler.
+Emails are sent synchronously; no queue worker is required.
+
+Run the contact flow tests with `php artisan test --filter=ContactFormTest`.
+
+## Registration email verification
+
+New public student, alumni, and employer registrations receive Laravel's signed
+email verification link and are directed to a verification/resend page.
+Links expire after 60 minutes and can be used without logging in, including
+while administrator approval is pending. Verification confirms email ownership
+only; it does not activate an account or bypass approval or blocked status.
+New accounts must be both verified and approved before login.
+
+Run `php artisan migrate` to add `email_verification_required`. It defaults to
+false, preserving access for existing and administrator-created accounts without
+pretending that their emails have been verified. Public registration sets it to
+true. Changing the primary email of an account requiring verification clears its
+verification timestamp; it must verify the new address before continuing.
+Signed links for the old address no longer work.
+
+The login page links to the public resend page. Resending and verification are
+rate-limited to six requests per minute per IP. Resend responses do not disclose
+whether an account exists or has already been verified. Mail transport failures
+are reported and displayed explicitly; an initial delivery failure keeps the
+created account and directs the user to resend rather than register again.
+
+Configure a working mailer as described above; `MAIL_MAILER=log` does not deliver
+verification emails. Set `APP_URL` to the public HTTPS application URL for links
+generated outside web requests, and rebuild cached configuration when changing
+deployment settings. Verification mail is sent synchronously.
+
+Run verification tests with `php artisan test --filter=EmailVerificationTest`.
+
+## Student and employer account status notifications
+
+Changing a student's or employer's account status from their admin list or the
+admin profile editor sends an email to their primary email address. This includes
+alumni stored as students. Emails describe the previous and new statuses and
+the next steps for Active, Pending, or Blocked accounts. An Active account that
+still needs email verification is directed to verify before logging in.
+Replies go to the configured Placement Officer.
+
+Saving an unchanged status or creating a student does not send a status-change
+email; the same applies to employers. Employer activation still requires a linked
+organization and a resolved organization request. Rejected updates send no email.
+Notifications are synchronous and use the configured mailer; a working
+delivery mailer is required (`log` does not deliver emails).
+If mail delivery fails, the status change remains saved, the exception is
+reported, and the admin sees a warning to contact the student directly.
+
+Run status-notification tests with
+`php artisan test --filter=StudentStatusNotificationTest`.
+Run employer notification tests with
+`php artisan test --filter=EmployerStatusNotificationTest`.
+
+## Application status notifications
+
+When an admin, super admin, or an employer managing their own job changes an
+application status, the applicant receives an email at their primary email
+address. The email names the job, company, previous and new status, provides
+status-specific next steps, and links to My Applications. Replies go to the
+Placement Officer. Interview notices do not invent scheduling details.
+
+Unchanged statuses and rejected/unauthorized updates send no email. Status and
+history are saved together before sending the notification. If delivery fails,
+both remain saved and the administrator/employer sees an explicit warning to
+contact the applicant directly. Notifications are synchronous and require a
+working delivery mailer; the `log` mailer does not deliver actual emails.
+
+Run application notification tests with
+`php artisan test --filter=ApplicationStatusNotificationTest`.
+
+## Application submission emails
+
+After an application and its initial status history are saved, the person who
+posted the job (`jobs.user_id`) receives a new-application email with the job,
+company, applicant name, email, phone, and a link to review applications and
+documents after login. Reply-To is the student's primary email. A separate
+confirmation is sent to the student's primary email, with a My Applications
+link and Placement Officer Reply-To. Documents are not attached to either email.
+
+Both deliveries are attempted independently. A mail transport failure is
+reported, but does not undo the application or stop the other email from being
+attempted. The application response remains successful, marks failed deliveries,
+and displays a warning that the application is saved and must not be resubmitted.
+Invalid, duplicate, or unauthorized submissions send no email.
+Emails are synchronous and require a working delivery mailer; `log` only logs.
+
+Run submission tests with
+`php artisan test --filter=ApplicationSubmissionNotificationTest`.
+
+## Feedback submission email
+
+Feedback submitted by a student about their placement company or by an employer
+about a placed student sends an email to `mail.contact.address` (configured by
+`PLACEMENT_OFFICER_EMAIL`). The notification includes the feedback type, job,
+company, author name/email, person the feedback is about, rating, comments, and
+an admin-only feedback review link. Reply-To is the feedback author's email.
+It is not sent to the other party; existing feedback visibility rules remain.
+
+Mail is sent only after valid, authorized feedback has been saved. Duplicate,
+invalid, and pre-placement submissions send no email. If delivery fails, feedback
+remains saved, the exception is reported, and the submitter sees a message not to
+submit again. Delivery is synchronous and requires a working mailer; `log` does
+not deliver actual email.
+
+Run feedback notification tests with
+`php artisan test --filter=FeedbackNotificationTest`.
+
+## Employer job-posting notification
+
+When an employer submits a new job, the job is saved as pending administrator
+approval, then an email is sent to `mail.contact.address` (configured by
+`PLACEMENT_OFFICER_EMAIL`). It includes the job details, employer contact, and
+an admin job-review link. Reply-To is the employer's email. Admin-created jobs
+do not send this notification.
+
+If delivery fails, the job remains saved and pending approval, the exception is
+reported, and the employer sees a warning to contact the Placement Officer.
+Notifications are synchronous and require a working delivery mailer; `log` only
+logs emails.
+
+Run job-posting notification tests with
+`php artisan test --filter=EmployerJobPostedNotificationTest`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

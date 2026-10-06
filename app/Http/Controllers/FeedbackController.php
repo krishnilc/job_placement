@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FeedbackSubmitted;
 use App\Models\Feedback;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class FeedbackController extends Controller
 {
@@ -48,7 +51,7 @@ class FeedbackController extends Controller
             'comments' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        Feedback::create([
+        $feedback = Feedback::create([
             'job_application_id' => $application->id,
             'given_by' => $user->id,
             'given_to' => $givenTo,
@@ -57,6 +60,15 @@ class FeedbackController extends Controller
             'comments' => $validated['comments'] ?? null,
         ]);
 
-        return back()->with('success', 'Thank you! Your feedback has been submitted.');
+        $feedback->load(['givenBy', 'givenTo', 'jobApplication.job']);
+        try {
+            Mail::to(config('mail.contact.address'))->send(new FeedbackSubmitted($feedback));
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
+
+            return back()->with('error', 'Your feedback has been saved, but the notification email to the Placement Officer could not be sent. Do not submit it again. Please contact the Placement Officer directly if you need assistance.');
+        }
+
+        return back()->with('success', 'Thank you! Your feedback has been submitted and the Placement Officer has been notified.');
     }
 }

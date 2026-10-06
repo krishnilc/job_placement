@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class AccountController extends Controller
 {
@@ -99,7 +100,7 @@ class AccountController extends Controller
         });
 
         if ($validator->passes()) {
-            DB::transaction(function () use ($request, $isStudentType, $isAlumni, $dbRole) {
+            $user = DB::transaction(function () use ($request, $isStudentType, $isAlumni, $dbRole) {
                 $user = new User();
                 $user->name = $request->name;
                 $user->email = $request->email;
@@ -107,6 +108,7 @@ class AccountController extends Controller
                 $user->password = Hash::make($request->password);
                 $user->role = $dbRole;
                 $user->status = 'pending';
+                $user->email_verification_required = true;
                 if ($isStudentType) {
                     $user->student_id = $request->student_id;
                     $user->date_of_birth = $request->date_of_birth;
@@ -130,13 +132,22 @@ class AccountController extends Controller
                         ]);
                     }
                 }
+                return $user;
             });
 
-            session()->flash('success', 'Registration successful! Your account is pending administrator approval.');
+            session()->put('verification_email', $user->email);
+            try {
+                $user->sendEmailVerificationNotification();
+                session()->flash('success', 'Registration successful! Please check your email and click the verification link. Your account also requires administrator approval before you can log in.');
+            } catch (TransportExceptionInterface $exception) {
+                report($exception);
+                session()->flash('error', 'Your account was created, but we could not send the verification email. Do not register again. Please use the resend button below to try again later.');
+            }
 
             return response()->json([
                 'status' => true,
-                'errors' => []
+                'errors' => [],
+                'redirect' => route('verification.notice'),
             ]);
         } else {
             return response()->json([
@@ -164,14 +175,31 @@ class AccountController extends Controller
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 if (in_array(Auth::user()->role, ['student', 'employer'], true) && Auth::user()->status !== 'active') {
                     $status = Auth::user()->status;
+                    $needsVerification = Auth::user()->needsEmailVerification();
                     Auth::logout();
 
                     $message = $status === 'blocked'
                         ? 'Your account has been blocked. Please contact the administrator.'
                         : 'Your account is pending administrator approval.';
+                    if ($status === 'pending' && $needsVerification) {
+                        $message .= ' Please also verify your email using the link sent during registration.';
+                    }
 
                     return redirect()->route('account.login')->with('error', $message);
                 }
+
+                if (Auth::user()->needsEmailVerification()) {
+                    $email = Auth::user()->email;
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return redirect()->route('verification.notice')
+                        ->with('verification_email', $email)
+                        ->with('error', 'Please verify your email address before logging in. You can request a new verification link below.');
+                }
+
+                $request->session()->regenerate();
 
                 // Authentication passed. Check user role and redirect accordingly
                 if (in_array(Auth::user()->role, ['admin', 'super_admin'], true)) {

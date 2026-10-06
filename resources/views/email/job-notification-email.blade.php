@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Notification Email</title>
+    <title>New job application</title>
 </head>
 <body>
-    <h1>Job Notification Email</h1>
-    <p>Hello, {{ $mailData['employer']->name }}!</p>
-    <p>You have received a new job application for the position of {{ $mailData['job']->title }}.</p>
-
-    <p>Applicant Detail:</p>
-    <p>Name: {{ $mailData['user']->name }}</p>
-    <p>Email: {{ $mailData['user']->email }}</p>
-    <p>Phone: {{ $mailData['user']->mobile }}</p>
-    <!-- <p>Application Date: {{ $mailData['application_date'] }}</p> -->
+    <h1>New job application</h1>
+    <p>Hello {{ $employer->name }},</p>
+    <p>You have received a new application for {{ $job->title }} at {{ $job->company_name }}.</p>
+    <p><strong>Applicant:</strong> {{ $applicant->name }}</p>
+    <p><strong>Email:</strong> {{ $applicant->email }}</p>
+    <p><strong>Phone:</strong> {{ $applicant->mobile }}</p>
+    <p><a href="{{ route('admin.jobApplications', ['search' => $job->title]) }}">Review applications and submitted documents</a> after logging in.</p>
+    <p>Reply to this email to contact the applicant directly.</p>
+    <p>FNU Job Placement Team</p>
 </body>
 </html>

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -82,6 +82,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'email_verification_required' => 'boolean',
             'password' => 'hashed',
         ];
     }
@@ -156,6 +157,10 @@ class User extends Authenticatable
      */
     public function save(array $options = [])
     {
+        if ($this->exists && $this->email_verification_required && $this->isDirty('email')) {
+            $this->email_verified_at = null;
+        }
+
         $saved = parent::save($options);
 
         if ($saved) {
@@ -170,6 +175,11 @@ class User extends Authenticatable
         }
 
         return $saved;
+    }
+
+    public function needsEmailVerification(): bool
+    {
+        return $this->email_verification_required && !$this->hasVerifiedEmail();
     }
 
     /**

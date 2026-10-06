@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmployerJobPosted;
 use App\Models\Category;
 use App\Models\College;
 use App\Models\JobType;
@@ -10,6 +11,8 @@ use App\Models\Job;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class MyJobController extends Controller
 {
@@ -34,6 +37,7 @@ class MyJobController extends Controller
 
     public function saveJob(Request $request)
     {
+        abort_unless(in_array(Auth::user()->role, ['admin', 'super_admin', 'employer'], true), 403);
         $isEmployer = Auth::user()->role === 'employer';
 
         $rules = [
@@ -95,11 +99,25 @@ class MyJobController extends Controller
         $message = $isEmployer
             ? 'Job submitted successfully and is awaiting admin approval.'
             : 'Job created successfully!';
+        $notificationSent = null;
+        if ($isEmployer) {
+            try {
+                Mail::to(config('mail.contact.address'))->send(new EmployerJobPosted($job->load('user')));
+                $notificationSent = true;
+                $message .= ' The Placement Officer has been notified.';
+            } catch (TransportExceptionInterface $exception) {
+                report($exception);
+                $notificationSent = false;
+                $message .= ' The job is saved and awaiting approval, but the Placement Officer notification email could not be sent. Please contact them directly.';
+            }
+        }
 
-        session()->flash('success', $message);
+        session()->flash($notificationSent === false ? 'error' : 'success', $message);
         return response()->json([
             'status' => true,
-            'errors' => []
+            'errors' => [],
+            'notification_sent' => $notificationSent,
+            'message' => $message,
         ]);
     }
 

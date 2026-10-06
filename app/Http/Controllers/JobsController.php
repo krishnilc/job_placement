@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Mail\JobNotificationEmail;
 use App\Models\Category;
 use App\Models\ApplicationStatus;
 use App\Models\College;
@@ -11,11 +10,10 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
 use App\Models\SavedJob;
-use App\Models\User;
+use App\Services\ApplicationSubmissionNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use to;
 
@@ -125,7 +123,7 @@ class JobsController extends Controller
       return view('front.job_detail', ['job' => $job, 'count' => $count, 'applications' => $applications, 'isOwner' => $isOwner]); // Pass the job data and save count to the job detail view
    }
 
-   public function applyJob(Request $request)
+   public function applyJob(Request $request, ApplicationSubmissionNotifier $notifier)
    {
       $id = $request->job_id; // Get the job ID from the request input
 
@@ -152,7 +150,7 @@ class JobsController extends Controller
          ]);
       }
 
-      if (in_array(Auth::user()->role, ['admin', 'employer'])) {
+      if (in_array(Auth::user()->role, ['admin', 'super_admin', 'employer'])) {
          session()->flash('error', 'Admins and employers cannot apply for jobs');
 
          return response()->json([
@@ -240,29 +238,37 @@ class JobsController extends Controller
          $application->certificates_file_names = json_encode($certificateNames);
       }
 
-      $application->save(); // Save the application to the database
+      DB::transaction(function () use ($application) {
+         $application->save();
+         DB::table('application_status_history')->insert([
+            'job_application_id' => $application->id,
+            'application_status_id' => $application->application_status_id,
+            'changed_by' => Auth::id(),
+            'created_at' => now(),
+         ]);
+      });
 
-      DB::table('application_status_history')->insert([
-         'job_application_id' => $application->id,
-         'application_status_id' => $application->application_status_id,
-         'changed_by' => Auth::id(),
-         'created_at' => now(),
-      ]);
+      $notifications = $notifier->send($job, Auth::user());
+      $warning = !$notifications['job_poster'] || !$notifications['student'];
+      $message = 'You have successfully applied for the job.';
+      if (!$notifications['job_poster']) {
+         $message .= ' The email notification to the job poster could not be sent.';
+      }
+      if (!$notifications['student']) {
+         $message .= ' Your confirmation email could not be sent.';
+      }
+      if ($warning) {
+         $message .= ' Your application is saved. Do not submit it again. Please contact the Placement Officer if you need assistance.';
+      } else {
+         $message .= ' The job poster has been notified and a confirmation email has been sent to you.';
+      }
 
-      // Send a notification email to the employer about the new job application
-      $employer = User::where('id', $employer_id)->first(); // Retrieve the employer's user record based on the employer ID
-      $mailData = [
-        'employer' => $employer, // Pass the employer's user data to the email template
-        'user' => Auth::user(), // Pass the authenticated user's data to the email template
-        'job' => $job, // Pass the job data to the email template
-      ];
-     // Mail::to($employer->email)->send(new JobNotificationEmail($mailData)); // Send a notification email to the employer using the JobNotificationEmail Mailable class   
-
-
-      session()->flash('success', 'You have successfully applied for the job'); // Flash a success message to the session if the application is successful
+      session()->flash($warning ? 'error' : 'success', $message);
       return response()->json([
          'status' => true,
-         'message' => 'You have successfully applied for the job'
+         'message' => $message,
+         'warning' => $warning,
+         'notifications' => $notifications,
       ]); // Return a JSON response indicating that the application was successful
    }
 

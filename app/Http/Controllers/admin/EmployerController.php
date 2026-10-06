@@ -9,6 +9,7 @@ use App\Models\JobApplication;
 use App\Models\Organization;
 use App\Models\EmployerProfile;
 use App\Models\User;
+use App\Services\AccountStatusNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -56,7 +57,7 @@ class EmployerController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id, AccountStatusNotifier $notifier)
     {
         $request->validate(['status' => 'required|in:pending,active,blocked']);
 
@@ -64,10 +65,20 @@ class EmployerController extends Controller
         if ($request->status === 'active' && (!$user->employerProfile?->organization_id || $user->organizationRequest?->status === 'pending')) {
             throw ValidationException::withMessages(['status' => 'Approve or link the organization request before activating this contact.']);
         }
+        $previousStatus = $user->status;
         $user->status = $request->status;
         $user->save();
+        $notificationSent = $notifier->sendIfChanged($user, $previousStatus);
 
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'notification_sent' => $notificationSent,
+            'message' => match ($notificationSent) {
+                true => 'The employer has been notified by email.',
+                false => 'The status was saved, but the notification email could not be sent. Please contact the employer directly.',
+                null => 'The status is unchanged; no notification email was sent.',
+            },
+        ]);
     }
 
     public function create()

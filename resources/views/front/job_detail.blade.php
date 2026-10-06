@@ -277,7 +277,7 @@
                 },
                 success: function(response) {
                     $('#applyModal').modal('hide');
-                    let alertClass = response.status ? 'alert-success' : 'alert-danger';
+                    let alertClass = response.status ? (response.warning ? 'alert-warning' : 'alert-success') : 'alert-danger';
                     let alertBox =
                         `<div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">${response.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
                     $(".col-md-8").prepend(alertBox);
