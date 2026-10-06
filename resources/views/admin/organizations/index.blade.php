@@ -22,6 +22,8 @@
                         <a href="{{ route('admin.organizations.create') }}" class="btn btn-primary">Add Organization</a>
                     </div>
                     <form method="GET" class="row g-2 mb-4">
+                        <input type="hidden" name="sort" value="{{ $sort }}">
+                        <input type="hidden" name="direction" value="{{ $direction }}">
                         <div class="col-md-6 col-lg-4">
                             <label for="search" class="visually-hidden">Search existing organizations</label>
                             <input id="search" name="search" class="form-control" value="{{ $search }}" placeholder="Search existing organization names">
@@ -33,15 +35,38 @@
                                         class="btn btn-secondary ms-1"><i class="fa fa-times"></i> Clear</a>
                         </div>
                     </form>
+                    @php
+                        $sortUrl = function ($column) use ($sort, $direction) {
+                            return route('admin.organizations.index', array_merge(request()->except('page'), [
+                                'sort' => $column,
+                                'direction' => $sort === $column && $direction === 'asc' ? 'desc' : 'asc',
+                            ]));
+                        };
+                        $sortIcon = fn ($column) => $sort === $column
+                            ? ($direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down')
+                            : 'fa-sort';
+                    @endphp
                     <div class="card border-0 shadow mb-4">
                         <div class="table-responsive">
                             <table class="table mb-0">
-                                <thead><tr><th>Organization</th><th>Address</th><th>Contacts</th><th>Action</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        @foreach (['name' => 'Organization', 'address' => 'Address', 'phone' => 'Phone', 'employer_profiles_count' => 'Contacts'] as $column => $label)
+                                            <th scope="col" aria-sort="{{ $sort === $column ? ($direction === 'asc' ? 'ascending' : 'descending') : 'none' }}">
+                                                <a href="{{ $sortUrl($column) }}" class="text-decoration-none text-dark" aria-label="Sort by {{ strtolower($label) }}">
+                                                    {{ $label }} <i class="fa {{ $sortIcon($column) }} ms-1" aria-hidden="true"></i>
+                                                </a>
+                                            </th>
+                                        @endforeach
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     @forelse ($organizations as $organization)
                                         <tr>
                                             <td>{{ $organization->name }}</td>
                                             <td>{{ $organization->address }}</td>
+                                            <td>{{ $organization->phone ?: '-' }}</td>
                                             <td><a href="{{ route('admin.users.employers', ['organization_id' => $organization->id]) }}">{{ $organization->employer_profiles_count }}</a></td>
                                             <td>
                                                 <div class="action-dots">
@@ -83,7 +108,7 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr><td colspan="4" class="text-center text-muted">No organizations found.</td></tr>
+                                        <tr><td colspan="5" class="text-center text-muted">No organizations found.</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>

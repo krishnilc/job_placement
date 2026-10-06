@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -41,10 +42,19 @@ class DashboardController extends Controller
             $headers = match ($report) {
                 'job-types' => ['Job Type', 'Jobs', 'Applications', 'Placed', 'Rejected', 'Placement Rate'],
                 'job-type-colleges' => ['Job Type', 'College', 'Jobs', 'Applications', 'Placed', 'Rejected', 'Placement Rate'],
+                'jobs' => ['Job ID', 'Organization', 'Job Title', 'Job Type', 'Location', 'Vacancies', 'Status', 'Posted', 'Closing Date', 'Applications'],
                 default => [],
             };
         }
         $title = ucfirst(str_replace('-', ' ', $report));
+        if ($report === 'funnel') {
+            if ($dashboard['selectedFunnelOrganization']) {
+                $title .= ' - '.$dashboard['selectedFunnelOrganization']->name;
+            }
+            if ($dashboard['selectedFunnelJob']) {
+                $title .= ' - '.$dashboard['selectedFunnelJob']->title.' (#'.$dashboard['selectedFunnelJob']->id.')';
+            }
+        }
         if ($report === 'job-types' && $dashboard['selectedReportCollege']) {
             $title .= ' - '.$dashboard['selectedReportCollege']->name;
             if ($rows === []) {
@@ -95,6 +105,12 @@ class DashboardController extends Controller
         $request->validate([
             'report_job_type' => ['nullable', 'integer', 'exists:job_types,id'],
             'report_college' => ['nullable', 'integer', 'exists:colleges,id'],
+            'report_organization' => ['nullable', 'integer', 'exists:organizations,id'],
+            'funnel_job' => ['nullable', 'integer', Rule::exists('jobs', 'id')->where(function ($query) use ($request) {
+                if ($request->filled('report_organization')) {
+                    $query->where('organization_id', $request->input('report_organization'));
+                }
+            })],
         ]);
 
         // Get statistics
@@ -326,45 +342,7 @@ class DashboardController extends Controller
         });
         $employerPerformanceReports = $employerPerformanceReports->sortByDesc('application_count')->values();
 
-        $funnelStatuses = ApplicationStatus::whereIn('category', ['Active', 'Successful'])->orderBy('sort_order')->get();
-        $funnelStatusIds = $funnelStatuses->pluck('id');
-        $funnelSortOrderById = $funnelStatuses->pluck('sort_order', 'id');
-        $filteredApplicationIds = (clone $applicationQuery)->pluck('job_applications.id');
-        $currentStageRows = (clone $applicationQuery)->whereIn('application_status_id', $funnelStatusIds)->pluck('application_status_id', 'id');
-        $historyStageRows = DB::table('application_status_history')
-            ->whereIn('application_status_id', $funnelStatusIds)
-            ->whereIn('job_application_id', $filteredApplicationIds)
-            ->select('job_application_id', 'application_status_id')
-            ->get();
-
-        $maxSortOrderByApplication = [];
-        foreach ($currentStageRows as $applicationId => $statusId) {
-            $maxSortOrderByApplication[$applicationId] = $funnelSortOrderById[$statusId] ?? 0;
-        }
-        foreach ($historyStageRows as $row) {
-            $sortOrder = $funnelSortOrderById[$row->application_status_id] ?? 0;
-            $maxSortOrderByApplication[$row->job_application_id] = max($maxSortOrderByApplication[$row->job_application_id] ?? 0, $sortOrder);
-        }
-        $maxSortOrders = collect($maxSortOrderByApplication);
-
-        $previousStageCount = null;
-        $firstStageCount = null;
-        $funnelReports = $funnelStatuses->map(function ($status) use ($maxSortOrders, &$previousStageCount, &$firstStageCount) {
-            $count = $maxSortOrders->filter(fn ($sortOrder) => $sortOrder >= $status->sort_order)->count();
-            $firstStageCount ??= $count;
-            $dropOff = $previousStageCount !== null ? $previousStageCount - $count : 0;
-            $dropOffRate = $previousStageCount ? round(($dropOff / $previousStageCount) * 100, 2) : 0;
-            $conversionFromStart = $firstStageCount > 0 ? round(($count / $firstStageCount) * 100, 2) : 0;
-            $previousStageCount = $count;
-
-            return [
-                'name' => $status->name,
-                'count' => $count,
-                'drop_off' => $dropOff,
-                'drop_off_rate' => $dropOffRate,
-                'conversion_from_start' => $conversionFromStart,
-            ];
-        })->values();
+        $funnelReports = $this->buildRecruitmentFunnel(clone $applicationQuery);
 
         $shortlistedFunnelCount = $funnelReports->firstWhere('name', 'Shortlisted')['count'] ?? 0;
         $acceptedFunnelCount = $funnelReports->firstWhere('name', 'Accepted')['count'] ?? 0;
@@ -375,6 +353,13 @@ class DashboardController extends Controller
             'rejection_rate' => round($rejectionRate, 2),
             'offer_conversion_rate' => $acceptedFunnelCount > 0 ? round(($placedApplications / $acceptedFunnelCount) * 100, 2) : 0,
         ];
+
+        $funnelApplicationQuery = (clone $applicationQuery)
+            ->when($request->filled('report_organization'), fn ($query) => $query->whereHas('job', fn ($jobs) => $jobs->where('organization_id', $request->input('report_organization'))))
+            ->when($request->filled('funnel_job'), fn ($query) => $query->where('job_id', $request->input('funnel_job')));
+        if ($request->filled('report_organization') || $request->filled('funnel_job')) {
+            $funnelReports = $this->buildRecruitmentFunnel($funnelApplicationQuery);
+        }
 
         $studentsSeekingEmployment = (clone $applicationQuery)->pluck('job_applications.user_id')->unique()->count();
         $studentsSuccessfullyPlaced = (clone $applicationQuery)
@@ -487,7 +472,7 @@ class DashboardController extends Controller
             ])
             ->values();
 
-        return array_merge($this->buildJobTypeReports($request), [
+        return array_merge($this->buildJobTypeReports($request), $this->buildJobReports($request, $applicationQuery), [
             'totalUsers' => $totalUsers,
             'totalAdmins' => $totalAdmins,
             'totalSuperAdmins' => $totalSuperAdmins,
@@ -552,9 +537,91 @@ class DashboardController extends Controller
             'yearlyFunnelReports' => $yearlyFunnelReports,
             'employerPerformanceReports' => $employerPerformanceReports,
             'funnelReports' => $funnelReports,
+            'funnelJobOptions' => Job::with('organization')->when($request->filled('report_organization'),
+                fn ($query) => $query->where('organization_id', $request->input('report_organization')))
+                ->orderBy('title')->orderBy('id')->get(),
+            'selectedFunnelJob' => $request->filled('funnel_job') ? Job::with('organization')->findOrFail($request->input('funnel_job')) : null,
+            'selectedFunnelOrganization' => $request->filled('report_organization') ? Organization::findOrFail($request->input('report_organization')) : null,
             'applicationMetrics' => $applicationMetrics,
             'studentMetrics' => $studentMetrics,
         ]);
+    }
+
+    private function buildRecruitmentFunnel(Builder $applicationQuery)
+    {
+        $funnelStatuses = ApplicationStatus::whereIn('category', ['Active', 'Successful'])->orderBy('sort_order')->get();
+        $funnelStatusIds = $funnelStatuses->pluck('id');
+        $funnelSortOrderById = $funnelStatuses->pluck('sort_order', 'id');
+        $filteredApplicationIds = (clone $applicationQuery)->pluck('job_applications.id');
+        $currentStageRows = (clone $applicationQuery)->whereIn('application_status_id', $funnelStatusIds)->pluck('application_status_id', 'id');
+        $historyStageRows = DB::table('application_status_history')
+            ->whereIn('application_status_id', $funnelStatusIds)
+            ->whereIn('job_application_id', $filteredApplicationIds)
+            ->select('job_application_id', 'application_status_id')->get();
+        $maxSortOrderByApplication = [];
+        foreach ($currentStageRows as $applicationId => $statusId) {
+            $maxSortOrderByApplication[$applicationId] = $funnelSortOrderById[$statusId] ?? 0;
+        }
+        foreach ($historyStageRows as $row) {
+            $sortOrder = $funnelSortOrderById[$row->application_status_id] ?? 0;
+            $maxSortOrderByApplication[$row->job_application_id] = max($maxSortOrderByApplication[$row->job_application_id] ?? 0, $sortOrder);
+        }
+        $maxSortOrders = collect($maxSortOrderByApplication);
+        $previousStageCount = null;
+        $firstStageCount = null;
+
+        return $funnelStatuses->map(function ($status) use ($maxSortOrders, &$previousStageCount, &$firstStageCount) {
+            $count = $maxSortOrders->filter(fn ($sortOrder) => $sortOrder >= $status->sort_order)->count();
+            $firstStageCount ??= $count;
+            $dropOff = $previousStageCount !== null ? $previousStageCount - $count : 0;
+            $dropOffRate = $previousStageCount ? round(($dropOff / $previousStageCount) * 100, 2) : 0;
+            $conversionFromStart = $firstStageCount > 0 ? round(($count / $firstStageCount) * 100, 2) : 0;
+            $previousStageCount = $count;
+
+            return [
+                'name' => $status->name, 'count' => $count, 'drop_off' => $dropOff,
+                'drop_off_rate' => $dropOffRate, 'conversion_from_start' => $conversionFromStart,
+            ];
+        })->values();
+    }
+
+    private function buildJobReports(Request $request, Builder $applications): array
+    {
+        $counts = (clone $applications)
+            ->select('job_applications.job_id', DB::raw('COUNT(job_applications.id) as application_count'))
+            ->groupBy('job_applications.job_id');
+        $jobs = Job::query()
+            ->leftJoin('organizations', 'organizations.id', '=', 'jobs.organization_id')
+            ->leftJoinSub($counts, 'job_report_counts', fn ($join) => $join->on('job_report_counts.job_id', '=', 'jobs.id'))
+            ->select('jobs.*', DB::raw('COALESCE(organizations.name, jobs.company_name) as organization_name'),
+                DB::raw('COALESCE(job_report_counts.application_count, 0) as application_count'))
+            ->with('jobType')
+            ->when($request->filled('report_organization'), fn ($query) => $query->where('jobs.organization_id', $request->input('report_organization')))
+            ->when($request->filled('employer'), fn ($query) => $query->where('jobs.user_id', $request->input('employer')))
+            ->when($request->filled('opportunity_type'), fn ($query) => $query->where('jobs.job_type_id', $request->input('opportunity_type')))
+            ->when($request->filled('category'), fn ($query) => $query->where('jobs.category_id', $request->input('category')))
+            ->orderBy('organization_name')->orderBy('jobs.created_at', 'desc')->orderBy('jobs.id', 'desc')
+            ->get();
+
+        return [
+            'jobLevelReports' => $jobs->map(fn ($job) => [
+                'Job ID' => $job->id,
+                'Organization' => $job->organization_name,
+                'Job Title' => $job->title,
+                'Job Type' => $job->jobType?->name ?? 'Not provided',
+                'Location' => $job->location,
+                'Vacancies' => $job->vacancy,
+                'Status' => match ((int) $job->status) {
+                    0 => 'Pending',
+                    1 => 'Active',
+                    2 => 'Blocked',
+                },
+                'Posted' => $job->created_at->format('d M Y'),
+                'Closing Date' => $job->closing_date ?: 'Not provided',
+                'Applications' => (int) $job->application_count,
+            ]),
+            'jobReportOrganizationOptions' => Organization::orderBy('name')->get(['id', 'name']),
+        ];
     }
 
     private function buildJobTypeReports(Request $request): array
@@ -724,6 +791,7 @@ class DashboardController extends Controller
                 ['Active Applications', $dashboard['activeApplications']],
                 ['Unsuccessful Applications', $dashboard['unsuccessfulApplications']],
             ],
+            'jobs' => $dashboard['jobLevelReports']->toArray(),
             'employer' => collect($dashboard['employerPerformanceReports'])->map(fn ($row) => [
                 'Organization' => $row->organization_name,
                 'Applications' => $row->application_count,

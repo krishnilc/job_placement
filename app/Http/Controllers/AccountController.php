@@ -85,6 +85,8 @@ class AccountController extends Controller
                 ? ['required', 'string', 'max:255', 'regex:/\S/u'] : 'nullable',
             'company_address' => $role === 'employer' && $request->input('organization_mode') === 'request'
                 ? 'required|string|max:1000' : 'nullable',
+            'company_phone' => $role === 'employer' && $request->input('organization_mode') === 'request'
+                ? 'required|string|max:50' : 'nullable',
         ], [
             'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
@@ -124,6 +126,7 @@ class AccountController extends Controller
                         OrganizationRequest::create([
                             'user_id' => $user->id, 'name' => $request->company_name,
                             'address' => $request->company_address,
+                            'phone' => $request->company_phone,
                         ]);
                     }
                 }

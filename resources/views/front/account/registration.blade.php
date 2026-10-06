@@ -122,6 +122,12 @@
                                             placeholder="Enter organization address" rows="3"></textarea>
                                         <p class="text-danger" id="companyAddressError"></p>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="company_phone" class="mb-2">Organization Phone*</label>
+                                        <input type="tel" name="company_phone" id="company_phone" class="form-control"
+                                            placeholder="Enter organization phone number">
+                                        <p class="text-danger" id="companyPhoneError"></p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -148,7 +154,7 @@
                 $('#organization_id').prop('disabled', !employer || newOrganization).prop('required', employer && !newOrganization);
                 $('#organizationPicker').toggle(!newOrganization);
                 $('#newOrganizationFields').toggle(newOrganization);
-                $('#company_name, #company_address').prop('disabled', !employer || !newOrganization).prop('required', employer && newOrganization);
+                $('#company_name, #company_address, #company_phone').prop('disabled', !employer || !newOrganization).prop('required', employer && newOrganization);
                 $('#requestOrganizationButton').text(newOrganization
                     ? 'Search existing organizations instead'
                     : "Can't find your organization? Request a new organization.");
@@ -186,7 +192,7 @@
                     $('#graduationYearGroup').show();
                     $('#graduation_year').attr('required', true);
                     $('#employerFields').hide();
-                    $('#designation, #company_name, #company_address').removeAttr('required');
+                    $('#designation, #company_name, #company_address, #company_phone').removeAttr('required');
                 } else {
                     // Student: student_id + DOB mandatory, no graduation year
                     $('#roleSectionLabel').text('Student details');
@@ -200,7 +206,7 @@
                     $('#graduation_year').removeAttr('required');
                     $('#graduationYearError').text('');
                     $('#employerFields').hide();
-                    $('#designation, #company_name, #company_address').removeAttr('required');
+                    $('#designation, #company_name, #company_address, #company_phone').removeAttr('required');
                 }
                 toggleOrganizationFields();
             }
@@ -233,6 +239,7 @@
                         $("#designationError").text('');
                         $("#companyNameError").text('');
                         $("#companyAddressError").text('');
+                        $("#companyPhoneError").text('');
                         $("#organization_idError, #organization_modeError").text('');
 
                         if (response.status == false) {
@@ -269,6 +276,9 @@
                             }
                             if (errors.company_address) {
                                 $("#companyAddressError").text(errors.company_address[0]);
+                            }
+                            if (errors.company_phone) {
+                                $("#companyPhoneError").text(errors.company_phone[0]);
                             }
                             if (errors.organization_id) {
                                 $("#organization_idError").text(errors.organization_id[0]);

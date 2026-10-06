@@ -194,35 +194,21 @@
                                             <p class="text-danger" id="experienceError"></p>
                                         </div>
 
-                                        <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
-
-                                        <div class="row">
-                                            <div class="mb-4 col-md-6">
-                                                <label for="" class="mb-2">Name<span
-                                                        class="req">*</span></label>
-                                                <input value="{{ $job->company_name }}" type="text"
-                                                    placeholder="Company Name" id="company_name" name="company_name"
-                                                    class="form-control">
-                                                <p class="text-danger" id="companyNameError"></p>
-                                            </div>
-
-                                            <div class="mb-4 col-md-6">
-                                                <label for="" class="mb-2">Location</label>
-                                                <input value="{{ $job->company_location }}" type="text"
-                                                    placeholder="Company Location" id="company_location"
-                                                    name="company_location" class="form-control">
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <label for="" class="mb-2">Website</label>
-                                            <input value="{{ $job->company_website }}" type="text"
-                                                placeholder="Website" id="company_website" name="company_website"
-                                                class="form-control">
-                                        </div>
+                                        <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Organization Details</h3>
+                                        <p class="text-muted">Organization details cannot be edited from this page. Update shared details in Manage Organizations.</p>
+                                        @if ($job->organization)
+                                            <p><a href="{{ route('admin.organizations.show', $job->organization) }}">View organization details</a></p>
+                                        @endif
+                                        @include('organizations.job-details', [
+                                            'name' => $job->organization ? $job->organization->name : $job->company_name,
+                                            'location' => $job->organization ? $job->organization->address : $job->company_location,
+                                            'website' => $job->organization ? $job->organization->website_url : $job->company_website,
+                                        ])
+                                        <p class="text-danger" id="organizationDetailsError"></p>
                                     </div>
                                     <div class="card-footer  p-4">
                                         <button type="submit" class="btn btn-primary">Update Job</button>
+                                        <a href="{{ route('admin.jobs') }}" class="btn btn-secondary">Cancel</a>
                                     </div>
                                 </div>
                     </form>
@@ -305,7 +291,7 @@
                     $("#locationError").text('');
                     $("#descriptionError").text('');
                     $("#experienceError").text('');
-                    $("#companyNameError").text('');
+                    $("#organizationDetailsError").text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('admin.jobs') }}";
@@ -333,9 +319,12 @@
                         if (errors.experience) {
                             $("#experienceError").text(errors.experience[0]);
                         }
-                        if (errors.company_name) {
-                            $("#companyNameError").text(errors.company_name[0]);
-                        }
+                        var organizationErrors = ['organization_id', 'company_name', 'company_location', 'company_website', 'organization_name', 'organization_location', 'organization_website'];
+                        organizationErrors.forEach(function(field) {
+                            if (errors[field]) {
+                                $("#organizationDetailsError").text('Organization details cannot be edited from this page. Update shared details in Manage Organizations.');
+                            }
+                        });
                     }
                 },
                 error: function(xhr, status, error) {

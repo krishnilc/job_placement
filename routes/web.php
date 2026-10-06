@@ -131,6 +131,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'checkRole'], function () {
 
 Route::group(['prefix' => 'employer', 'middleware' => 'checkRole'], function () {
     Route::get('/home', [EmployerController::class, 'dashboard'])->name('employer.dashboard');
+    Route::get('/organization', [OrganizationController::class, 'showForEmployer'])
+        ->middleware('auth')->name('employer.organization');
 
     Route::middleware('auth')->prefix('account')->name('employer.account.')->group(function () {
         Route::get('/profile', [AccountManagementController::class, 'employerViewProfile'])->name('profile');

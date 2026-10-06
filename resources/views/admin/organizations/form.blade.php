@@ -25,13 +25,13 @@
                             <form method="POST" action="{{ $organization->exists ? route('admin.organizations.update', $organization) : route('admin.organizations.store') }}">
                                 @csrf
                                 @if ($organization->exists) @method('PUT') @endif
-                                @foreach (['name' => 'Organization name', 'address' => 'Address', 'postal_address' => 'Postal address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
+                                @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'postal_address' => 'Postal address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
                                     <div class="mb-3">
                                         <label for="{{ $field }}" class="form-label">{{ $label }}{{ in_array($field, ['name', 'address']) ? '*' : '' }}</label>
                                         @if (in_array($field, ['address', 'postal_address', 'description']))
                                             <textarea id="{{ $field }}" name="{{ $field }}" class="form-control" rows="3">{{ old($field, $organization->{$field}) }}</textarea>
                                         @else
-                                            <input id="{{ $field }}" name="{{ $field }}" type="{{ str_ends_with($field, '_url') ? 'url' : 'text' }}" class="form-control" value="{{ old($field, $organization->{$field}) }}">
+                                            <input id="{{ $field }}" name="{{ $field }}" type="{{ str_ends_with($field, '_url') ? 'url' : ($field === 'phone' ? 'tel' : 'text') }}" class="form-control" value="{{ old($field, $organization->{$field}) }}">
                                         @endif
                                         @error($field)<p class="text-danger">{{ $message }}</p>@enderror
                                     </div>

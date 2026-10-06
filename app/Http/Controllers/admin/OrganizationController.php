@@ -9,20 +9,27 @@ use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class OrganizationController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'sort' => ['nullable', Rule::in(['name', 'address', 'phone', 'employer_profiles_count'])],
+            'direction' => ['nullable', Rule::in(['asc', 'desc'])],
+        ]);
+        $sort = $request->query('sort') ?: 'name';
+        $direction = $request->query('direction') ?: 'asc';
         $search = trim((string) $request->query('search', ''));
         $organizations = Organization::withCount(['employerProfiles', 'jobs'])
             ->when($search !== '', fn ($query) => $query->whereRaw('LOWER(name) LIKE ?', ['%'.Organization::normalizeName($search).'%']))
-            ->orderBy('name')->paginate(15)->withQueryString();
+            ->orderBy($sort, $direction)->orderBy('id')->paginate(15)->withQueryString();
         $requests = OrganizationRequest::with(['user', 'organization', 'reviewer'])
             ->where('status', 'pending')->orderBy('created_at')->paginate(15, ['*'], 'requests_page')->withQueryString();
 
-        return view('admin.organizations.index', compact('organizations', 'requests', 'search'));
+        return view('admin.organizations.index', compact('organizations', 'requests', 'search', 'sort', 'direction'));
     }
 
     public function create()
@@ -86,6 +93,7 @@ class OrganizationController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/\S/u'],
             'address' => ['required', 'string', 'max:1000'],
+            'phone' => ['nullable', 'string', 'max:50'],
             'postal_address' => ['nullable', 'string', 'max:1000'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -124,7 +132,7 @@ class OrganizationController extends Controller
             if ($data['decision'] === 'approve') {
                 $organization = Organization::createOrFirst(
                     ['name_key' => Organization::nameKey($pending->name)],
-                    $pending->only(['name', 'address', 'website_url', 'description'])
+                    $pending->only(['name', 'address', 'phone', 'website_url', 'description'])
                 );
                 if (! $organization->wasRecentlyCreated) {
                     throw ValidationException::withMessages(['decision' => 'An organization with this name already exists. Link the request to the existing record instead.']);

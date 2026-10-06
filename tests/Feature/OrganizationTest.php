@@ -30,7 +30,7 @@ class OrganizationTest extends TestCase
     {
         $this->post(route('account.processRegistration'), $this->registration([
             'organization_mode' => 'request', 'company_name' => 'New Organization',
-            'company_address' => 'Suva',
+            'company_address' => 'Suva', 'company_phone' => '+679 123 4567',
         ]))->assertOk()->assertJson(['status' => true]);
 
         return OrganizationRequest::firstOrFail();
@@ -41,6 +41,7 @@ class OrganizationTest extends TestCase
         $this->get(route('account.registration'))->assertOk()
             ->assertSee('Search your organization')
             ->assertSee("Can't find your organization? Request a new organization.", false)
+            ->assertSee('Organization Phone*')
             ->assertSee('assets/js/organization-picker.js', false);
     }
 
@@ -52,6 +53,64 @@ class OrganizationTest extends TestCase
             ->assertOk()->assertExactJson(['organizations' => [['id' => $organization->id, 'name' => 'Example Organization']]]);
         $this->getJson(route('organizations.search', ['search' => 'missing']))->assertOk()->assertExactJson(['organizations' => []]);
         $this->getJson(route('organizations.search', ['search' => 'a']))->assertUnprocessable();
+    }
+
+    public function test_organization_list_sorts_each_data_column_in_both_directions(): void
+    {
+        $alpha = Organization::create(['name' => 'Alpha Company', 'address' => 'Z Street', 'phone' => '2222222']);
+        $zulu = Organization::create(['name' => 'Zulu Company', 'address' => 'A Street', 'phone' => '1111111']);
+        $contact = User::factory()->create(['role' => 'employer']);
+        $contact->employerProfile()->create(['organization_id' => $alpha->id]);
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $this->get(route('admin.organizations.index'))->assertOk()
+            ->assertViewHas('organizations', fn ($organizations) => $organizations->modelKeys() === [$alpha->id, $zulu->id]);
+        foreach ([
+            'name' => [$alpha->id, $zulu->id],
+            'address' => [$zulu->id, $alpha->id],
+            'phone' => [$zulu->id, $alpha->id],
+            'employer_profiles_count' => [$zulu->id, $alpha->id],
+        ] as $column => $ids) {
+            foreach (['asc', 'desc'] as $direction) {
+                $expected = $direction === 'asc' ? $ids : array_reverse($ids);
+                $this->get(route('admin.organizations.index', ['sort' => $column, 'direction' => $direction]))
+                    ->assertOk()->assertViewHas('organizations', fn ($organizations) => $organizations->modelKeys() === $expected);
+            }
+        }
+    }
+
+    public function test_organization_sorting_preserves_search_pagination_and_header_toggle(): void
+    {
+        for ($i = 1; $i <= 16; $i++) {
+            Organization::create(['name' => sprintf('Shared Company %02d', $i), 'address' => 'Suva']);
+        }
+        Organization::create(['name' => 'Unrelated Company', 'address' => 'Nadi']);
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $parameters = ['search' => 'Shared', 'sort' => 'name', 'direction' => 'desc'];
+        $this->get(route('admin.organizations.index', $parameters))->assertOk()
+            ->assertViewHas('organizations', fn ($organizations) => $organizations->total() === 16
+                && $organizations->first()->name === 'Shared Company 16'
+                && $organizations->count() === 15)
+            ->assertSee(route('admin.organizations.index', [...$parameters, 'page' => 2]));
+        $this->get(route('admin.organizations.index', [...$parameters, 'page' => 2, 'requests_page' => 3]))
+            ->assertOk()
+            ->assertViewHas('organizations', fn ($organizations) => $organizations->first()->name === 'Shared Company 01')
+            ->assertSee(route('admin.organizations.index', [...$parameters, 'direction' => 'asc', 'requests_page' => 3]))
+            ->assertSee('aria-sort="descending"', false)
+            ->assertSee('name="sort" value="name"', false)
+            ->assertSee('name="direction" value="desc"', false);
+        $this->get(route('admin.organizations.index', ['sort' => 'address']))
+            ->assertOk()->assertViewHas('organizations', fn ($organizations) => $organizations->modelKeys()
+                === Organization::orderBy('address')->orderBy('id')->limit(15)->pluck('id')->all());
+    }
+
+    public function test_organization_sorting_rejects_invalid_parameters(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $this->getJson(route('admin.organizations.index', ['sort' => 'invalid']))
+            ->assertUnprocessable()->assertJsonValidationErrors('sort');
+        $this->getJson(route('admin.organizations.index', ['direction' => 'invalid']))
+            ->assertUnprocessable()->assertJsonValidationErrors('direction');
     }
 
     public function test_multiple_contacts_register_for_the_same_organization(): void
@@ -73,6 +132,7 @@ class OrganizationTest extends TestCase
         $pending = $this->requestOrganization();
         $this->assertSame('pending', $pending->status);
         $this->assertSame('pending', $pending->user->status);
+        $this->assertSame('+679 123 4567', $pending->phone);
         $this->assertNull($pending->user->employerProfile->organization_id);
         $this->assertDatabaseCount('organizations', 0);
         $this->post(route('account.authenticate'), ['email' => 'contact@example.com', 'password' => 'secret123'])
@@ -87,7 +147,12 @@ class OrganizationTest extends TestCase
             'organization_mode' => 'existing', 'organization_id' => 99999,
         ]))->assertJson(['status' => false])->assertJsonStructure(['errors' => ['organization_id']]);
         $this->post(route('account.processRegistration'), $this->registration([
+            'organization_mode' => 'request', 'company_name' => 'Another Organization',
+            'company_address' => 'Suva',
+        ]))->assertJson(['status' => false])->assertJsonStructure(['errors' => ['company_phone']]);
+        $this->post(route('account.processRegistration'), $this->registration([
             'organization_mode' => 'request', 'company_name' => '  EXAMPLE   ORGANIZATION  ', 'company_address' => 'Suva',
+            'company_phone' => '+679 123 4567',
         ]))->assertJson(['status' => false])->assertJsonStructure(['errors' => ['company_name']]);
         $this->assertDatabaseCount('users', 0);
     }
@@ -108,6 +173,7 @@ class OrganizationTest extends TestCase
         $this->assertSame('approved', $pending->status);
         $this->assertSame('pending', $pending->user->status);
         $this->assertSame($pending->organization_id, $pending->user->employerProfile->organization_id);
+        $this->assertSame('+679 123 4567', $pending->organization->phone);
         $this->patchJson(route('admin.users.employers.status', $pending->user_id), ['status' => 'active'])
             ->assertOk()->assertJson(['status' => true]);
         $this->assertSame('active', $pending->user->fresh()->status);
@@ -242,7 +308,10 @@ class OrganizationTest extends TestCase
     {
         $this->actingAs(User::factory()->create(['role' => 'admin']));
         $this->get(route('admin.organizations.create'))->assertOk();
-        $this->post(route('admin.organizations.store'), ['name' => 'Example Company', 'address' => 'Suva'])->assertRedirect();
+        $this->post(route('admin.organizations.store'), [
+            'name' => 'Example Company', 'address' => 'Suva', 'phone' => '+679 123 4567',
+        ])->assertRedirect();
+        $this->get(route('admin.organizations.index'))->assertOk()->assertSee('+679 123 4567');
         $this->postJson(route('admin.organizations.store'), ['name' => 'EXAMPLE   COMPANY', 'address' => 'Nadi'])
             ->assertUnprocessable()->assertJsonValidationErrors('name');
         $other = Organization::create(['name' => 'Other Company', 'address' => 'Nadi']);

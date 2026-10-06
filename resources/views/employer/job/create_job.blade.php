@@ -156,14 +156,18 @@
                                     <p class="text-danger" id="experienceError"></p>
                                 </div>
 
-                                <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
                                 @if (auth()->user()->role === 'employer')
-                                    <p class="text-muted small">
-                                        These details are linked to your organization profile and cannot be
-                                        changed here. 
-                                    </p>
-                                @endif
-
+                                    <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Organization Details</h3>
+                                    <p class="text-muted">Organization details cannot be edited from this page. Contact an administrator to update shared details.</p>
+                                    <p><a href="{{ route('employer.organization') }}">View organization details</a></p>
+                                    @include('organizations.job-details', [
+                                        'name' => auth()->user()->company_name,
+                                        'location' => auth()->user()->company_address,
+                                        'website' => auth()->user()->website_url,
+                                    ])
+                                    <p class="text-danger" id="companyNameError"></p>
+                                @else
+                                <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
                                 <div class="row">
                                     <div class="mb-4 col-md-6">
                                         <label for="" class="mb-2">Name<span class="req">*</span></label>
@@ -193,9 +197,11 @@
                                         value="{{ old('company_website', auth()->user()->role === 'employer' ? auth()->user()->website_url : '') }}"
                                         @readonly(auth()->user()->role === 'employer')>
                                 </div>
+                                @endif
                             </div>
                             <div class="card-footer  p-4">
                                 <button type="submit" class="btn btn-primary">Save Job</button>
+                                <a href="{{ route('employer.dashboard') }}" class="btn btn-secondary ms-1">Cancel</a>
                             </div>
                         </div>
                     </form>

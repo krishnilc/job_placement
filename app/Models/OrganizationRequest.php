@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrganizationRequest extends Model
 {
     protected $fillable = [
-        'user_id', 'name', 'address', 'website_url', 'description',
+        'user_id', 'name', 'address', 'phone', 'website_url', 'description',
         'status', 'organization_id', 'reviewed_by', 'reviewed_at', 'review_notes',
     ];
 

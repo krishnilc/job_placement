@@ -194,35 +194,14 @@
                                             <p class="text-danger" id="experienceError"></p>
                                         </div>
 
-                                        <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company Details</h3>
-
-                                        <div class="row">
-                                            <div class="mb-4 col-md-6">
-                                                <label for="" class="mb-2">Name<span
-                                                        class="req">*</span></label>
-                                                <input value="" type="text"
-                                                    placeholder="Company Name" id="company_name" name="company_name"
-                                                    class="form-control">
-                                                <p class="text-danger" id="companyNameError"></p>
-                                            </div>
-
-                                            <div class="mb-4 col-md-6">
-                                                <label for="" class="mb-2">Location</label>
-                                                <input value="" type="text"
-                                                    placeholder="Company Location" id="company_location"
-                                                    name="company_location" class="form-control">
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <label for="" class="mb-2">Website</label>
-                                            <input value="" type="text"
-                                                placeholder="Website" id="company_website" name="company_website"
-                                                class="form-control">
-                                        </div>
+                                        <h3 class="fs-4 mb-1 mt-5 border-top pt-5">Company</h3>
+                                        <p class="text-muted">Search and select an existing organization. Its name, address, and website will be used for this job.</p>
+                                        @include('organizations.picker', ['required' => true, 'emptyMessage' => 'No organizations found. Add the organization in Manage Organizations first.'])
+                                        <p class="small">Can't find the company? <a href="{{ route('admin.organizations.create') }}" target="_blank" rel="noopener">Add an organization</a>, then search again.</p>
                                     </div>
                                     <div class="card-footer  p-4">
                                         <button type="submit" class="btn btn-primary">Add Job</button>
+                                        <a href="{{ route('admin.jobs') }}" class="btn btn-secondary ms-1">Cancel</a>
                                     </div>
                                 </div>
                     </form>
@@ -233,6 +212,7 @@
 @endsection
 
 @section('customJS')
+    <script src="{{ asset('assets/js/organization-picker.js') }}"></script>
     <script type="text/javascript">
         // Store all category options for filtering by college
         var allCategoryOptions = $('#category option').clone();
@@ -305,7 +285,7 @@
                     $("#locationError").text('');
                     $("#descriptionError").text('');
                     $("#experienceError").text('');
-                    $("#companyNameError").text('');
+                    $("#organization_idError").text('');
 
                     if (response.status == true) {
                         window.location.href = "{{ route('admin.jobs') }}";
@@ -333,8 +313,8 @@
                         if (errors.experience) {
                             $("#experienceError").text(errors.experience[0]);
                         }
-                        if (errors.company_name) {
-                            $("#companyNameError").text(errors.company_name[0]);
+                        if (errors.organization_id) {
+                            $("#organization_idError").text(errors.organization_id[0]);
                         }
                     }
                 },

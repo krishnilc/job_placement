@@ -33,7 +33,7 @@ $(function () {
                 });
                 message.text(response.organizations.length
                     ? 'Select your organization from the results. Search a more specific name if needed.'
-                    : 'No organizations found. You can request a new organization.');
+                    : (picker.data('empty-message') || 'No organizations found. You can request a new organization.'));
             },
             error: function (xhr, status) {
                 if (status !== 'abort') {

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\College;
 use App\Models\Job;
 use App\Models\JobType;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use session;
@@ -82,7 +83,7 @@ class JobController extends Controller
             'vacancy' => 'required|integer',
             'location' => 'required|max:50',
             'description' => 'required',
-            'company_name' => 'required|min:3|max:75',
+            'organization_id' => 'required|integer|exists:organizations,id',
             'closing_date' => 'nullable|date',
             'experience' => 'required',
             'job_status' => 'required|in:pending,active,blocked',
@@ -95,12 +96,13 @@ class JobController extends Controller
             ]);
         }
 
+        $organization = Organization::findOrFail($request->integer('organization_id'));
         $job = new Job();
         $job->title = $request->title;
         $job->category_id = $request->category;
         $job->job_type_id = $request->job_type;
         $job->user_id = auth()->id();
-        $job->organization_id = auth()->user()->employerProfile?->organization_id;
+        $job->organization_id = $organization->id;
         $job->vacancy = $request->vacancy;
         $job->closing_date = $request->closing_date;
         $job->salary = $request->salary;
@@ -110,9 +112,9 @@ class JobController extends Controller
         $job->qualifications = $request->qualifications;
         $job->keywords = $request->keywords;
         $job->experience = $request->experience;
-        $job->company_name = $request->company_name;
-        $job->company_location = $request->company_location;
-        $job->company_website = $request->company_website;
+        $job->company_name = $organization->name;
+        $job->company_location = $organization->address;
+        $job->company_website = $organization->website_url;
         $job->isFeatured = $request->has('isFeatured') ? 1 : 0;
         $job->status = match ($request->job_status) {
             'pending' => 0,
@@ -153,7 +155,13 @@ class JobController extends Controller
             'vacancy' => 'required|integer',
             'location' => 'required|max:50',
             'description' => 'required',
-            'company_name' => 'required|min:3|max:75',
+            'organization_id' => 'prohibited',
+            'company_name' => 'prohibited',
+            'company_location' => 'prohibited',
+            'company_website' => 'prohibited',
+            'organization_name' => 'prohibited',
+            'organization_location' => 'prohibited',
+            'organization_website' => 'prohibited',
             'closing_date' => 'nullable|date',
             'job_status' => 'required|in:pending,active,blocked',
         ];
@@ -161,7 +169,7 @@ class JobController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->passes()) {
-            $job = job::find($id);
+            $job = Job::findOrFail($id);
 
             $job->title = $request->title;
             $job->category_id = $request->category;
@@ -175,9 +183,6 @@ class JobController extends Controller
             $job->qualifications = $request->qualifications;
             $job->keywords = $request->keywords;
             $job->experience = $request->experience;
-            $job->company_name = $request->company_name;
-            $job->company_location = $request->company_location;
-            $job->company_website = $request->company_website;
             $job->isFeatured = $request->has('isFeatured') ? 1 : 0;
             $job->status = match ($request->job_status) {
                 'pending' => 0,

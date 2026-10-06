@@ -48,6 +48,8 @@
         </div>
     </div>
 
+    @include('admin.reports.jobs')
+
     <div class="card border-0 shadow">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Recruitment Funnel</h5>
@@ -59,6 +61,32 @@
             </div>
         </div>
         <div class="card-body">
+            <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-2 mb-4">
+                <input type="hidden" name="tab" value="employers">
+                @foreach (request()->except(['tab', 'funnel_job', 'page']) as $key => $value)
+                    @if (is_scalar($value))
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endif
+                @endforeach
+                <div class="col-md-8">
+                    <label for="funnel_job" class="form-label">Job title for recruitment funnel</label>
+                    <select name="funnel_job" id="funnel_job" class="form-select">
+                        <option value="">All job postings{{ $selectedFunnelOrganization ? ' for '.$selectedFunnelOrganization->name : '' }}</option>
+                        @foreach ($funnelJobOptions as $job)
+                            <option value="{{ $job->id }}" @selected((string) request('funnel_job') === (string) $job->id)>
+                                {{ $job->title }} (#{{ $job->id }}) - {{ $job->organization?->name ?? $job->company_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button class="btn btn-primary">View Funnel</button>
+                    <a href="{{ route('admin.dashboard', array_merge(request()->except(['funnel_job', 'page']), ['tab' => 'employers'])) }}" class="btn btn-outline-secondary">Reset job</a>
+                </div>
+            </form>
+            <p class="text-muted">Funnel for {{ $selectedFunnelJob ? $selectedFunnelJob->title.' (#'.$selectedFunnelJob->id.')' : 'all job postings' }}
+                {{ $selectedFunnelOrganization ? ' at '.$selectedFunnelOrganization->name : '' }}.
+                Dashboard applicant and application-year filters also apply.</p>
             @forelse($funnelReports as $index => $stage)
                 <div class="mb-2">
                     <div class="d-flex justify-content-between">
@@ -90,4 +118,3 @@
         </div>
     </div>
 </div>
-
