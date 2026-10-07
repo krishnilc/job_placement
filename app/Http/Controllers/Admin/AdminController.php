@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminAccountCreated;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class AdminController extends Controller
 {
@@ -57,7 +60,13 @@ class AdminController extends Controller
             $user->status = 'active';
             $user->save();
 
-            session()->flash('success', 'Admin user created successfully!');
+            try {
+                Mail::to($user->email)->send(new AdminAccountCreated($user));
+                session()->flash('success', 'Admin user created successfully and an email notification was sent.');
+            } catch (TransportExceptionInterface $exception) {
+                report($exception);
+                session()->flash('error', 'Admin user created successfully, but the notification email could not be sent. Please contact the new admin directly.');
+            }
 
             return response()->json([
                 'status' => true,
