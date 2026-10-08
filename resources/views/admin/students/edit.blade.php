@@ -1,16 +1,23 @@
 @extends('front.layouts.app')
 
 @php
+    // Mirrors the fields a student/alumni must supply on their own profile update form.
+    $requiredFields = array_merge(
+        ['name', 'student_id', 'email', 'mobile', 'designation'],
+        \App\Models\StudentProfile::REQUIRED_COMPLETION_FIELDS,
+    );
+
     $fields = [
-        'name' => ['label' => 'Name*', 'max' => 20],
-        'student_id' => ['label' => 'Student ID*', 'max' => 9],
-        'email' => ['label' => 'Email*'],
+        'name' => ['label' => 'Name', 'max' => 20],
+        'student_id' => ['label' => 'Student ID', 'max' => 9],
+        'email' => ['label' => 'Email'],
         'email_2' => ['label' => 'Alternate Email'],
         'mobile' => ['label' => 'Mobile', 'max' => 7],
         'mobile_2' => ['label' => 'Alternate Mobile', 'max' => 7],
-        'designation' => ['label' => 'Designation', 'max' => 100],
+        'designation' => ['label' => 'Student Status', 'type' => 'select', 'options' => ['' => 'Select status', 'Full-time Student' => 'Full-time Student', 'Part-time Student' => 'Part-time Student', 'Alumni' => 'Alumni']],
         'date_of_birth' => ['label' => 'Date of Birth', 'type' => 'date'],
         'gender' => ['label' => 'Gender', 'type' => 'select', 'options' => ['' => 'Select gender', 'Male' => 'Male', 'Female' => 'Female', 'Other' => 'Other']],
+        'marital_status' => ['label' => 'Marital Status', 'type' => 'select', 'options' => ['' => 'Select marital status', 'Single' => 'Single', 'Married' => 'Married', 'Divorced' => 'Divorced', 'Widowed' => 'Widowed']],
         'residential_address' => ['label' => 'Residential Address'],
         'postal_address' => ['label' => 'Postal Address'],
         'city' => ['label' => 'City', 'max' => 100],
@@ -58,26 +65,24 @@
                                         <h3 class="fs-4 mb-1">Student/Edit</h3>
                                         <div class="row g-3 mt-1">
                                             @foreach ($fields as $name => $f)
+                                                @php($isRequired = in_array($name, $requiredFields, true))
                                                 <div class="{{ $f['full'] ?? false ? 'col-12' : 'col-md-6' }}">
                                                     <label for="{{ $name }}" class="mb-2">
-                                                        @if (str_ends_with($f['label'], '*'))
-                                                            {{ substr($f['label'], 0, -1) }}<span class="text-danger">*</span>
-                                                        @else
-                                                            {{ $f['label'] }}
-                                                        @endif
+                                                        {{ $f['label'] }}@if ($isRequired)<span class="text-danger">*</span>@endif
                                                     </label>
                                                     @if (($f['type'] ?? 'text') === 'select')
-                                                        <select name="{{ $name }}" id="{{ $name }}" class="form-control">
+                                                        <select name="{{ $name }}" id="{{ $name }}" class="form-control" @if ($isRequired) required @endif>
                                                             @foreach ($f['options'] as $value => $text)
                                                                 <option value="{{ $value }}" @selected((string) $user->{$name} === (string) $value)>{{ $text }}</option>
                                                             @endforeach
                                                         </select>
                                                     @elseif (($f['type'] ?? 'text') === 'textarea')
-                                                        <textarea name="{{ $name }}" id="{{ $name }}" rows="3" class="form-control">{{ $user->{$name} }}</textarea>
+                                                        <textarea name="{{ $name }}" id="{{ $name }}" rows="3" class="form-control" @if ($isRequired) required @endif>{{ $user->{$name} }}</textarea>
                                                     @else
                                                         <input type="{{ $f['type'] ?? 'text' }}" name="{{ $name }}" id="{{ $name }}"
                                                             class="form-control" maxlength="{{ $f['max'] ?? 255 }}"
-                                                            value="{{ ($f['type'] ?? 'text') === 'date' && $user->{$name} ? \Illuminate\Support\Carbon::parse($user->{$name})->format('Y-m-d') : $user->{$name} }}">
+                                                            value="{{ ($f['type'] ?? 'text') === 'date' && $user->{$name} ? \Illuminate\Support\Carbon::parse($user->{$name})->format('Y-m-d') : $user->{$name} }}"
+                                                            @if ($isRequired) required @endif>
                                                     @endif
                                                     <p class="text-danger mb-0" id="{{ $name }}Error"></p>
                                                 </div>

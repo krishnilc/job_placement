@@ -77,6 +77,7 @@
                         <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Personal details</h2><p class="profile-section-caption">Your location and personal information</p></div></div><div class="row g-3">
                             @include('front.account.profile-field', ['icon' => 'calendar', 'label' => 'Date of Birth', 'value' => $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y') : 'Not provided'])
                             @include('front.account.profile-field', ['icon' => 'venus-mars', 'label' => 'Gender', 'value' => $user->gender])
+                            @include('front.account.profile-field', ['icon' => 'heart-o', 'label' => 'Marital Status', 'value' => $user->marital_status])
                             @include('front.account.profile-field', ['icon' => 'home', 'label' => 'Residential Address', 'value' => $user->residential_address, 'wide' => true])
                             @include('front.account.profile-field', ['icon' => 'mail-forward', 'label' => 'Postal Address', 'value' => $user->postal_address, 'wide' => true])
                             @include('front.account.profile-field', ['icon' => 'building-o', 'label' => 'City', 'value' => $user->city])

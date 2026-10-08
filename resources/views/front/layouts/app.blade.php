@@ -131,6 +131,26 @@
         </nav>
     </header>
 
+    @if (Auth::check() && Auth::user()->role === 'student' && ! Auth::user()->hasCompleteStudentProfile())
+        <div class="container mt-3">
+            <div class="alert alert-warning mb-0" role="alert">
+                <strong>Your {{ Auth::user()->designation === 'Alumni' ? 'alumni' : 'student' }} profile is incomplete.</strong>
+                Please provide all required profile details to complete your account.
+                <a href="{{ route('account.editProfile') }}" class="alert-link">Update your profile now</a>.
+            </div>
+        </div>
+    @endif
+
+    @if (Auth::check() && Auth::user()->role === 'student' && ! Auth::user()->hasProfilePicture())
+        <div class="container mt-3">
+            <div class="alert alert-warning mb-0" role="alert">
+                <strong>Your profile picture has not been uploaded.</strong>
+                Add a profile picture to complete your {{ Auth::user()->designation === 'Alumni' ? 'alumni' : 'student' }} account.
+                <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#exampleModal">Upload a profile picture now</a>.
+            </div>
+        </div>
+    @endif
+
     @yield('main')
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

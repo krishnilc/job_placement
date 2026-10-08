@@ -76,6 +76,7 @@
                                 <div class="row g-3">
                                     @include('front.account.profile-field', ['icon' => 'calendar', 'label' => 'Date of Birth', 'value' => $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y') : 'Not provided'])
                                     @include('front.account.profile-field', ['icon' => 'venus-mars', 'label' => 'Gender', 'value' => $user->gender])
+                                    @include('front.account.profile-field', ['icon' => 'heart-o', 'label' => 'Marital Status', 'value' => $user->marital_status])
                                     @include('front.account.profile-field', ['icon' => 'home', 'label' => 'Residential Address', 'value' => $user->residential_address, 'wide' => true])
                                     @include('front.account.profile-field', ['icon' => 'mail-forward', 'label' => 'Postal Address', 'value' => $user->postal_address, 'wide' => true])
                                     @include('front.account.profile-field', ['icon' => 'building-o', 'label' => 'City', 'value' => $user->city])

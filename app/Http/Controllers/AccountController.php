@@ -85,6 +85,7 @@ class AccountController extends Controller
             'company_description' => $role === 'employer' ? 'prohibited' : 'nullable',
             'date_of_birth' => $isStudent ? 'required|date' : 'nullable|date',
             'gender' => $isStudent ? 'required|string|max:20' : 'nullable|string|max:20',
+            'marital_status' => $isStudent ? 'required|in:Single,Married,Divorced,Widowed' : 'nullable|in:Single,Married,Divorced,Widowed',
             'residential_address' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
             'postal_address' => $role === 'employer' ? 'prohibited' : 'nullable|string|max:255',
             'city' => $isStudent ? 'required|string|max:100' : 'nullable|string|max:100',
@@ -114,6 +115,7 @@ class AccountController extends Controller
             if ($role !== 'employer' && ! $user->isReadOnlyManagement()) {
                 $user->date_of_birth = $request->date_of_birth;
                 $user->gender = $request->gender;
+                $user->marital_status = $request->marital_status;
                 $user->residential_address = $request->residential_address;
                 $user->postal_address = $request->postal_address;
                 $user->city = $request->city;

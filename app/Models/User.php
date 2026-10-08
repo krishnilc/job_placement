@@ -41,6 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'student_id' => 'studentProfile',
         'date_of_birth' => 'studentProfile',
         'gender' => 'studentProfile',
+        'marital_status' => 'studentProfile',
         'residential_address' => 'studentProfile',
         'postal_address' => 'studentProfile',
         'city' => 'studentProfile',
@@ -190,6 +191,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isReadOnlyManagement(): bool
     {
         return $this->role === 'management';
+    }
+
+    public function hasCompleteStudentProfile(): bool
+    {
+        if ($this->role !== 'student') {
+            return true;
+        }
+
+        return filled($this->designation) && ($this->studentProfile?->isComplete() ?? false);
+    }
+
+    public function hasProfilePicture(): bool
+    {
+        return filled($this->image);
     }
 
     /**

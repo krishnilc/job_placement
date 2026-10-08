@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-lg-9">
                     <div class="admin-student-profile card border-0 shadow mb-4">
-                        <div class="student-profile-header {{ $isEmployer ? 'student-profile-header-employer' : '' }}">
+                        <div class="student-profile-header {{ $isEmployer ? 'student-profile-header-employer' : ($isAdmin ? 'student-profile-header-admin' : '') }}">
                             <div class="student-profile-avatar">
                                 @if ($user->image)
                                     <button type="button" class="student-profile-avatar-button" data-bs-toggle="modal"
@@ -40,13 +40,19 @@
                             </div>
                             <div>
                                 <p class="student-profile-eyebrow mb-1">
-                                    {{ $isEmployer ? 'Employer profile' : 'Student profile' }}</p>
+                                    {{ $isEmployer ? 'Employer profile' : ($isAdmin ? 'Administrator profile' : 'Student profile') }}</p>
                                 <h1 class="student-profile-name mb-1">{{ $user->name }}</h1>
                                 @if ($isEmployer)
                                     <p class="student-profile-meta mb-0">
                                         {{ $user->designation ?: 'Designation not provided' }}</p>
                                     <p class="student-profile-meta mb-0">{{ $user->company_name ?: 'Company not provided' }}
                                     </p>
+                                @elseif ($isAdmin)
+                                    <p class="student-profile-meta mb-0">
+                                        {{ $user->isReadOnlyManagement() ? 'Management (Read-only)' : ucfirst(str_replace('_', ' ', $user->role)) }}
+                                    </p>
+                                    <p class="student-profile-meta mb-0">
+                                        {{ $user->designation ?: 'Designation not provided' }}</p>
                                 @else
                                     <p class="student-profile-meta mb-0">Student ID:
                                         {{ $user->student_id ?: 'Not provided' }}</p>
@@ -63,6 +69,9 @@
                                     @if ($isEmployer)
                                         <p class="text-muted mb-0">Employer information submitted to the placement portal.
                                         </p>
+                                    @elseif ($isAdmin)
+                                        <p class="text-muted mb-0">Administrator account information for the placement
+                                            portal.</p>
                                     @else
                                         <p class="text-muted mb-0">Student information submitted to the placement portal.
                                         </p>
@@ -75,6 +84,10 @@
                                     @if (in_array(auth()->user()->role, $isAdmin ? ['super_admin'] : ['admin', 'super_admin'], true))
                                     <a href="{{ route('admin.users.edit', [$user->id, 'list_type' => $isAdmin ? 'admins' : ($isEmployer ? 'employers' : 'students')]) }}"
                                         class="btn btn-primary">Edit {{ $isAdmin ? 'Admin' : ($isEmployer ? 'Employer' : 'Student') }}</a>
+                                    @endif
+                                    @if (auth()->user()->role === 'super_admin' || (auth()->user()->role === 'admin' && !$isAdmin))
+                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                            data-bs-target="#resetPasswordModal">Reset Password</button>
                                     @endif
                                 </div>
                             </div>
@@ -127,13 +140,32 @@
                                     'value' => $user->mobile_2,
                                 ])
                                 @include('admin.users.profile-field', [
-                                    'label' => 'Student Status',
+                                    'label' => $isAdmin ? 'Designation' : 'Student Status',
                                     'value' => $user->designation,
                                 ])
                             </div>
                             @endif
 
-                            @if (!$isEmployer)
+                            @if ($isAdmin)
+                                <div class="profile-divider">
+                                    <h3>Account information</h3>
+                                </div>
+                                <div class="row g-3">
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Role',
+                                        'value' => $user->isReadOnlyManagement()
+                                            ? 'Management (Read-only)'
+                                            : ucfirst(str_replace('_', ' ', $user->role)),
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Account Status',
+                                        'value' =>
+                                            $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status),
+                                    ])
+                                </div>
+                            @endif
+
+                            @if (!$isEmployer && !$isAdmin)
                                 <div class="profile-divider">
                                     <h3>Personal details</h3>
                                 </div>
@@ -147,6 +179,10 @@
                                     @include('admin.users.profile-field', [
                                         'label' => 'Gender',
                                         'value' => $user->gender,
+                                    ])
+                                    @include('admin.users.profile-field', [
+                                        'label' => 'Marital Status',
+                                        'value' => $user->marital_status,
                                     ])
                                     @include('admin.users.profile-field', [
                                         'label' => 'Residential Address',
@@ -253,9 +289,73 @@
             </div>
         </div>
     @endif
+
+    @if (auth()->user()->role === 'super_admin' || (auth()->user()->role === 'admin' && !$isAdmin))
+        <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="resetPasswordForm" method="POST">
+                        @csrf
+                        <div class="modal-header">
+                            <h2 class="modal-title fs-5" id="resetPasswordModalLabel">Reset Password</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted">Set a new password for {{ $user->name }}.</p>
+                            <div class="mb-3">
+                                <label for="reset_password" class="form-label">New Password<span class="text-danger">*</span></label>
+                                <input type="password" name="password" id="reset_password" class="form-control" minlength="5"
+                                    required>
+                                <p class="text-danger mb-0" id="reset_passwordError"></p>
+                            </div>
+                            <div>
+                                <label for="reset_password_confirmation" class="form-label">Confirm Password<span class="text-danger">*</span></label>
+                                <input type="password" name="password_confirmation" id="reset_password_confirmation"
+                                    class="form-control" minlength="5" required>
+                                <p class="text-danger mb-0" id="reset_password_confirmationError"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Reset Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @section('customJS')
+    @if (auth()->user()->role === 'super_admin' || (auth()->user()->role === 'admin' && !$isAdmin))
+        <script>
+            $('#resetPasswordForm').submit(function (event) {
+                event.preventDefault();
+                $('#reset_passwordError, #reset_password_confirmationError').text('');
+
+                $.ajax({
+                    url: "{{ route('admin.users.resetPassword', $user->id) }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.status === true) {
+                            window.location.reload();
+                            return;
+                        }
+
+                        $.each(response.errors || {}, function (field, messages) {
+                            $('#reset_' + field + 'Error').text(messages[0]);
+                        });
+                    },
+                    error: function () {
+                        alert('Unable to reset the password. Please try again.');
+                    }
+                });
+            });
+        </script>
+    @endif
     <style>
         .student-profile-header {
             display: flex;
@@ -268,6 +368,10 @@
 
         .student-profile-header-employer {
             background: linear-gradient(120deg, #7a4b20, #b8782e);
+        }
+
+        .student-profile-header-admin {
+            background: linear-gradient(120deg, #3b2f73, #6c4fa3);
         }
 
         .student-profile-avatar {

@@ -5,7 +5,7 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col">
-                     <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
+                    <nav aria-label="breadcrumb" class="rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             @if (auth()->user()->role == 'admin')
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
@@ -37,7 +37,7 @@
                             @csrf
                             <div class="card-body p-4">
                                 <h3 class="fs-4 mb-4">My Profile</h3>
-
+                                <h4 class="fs-5 mb-3">Contact Information</h4>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
@@ -48,19 +48,27 @@
 
                                     @if (in_array(auth()->user()->role, ['admin', 'employer'], true))
                                         <div class="col-md-6">
-                                            <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
+                                            <label for="designation" class="mb-2">Designation<span
+                                                    class="text-danger">*</span></label>
                                             <input type="text" name="designation" id="designation" class="form-control"
-                                                value="{{ $user->designation }}" placeholder="e.g. CEO, Manager, HR Specialist" required>
+                                                value="{{ $user->designation }}"
+                                                placeholder="e.g. CEO, Manager, HR Specialist" required>
                                             <p class="text-danger mb-0" id="designationError"></p>
                                         </div>
                                     @elseif (auth()->user()->role === 'student')
                                         <div class="col-md-6">
-                                            <label for="designation" class="mb-2">Student Status<span class="text-danger">*</span></label>
+                                            <label for="designation" class="mb-2">Student Status<span
+                                                    class="text-danger">*</span></label>
                                             <select name="designation" id="designation" class="form-control" required>
                                                 <option value="">Select your status</option>
-                                                <option value="Full-time Student" {{ $user->designation == 'Full-time Student' ? 'selected' : '' }}>Full-time Student</option>
-                                                <option value="Part-time Student" {{ $user->designation == 'Part-time Student' ? 'selected' : '' }}>Part-time Student</option>
-                                                <option value="Alumni" {{ $user->designation == 'Alumni' ? 'selected' : '' }}>
+                                                <option value="Full-time Student"
+                                                    {{ $user->designation == 'Full-time Student' ? 'selected' : '' }}>
+                                                    Full-time Student</option>
+                                                <option value="Part-time Student"
+                                                    {{ $user->designation == 'Part-time Student' ? 'selected' : '' }}>
+                                                    Part-time Student</option>
+                                                <option value="Alumni"
+                                                    {{ $user->designation == 'Alumni' ? 'selected' : '' }}>
                                                     Alumni</option>
                                             </select>
                                             <p class="text-danger mb-0" id="designationError"></p>
@@ -79,7 +87,8 @@
                                         <p class="text-danger mb-0" id="email2Error"></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
+                                        <label for="mobile" class="mb-2">Mobile<span
+                                                class="text-danger">*</span></label>
                                         <input type="text" name="mobile" id="mobile" class="form-control"
                                             value="{{ $user->mobile }}" required>
                                         <p class="text-danger mb-0" id="mobileError"></p>
@@ -98,35 +107,48 @@
                                         <h4 class="fs-5 mb-3">Company Details</h4>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label for="company_name" class="mb-2">Company Name<span class="text-danger">*</span></label>
-                                                <input type="text" name="company_name" id="company_name" class="form-control"
+                                                <label for="company_name" class="mb-2">Company Name<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" name="company_name" id="company_name"
+                                                    class="form-control"
                                                     value="{{ old('company_name', $user->company_name) }}" required>
                                                 <p class="text-danger mb-0" id="companyNameError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="website_url" class="mb-2">Website</label>
-                                                <input type="url" name="website_url" id="website_url" class="form-control"
-                                                    value="{{ old('website_url', $user->website_url) }}" placeholder="https://example.com">
+                                                <input type="url" name="website_url" id="website_url"
+                                                    class="form-control"
+                                                    value="{{ old('website_url', $user->website_url) }}"
+                                                    placeholder="https://example.com">
                                                 <p class="text-danger mb-0" id="websiteUrlError"></p>
                                             </div>
                                             <div class="col-12">
-                                                <label for="company_address" class="mb-2">Company Address<span class="text-danger">*</span></label>
+                                                <label for="company_address" class="mb-2">Company Address<span
+                                                        class="text-danger">*</span></label>
                                                 <textarea name="company_address" id="company_address" rows="3" class="form-control" required>{{ old('company_address', $user->company_address) }}</textarea>
                                                 <p class="text-danger mb-0" id="companyAddressError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="linkedin_url" class="mb-2">LinkedIn Page</label>
-                                                <input type="url" name="linkedin_url" id="linkedin_url" class="form-control"
-                                                    value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="https://www.linkedin.com/company/..."><p class="text-danger mb-0" id="linkedinUrlError"></p>
+                                                <input type="url" name="linkedin_url" id="linkedin_url"
+                                                    class="form-control"
+                                                    value="{{ old('linkedin_url', $user->linkedin_url) }}"
+                                                    placeholder="https://www.linkedin.com/company/...">
+                                                <p class="text-danger mb-0" id="linkedinUrlError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="facebook_url" class="mb-2">Facebook Page</label>
-                                                <input type="url" name="facebook_url" id="facebook_url" class="form-control"
-                                                    value="{{ old('facebook_url', $user->facebook_url) }}" placeholder="https://www.facebook.com/..."><p class="text-danger mb-0" id="facebookUrlError"></p>
+                                                <input type="url" name="facebook_url" id="facebook_url"
+                                                    class="form-control"
+                                                    value="{{ old('facebook_url', $user->facebook_url) }}"
+                                                    placeholder="https://www.facebook.com/...">
+                                                <p class="text-danger mb-0" id="facebookUrlError"></p>
                                             </div>
                                             <div class="col-12">
-                                                <label for="company_description" class="mb-2">Company Description<span class="text-danger">*</span></label>
-                                                <textarea name="company_description" id="company_description" rows="5" class="form-control" placeholder="Tell candidates about your company" required>{{ old('company_description', $user->company_description) }}</textarea>
+                                                <label for="company_description" class="mb-2">Company Description<span
+                                                        class="text-danger">*</span></label>
+                                                <textarea name="company_description" id="company_description" rows="5" class="form-control"
+                                                    placeholder="Tell candidates about your company" required>{{ old('company_description', $user->company_description) }}</textarea>
                                                 <p class="text-danger mb-0" id="companyDescriptionError"></p>
                                             </div>
                                         </div>
@@ -138,44 +160,65 @@
                                         <h4 class="fs-5 mb-3">Personal Details</h4>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label for="date_of_birth" class="mb-2">Date of Birth<span class="text-danger">*</span></label>
-                                                <input type="date" name="date_of_birth" id="date_of_birth" class="form-control"
+                                                <label for="date_of_birth" class="mb-2">Date of Birth<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" name="date_of_birth" id="date_of_birth"
+                                                    class="form-control"
                                                     value="{{ old('date_of_birth', $user->date_of_birth) }}" required>
                                                 <p class="text-danger mb-0" id="dateOfBirthError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="gender" class="mb-2">Gender<span class="text-danger">*</span></label>
+                                                <label for="gender" class="mb-2">Gender<span
+                                                        class="text-danger">*</span></label>
                                                 <select name="gender" id="gender" class="form-control" required>
                                                     <option value="">Select gender</option>
-                                                    <option value="Male" {{ $user->gender == 'Male' ? 'selected' : '' }}>Male
+                                                    <option value="Male"
+                                                        {{ $user->gender == 'Male' ? 'selected' : '' }}>Male
                                                     </option>
-                                                    <option value="Female" {{ $user->gender == 'Female' ? 'selected' : '' }}>
+                                                    <option value="Female"
+                                                        {{ $user->gender == 'Female' ? 'selected' : '' }}>
                                                         Female</option>
-                                                    <option value="Other" {{ $user->gender == 'Other' ? 'selected' : '' }}>Other
+                                                    <option value="Other"
+                                                        {{ $user->gender == 'Other' ? 'selected' : '' }}>Other
                                                     </option>
                                                 </select>
                                                 <p class="text-danger mb-0" id="genderError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="residential_address" class="mb-2">Permanent Residential Address<span class="text-danger">*</span></label>
-                                                <textarea name="residential_address" id="residential_address" rows="3"
-                                                    class="form-control" required>{{ old('residential_address', $user->residential_address) }}</textarea>
+                                                <label for="marital_status" class="mb-2">Marital Status<span
+                                                        class="text-danger">*</span></label>
+                                                <select name="marital_status" id="marital_status" class="form-control"
+                                                    required>
+                                                    <option value="">Select marital status</option>
+                                                    @foreach (['Single', 'Married', 'Divorced', 'Widowed'] as $maritalStatus)
+                                                        <option value="{{ $maritalStatus }}" @selected(old('marital_status', $user->marital_status) === $maritalStatus)>
+                                                            {{ $maritalStatus }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <p class="text-danger mb-0" id="maritalStatusError"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="residential_address" class="mb-2">Permanent Residential
+                                                    Address<span class="text-danger">*</span></label>
+                                                <textarea name="residential_address" id="residential_address" rows="3" class="form-control" required>{{ old('residential_address', $user->residential_address) }}</textarea>
                                                 <p class="text-danger mb-0" id="residentialAddressError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="postal_address" class="mb-2">Postal Address</label>
-                                                <textarea name="postal_address" id="postal_address" rows="3"
-                                                    class="form-control" >{{ old('postal_address', $user->postal_address) }}</textarea>
+                                                <textarea name="postal_address" id="postal_address" rows="3" class="form-control">{{ old('postal_address', $user->postal_address) }}</textarea>
                                                 <p class="text-danger mb-0" id="postalAddressError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="city" class="mb-2">City<span class="text-danger">*</span></label>
+                                                <label for="city" class="mb-2">City<span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text" name="city" id="city" class="form-control"
                                                     value="{{ old('city', $user->city) }}" required>
                                                 <p class="text-danger mb-0" id="cityError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="country" class="mb-2">Country<span class="text-danger">*</span></label>
+                                                <label for="country" class="mb-2">Country<span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text" name="country" id="country" class="form-control"
                                                     value="{{ old('country', $user->country) }}" required>
                                                 <p class="text-danger mb-0" id="countryError"></p>
@@ -187,13 +230,16 @@
                                         <h4 class="fs-5 mb-3">Educational Details<span class="text-danger">*</span></h4>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label for="high_school" class="mb-2">High School<span class="text-danger">*</span></label>
-                                                <input type="text" name="high_school" id="high_school" class="form-control"
+                                                <label for="high_school" class="mb-2">High School<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" name="high_school" id="high_school"
+                                                    class="form-control"
                                                     value="{{ old('high_school', $user->high_school) }}" required>
                                                 <p class="text-danger mb-0" id="highSchoolError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="high_school_graduation_year" class="mb-2">High School Graduation
+                                                <label for="high_school_graduation_year" class="mb-2">High School
+                                                    Graduation
                                                     Year<span class="text-danger">*</span></label>
                                                 <input type="text" name="high_school_graduation_year"
                                                     id="high_school_graduation_year" class="form-control"
@@ -202,29 +248,35 @@
                                                 <p class="text-danger mb-0" id="highSchoolGraduationYearError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="college_id" class="mb-2">College<span class="text-danger">*</span></label>
+                                                <label for="college_id" class="mb-2">College<span
+                                                        class="text-danger">*</span></label>
                                                 <select name="college_id" id="college_id" class="form-control" required>
                                                     <option value="">Select your College/Center</option>
                                                     @foreach ($colleges as $college)
-                                                        <option value="{{ $college->id }}" {{ old('college_id', $user->college_id) == $college->id ? 'selected' : '' }}>{{ $college->display_name }}</option>
+                                                        <option value="{{ $college->id }}"
+                                                            {{ old('college_id', $user->college_id) == $college->id ? 'selected' : '' }}>
+                                                            {{ $college->display_name }}</option>
                                                     @endforeach
                                                 </select>
                                                 <p class="text-danger mb-0" id="collegeIdError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="degree" class="mb-2">Degree / Program<span class="text-danger">*</span></label>
+                                                <label for="degree" class="mb-2">Degree / Program<span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text" name="degree" id="degree" class="form-control"
                                                     value="{{ old('degree', $user->degree) }}" required>
                                                 <p class="text-danger mb-0" id="degreeError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="major" class="mb-2">Major / Specialization<span class="text-danger">*</span></label>
+                                                <label for="major" class="mb-2">Major / Specialization<span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text" name="major" id="major" class="form-control"
                                                     value="{{ old('major', $user->major) }}" required>
                                                 <p class="text-danger mb-0" id="majorError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="graduation_year" class="mb-2">Graduation Year<span class="text-danger">*</span></label>
+                                                <label for="graduation_year" class="mb-2">Graduation Year<span
+                                                        class="text-danger">*</span></label>
                                                 <input type="text" name="graduation_year" id="graduation_year"
                                                     class="form-control"
                                                     value="{{ old('graduation_year', $user->graduation_year) }}"
@@ -238,34 +290,41 @@
                                         <h4 class="fs-5 mb-3">Other Details</h4>
                                         <div class="row g-3">
                                             <div class="col-md-12">
-                                                <label for="skills" class="mb-2">Skills<span class="text-danger">*</span></label>
+                                                <label for="skills" class="mb-2">Skills<span
+                                                        class="text-danger">*</span></label>
                                                 <textarea name="skills" id="skills" rows="3" class="form-control"
                                                     placeholder="PHP, Laravel, JavaScript, SQL" required>{{ old('skills', $user->skills) }} </textarea>
                                                 <p class="text-danger mb-0" id="skillsError"></p>
                                             </div>
                                             <div class="col-md-12">
-                                                <label for="bio" class="mb-2">Short Bio<span class="text-danger">*</span></label>
+                                                <label for="bio" class="mb-2">Short Bio<span
+                                                        class="text-danger">*</span></label>
                                                 <textarea name="bio" id="bio" rows="3" class="form-control"
                                                     placeholder="Tell employers a little about yourself" required>{{ old('bio', $user->bio) }}</textarea>
                                                 <p class="text-danger mb-0" id="bioError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="linkedin_url" class="mb-2">LinkedIn URL</label>
-                                                <input type="url" name="linkedin_url" id="linkedin_url" class="form-control"
+                                                <input type="url" name="linkedin_url" id="linkedin_url"
+                                                    class="form-control"
                                                     value="{{ old('linkedin_url', $user->linkedin_url) }}">
                                                 <p class="text-danger mb-0" id="linkedinUrlError"></p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="facebook_url" class="mb-2">Facebook URL</label>
-                                                <input type="url" name="facebook_url" id="facebook_url" class="form-control"
+                                                <input type="url" name="facebook_url" id="facebook_url"
+                                                    class="form-control"
                                                     value="{{ old('facebook_url', $user->facebook_url) }}">
                                                 <p class="text-danger mb-0" id="facebookUrlError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="availability" class="mb-2">Availability<span class="text-danger">*</span></label>
-                                                <input type="text" name="availability" id="availability" class="form-control"
+                                                <label for="availability" class="mb-2">Availability<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" name="availability" id="availability"
+                                                    class="form-control"
                                                     value="{{ old('availability', $user->availability) }}"
-                                                    placeholder="Available for internships / Ready for full time" required>
+                                                    placeholder="Available for internships / Ready for full time etc"
+                                                    required>
                                                 <p class="text-danger mb-0" id="availabilityError"></p>
                                             </div>
                                         </div>
@@ -287,16 +346,18 @@
 
 @section('customJS')
     <script>
-        $('#userForm').submit(function (e) {
+        $('#userForm').submit(function(e) {
             e.preventDefault();
             $('#userForm .text-danger').text('');
 
             let isValid = true;
-            $('#userForm :input[required]').each(function () {
-                const errorId = this.id.replace(/_([a-z0-9])/g, (_, character) => character.toUpperCase()) + 'Error';
+            $('#userForm :input[required]').each(function() {
+                const errorId = this.id.replace(/_([a-z0-9])/g, (_, character) => character.toUpperCase()) +
+                    'Error';
 
                 if (!this.checkValidity()) {
-                    $('#' + errorId).text(this.validity.valueMissing ? 'This field is required.' : this.validationMessage);
+                    $('#' + errorId).text(this.validity.valueMissing ? 'This field is required.' : this
+                        .validationMessage);
                     isValid = false;
                 }
             });
@@ -311,7 +372,7 @@
                 dataType: "json",
                 data: $("#userForm").serializeArray(),
 
-                success: function (response) {
+                success: function(response) {
                     if (response.status == true) {
                         window.location.href = "{{ route('account.editProfile') }}";
                     } else {
@@ -353,6 +414,9 @@
                         if (errors.gender) {
                             $("#genderError").text(errors.gender[0]);
                         }
+                        if (errors.marital_status) {
+                            $("#maritalStatusError").text(errors.marital_status[0]);
+                        }
                         if (errors.residential_address) {
                             $("#residentialAddressError").text(errors.residential_address[0]);
                         }
@@ -369,7 +433,8 @@
                             $("#highSchoolError").text(errors.high_school[0]);
                         }
                         if (errors.high_school_graduation_year) {
-                            $("#highSchoolGraduationYearError").text(errors.high_school_graduation_year[0]);
+                            $("#highSchoolGraduationYearError").text(errors.high_school_graduation_year[
+                                0]);
                         }
                         if (errors.college_id) {
                             $("#collegeIdError").text(errors.college_id[0]);
@@ -400,10 +465,10 @@
                         }
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     alert('An error occurred: ' + error);
                 }
             });
-        });      
+        });
     </script>
 @endsection

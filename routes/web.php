@@ -66,6 +66,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function
     Route::get('/users/profile/{id}', [UserController::class, 'profile'])->name('admin.users.profile');
     Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::post('/users/reset-password/{id}', [UserController::class, 'resetPassword'])->name('admin.users.resetPassword');
     Route::delete('/users/delete', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('/jobs', [JobController::class, 'index'])->name('admin.jobs');
     Route::middleware('adminAccess')->group(function () {

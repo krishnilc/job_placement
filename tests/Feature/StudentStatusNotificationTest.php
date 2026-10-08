@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\College;
 use App\Models\User;
 use App\Notifications\StudentAccountStatusChanged;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,11 +35,35 @@ class StudentStatusNotificationTest extends TestCase
 
     private function profileData(User $student, string $status): array
     {
+        $college = College::firstOrCreate(
+            ['code' => 'STN'],
+            ['name' => 'Status Notification College', 'status' => 1],
+        );
+
         return [
             'name' => $student->name,
             'email' => $student->email,
             'student_id' => $student->student_id,
             'status' => $status,
+            'mobile' => '1234567',
+            'designation' => in_array($student->designation, ['Full-time Student', 'Part-time Student', 'Alumni'], true)
+                ? $student->designation
+                : 'Full-time Student',
+            'date_of_birth' => '2000-01-01',
+            'gender' => 'Male',
+            'marital_status' => 'Single',
+            'residential_address' => '1 Campus Road',
+            'city' => 'Suva',
+            'country' => 'Fiji',
+            'high_school' => 'Suva High School',
+            'high_school_graduation_year' => '2018',
+            'college_id' => $college->id,
+            'degree' => 'Bachelor of Science',
+            'major' => 'Computer Science',
+            'graduation_year' => '2022',
+            'skills' => 'PHP, Laravel',
+            'bio' => 'A short biography.',
+            'availability' => 'Immediately',
         ];
     }
 

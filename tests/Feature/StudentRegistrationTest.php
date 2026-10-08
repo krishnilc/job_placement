@@ -48,6 +48,7 @@ class StudentRegistrationTest extends TestCase
         $profile = [
             'date_of_birth' => '2001-05-10',
             'gender' => 'Female',
+            'marital_status' => 'Single',
             'residential_address' => '12 Queen Street, Suva',
             'postal_address' => 'PO Box 123, Suva',
             'city' => 'Suva',
@@ -83,6 +84,48 @@ class StudentRegistrationTest extends TestCase
         $this->assertDatabaseHas('student_profiles', [
             'user_id' => $user->id,
             ...$profile,
+        ]);
+    }
+
+    public function test_alumni_can_store_marital_status(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'student',
+            'status' => 'active',
+            'designation' => 'Alumni',
+        ]);
+        $college = College::create([
+            'name' => 'College of Business, Hospitality and Tourism Studies',
+            'code' => 'CBHTS',
+            'status' => 1,
+        ]);
+
+        $response = $this->actingAs($user)->putJson(route('account.updateProfile'), [
+            'name' => 'Alumni User',
+            'email' => $user->email,
+            'mobile' => '1234567',
+            'designation' => 'Alumni',
+            'date_of_birth' => '1995-05-10',
+            'gender' => 'Male',
+            'marital_status' => 'Married',
+            'residential_address' => '12 Queen Street, Suva',
+            'city' => 'Suva',
+            'country' => 'Fiji',
+            'high_school' => 'Suva Grammar School',
+            'high_school_graduation_year' => '2013',
+            'college_id' => $college->id,
+            'degree' => 'Bachelor of Information Technology',
+            'major' => 'Software Engineering',
+            'graduation_year' => '2018',
+            'skills' => 'PHP, Laravel',
+            'bio' => 'Experienced alumni developer.',
+            'availability' => 'Available for full-time work',
+        ]);
+
+        $response->assertOk()->assertJsonPath('status', true);
+        $this->assertDatabaseHas('student_profiles', [
+            'user_id' => $user->id,
+            'marital_status' => 'Married',
         ]);
     }
 }

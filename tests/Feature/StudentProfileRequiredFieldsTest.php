@@ -27,6 +27,7 @@ class StudentProfileRequiredFieldsTest extends TestCase
             'designation',
             'date_of_birth',
             'gender',
+            'marital_status',
             'residential_address',
             'city',
             'country',

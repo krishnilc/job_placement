@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\AccountStatusNotifier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -61,29 +62,32 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:5|max:20',
             'email' => 'required|email|unique:users,email,' . $id . ',id', // Ensure email is unique except for the current user
-            'mobile' => $isStudent ? 'nullable|digits:7' : 'required|digits:7',
+            'mobile' => 'required|digits:7',
             'email_2' => 'nullable|email|max:255',
             'mobile_2' => 'nullable|digits:7',
-            'date_of_birth' => $isStudent ? 'nullable|date|before:today' : 'nullable',
-            'gender' => 'nullable|string|max:20',
-            'residential_address' => 'nullable|string|max:255',
+            'date_of_birth' => $isStudent ? 'required|date|before:today' : 'nullable',
+            'gender' => $isStudent ? 'required|string|max:20' : 'nullable|string|max:20',
+            'marital_status' => $isStudent ? 'required|in:Single,Married,Divorced,Widowed' : 'nullable',
+            'residential_address' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
             'postal_address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'high_school' => 'nullable|string|max:255',
-            'high_school_graduation_year' => 'nullable|string|max:10',
-            'college_id' => 'nullable|exists:colleges,id',
-            'degree' => 'nullable|string|max:255',
-            'major' => 'nullable|string|max:255',
-            'graduation_year' => 'nullable|string|max:10',
-            'skills' => 'nullable|string|max:1000',
-            'bio' => 'nullable|string|max:1000',
+            'city' => $isStudent ? 'required|string|max:100' : 'nullable|string|max:100',
+            'country' => $isStudent ? 'required|string|max:100' : 'nullable|string|max:100',
+            'high_school' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'high_school_graduation_year' => $isStudent ? 'required|string|max:10' : 'nullable|string|max:10',
+            'college_id' => $isStudent ? 'required|exists:colleges,id' : 'nullable|exists:colleges,id',
+            'degree' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'major' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'graduation_year' => $isStudent ? 'required|string|max:10' : 'nullable|string|max:10',
+            'skills' => $isStudent ? 'required|string|max:1000' : 'nullable|string|max:1000',
+            'bio' => $isStudent ? 'required|string|max:1000' : 'nullable|string|max:1000',
             'linkedin_url' => 'nullable|url|max:255',
             'facebook_url' => 'nullable|url|max:255',
-            'availability' => 'nullable|string|max:255',
+            'availability' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
             'role' => ($isStudent || $isEmployer) ? 'nullable' : 'required|in:admin,super_admin,management,student,employer,user',
             'student_id' => $isStudent ? 'required|string|max:9|unique:student_profiles,student_id,' . $id . ',user_id' : 'nullable',
-            'designation' => $isStudent ? 'nullable' : ($willBeEmployer ? 'required|string|max:100' : 'nullable|string|max:100'),
+            'designation' => $isStudent
+                ? 'required|in:Full-time Student,Part-time Student,Alumni'
+                : ($willBeEmployer ? 'required|string|max:100' : 'nullable|string|max:100'),
             'organization_id' => $willBeEmployer ? 'nullable|integer|exists:organizations,id' : 'nullable',
             'website_url' => 'nullable|url|max:255',
             'company_description' => 'nullable',
@@ -120,7 +124,7 @@ class UserController extends Controller
                 $user->mobile_2 = $request->mobile_2;
                 $user->designation = $request->designation;
                 foreach ([
-                    'date_of_birth', 'gender', 'residential_address', 'postal_address', 'city', 'country',
+                    'date_of_birth', 'gender', 'marital_status', 'residential_address', 'postal_address', 'city', 'country',
                     'high_school', 'high_school_graduation_year', 'college_id', 'degree', 'major',
                     'graduation_year', 'skills', 'bio', 'linkedin_url', 'facebook_url', 'availability',
                 ] as $field) {
@@ -165,6 +169,38 @@ class UserController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+    }
+
+    public function resetPassword(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $actorRole = $request->user()?->role;
+        $canReset = $actorRole === 'super_admin'
+            || ($actorRole === 'admin' && in_array($user->role, ['student', 'user', 'employer'], true));
+
+        abort_unless($canReset, 403);
+
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|min:5|same:password_confirmation',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $user->password = Hash::make($request->input('password'));
+        $user->save();
+
+        session()->flash('success', 'Password reset successfully!');
+
+        return response()->json([
+            'status' => true,
+            'errors' => [],
+        ]);
     }
 
     //delete user

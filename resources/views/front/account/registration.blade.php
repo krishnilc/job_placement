@@ -77,7 +77,7 @@
                             <h2 class="h6 text-muted mb-3" id="roleSectionLabel">Student details</h2>
 
                             <div class="mb-3" id="studentIdGroup">
-                                <label for="student_id" class="mb-2">Student ID<span id="studentIdRequired">*</span></label>
+                                <label for="student_id" class="mb-2">Student ID<span id="studentIdRequired"><span class="text-danger">*</span></span></label>
                                 <input type="text" name="student_id" id="student_id" class="form-control"
                                     placeholder="Enter University Student ID">
                                 {{-- <small class="text-muted" id="studentIdHint" style="display: none;">Optional — you can fill this in later from your profile.</small> --}}
