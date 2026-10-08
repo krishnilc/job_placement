@@ -67,6 +67,7 @@ class AccountController extends Controller
 
         // Validation rules for profile update
         $role = Auth::user()->role;
+        $isStudent = $role === 'student';
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:5|max:50',
@@ -82,23 +83,23 @@ class AccountController extends Controller
             'company_address' => $role === 'employer' ? 'prohibited' : 'nullable',
             'website_url' => $role === 'employer' ? 'prohibited' : 'nullable',
             'company_description' => $role === 'employer' ? 'prohibited' : 'nullable',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|string|max:20',
-            'residential_address' => 'nullable|string|max:255',
+            'date_of_birth' => $isStudent ? 'required|date' : 'nullable|date',
+            'gender' => $isStudent ? 'required|string|max:20' : 'nullable|string|max:20',
+            'residential_address' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
             'postal_address' => $role === 'employer' ? 'prohibited' : 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'high_school' => 'nullable|string|max:255',
-            'high_school_graduation_year' => 'nullable|string|max:10',
-            'college_id' => 'nullable|exists:colleges,id',
-            'degree' => 'nullable|string|max:255',
-            'major' => 'nullable|string|max:255',
-            'graduation_year' => 'nullable|string|max:10',
-            'skills' => 'nullable|string|max:1000',
-            'bio' => 'nullable|string|max:1000',
+            'city' => $isStudent ? 'required|string|max:100' : 'nullable|string|max:100',
+            'country' => $isStudent ? 'required|string|max:100' : 'nullable|string|max:100',
+            'high_school' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'high_school_graduation_year' => $isStudent ? 'required|string|max:10' : 'nullable|string|max:10',
+            'college_id' => $isStudent ? 'required|exists:colleges,id' : 'nullable|exists:colleges,id',
+            'degree' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'major' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
+            'graduation_year' => $isStudent ? 'required|string|max:10' : 'nullable|string|max:10',
+            'skills' => $isStudent ? 'required|string|max:1000' : 'nullable|string|max:1000',
+            'bio' => $isStudent ? 'required|string|max:1000' : 'nullable|string|max:1000',
             'linkedin_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
             'facebook_url' => $role === 'employer' ? 'prohibited' : ['nullable', 'url', 'max:255'],
-            'availability' => 'nullable|string|max:255',
+            'availability' => $isStudent ? 'required|string|max:255' : 'nullable|string|max:255',
         ]);
 
         if ($validator->passes()) {

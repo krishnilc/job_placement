@@ -25,20 +25,20 @@
                                 <h4 class="fs-5 mb-3">Contact Person</h4>
                                 <div class="row g-4">
                                     <div class="col-md-6">
-                                        <label for="name" class="mb-2">Name*</label>
+                                        <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                         <input type="text" name="name" id="name" class="form-control"
                                             value="{{ old('name', $user->name) }}" required>
                                         <p class="text-danger" id="nameError"></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="designation" class="mb-2">Designation*</label>
+                                        <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
                                         <input type="text" name="designation" id="designation" class="form-control"
                                             value="{{ old('designation', $user->designation) }}"
                                             placeholder="e.g. HR Manager" required>
                                         <p class="text-danger" id="designationError"></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="email" class="mb-2">Email*</label>
+                                        <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                         <input type="email" name="email" id="email" class="form-control"
                                             value="{{ old('email', $user->email) }}" required>
                                         <p class="text-danger" id="emailError"></p>
@@ -50,7 +50,7 @@
                                         <p class="text-danger" id="email2Error"></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="mobile" class="mb-2">Mobile*</label>
+                                        <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                         <input type="text" name="mobile" id="mobile" class="form-control"
                                             value="{{ old('mobile', $user->mobile) }}" required>
                                         <p class="text-danger" id="mobileError"></p>
@@ -68,7 +68,7 @@
                                     <fieldset disabled>
                                     <div class="row g-4">
                                         <div class="col-md-6">
-                                            <label for="company_name" class="mb-2">Company Name*</label>
+                                            <label for="company_name" class="mb-2">Company Name<span class="text-danger">*</span></label>
                                             <input type="text" name="company_name" id="company_name" class="form-control"
                                                 value="{{ old('company_name', $user->company_name) }}" required>
                                             <p class="text-danger" id="companynameError"></p>
@@ -81,12 +81,12 @@
                                             <p class="text-danger" id="websiteurlError"></p>
                                         </div>
                                         <div class="col-6">
-                                            <label for="company_address" class="mb-2">Company Address*</label>
+                                            <label for="company_address" class="mb-2">Company Address<span class="text-danger">*</span></label>
                                             <textarea name="company_address" id="company_address" rows="3" class="form-control" required>{{ old('company_address', $user->company_address) }}</textarea>
                                             <p class="text-danger" id="companyaddressError"></p>
                                         </div>
                                         <div class="col-6">
-                                            <label for="postal_address" class="mb-2">Company Postal Address*</label>
+                                            <label for="postal_address" class="mb-2">Company Postal Address<span class="text-danger">*</span></label>
                                             <textarea name="postal_address" id="postal_address" rows="3" class="form-control" placeholder="PO Box, etc." required>{{ old('postal_address', optional($user->employerProfile)->postal_address) }}</textarea>
                                             <p class="text-danger" id="postaladdressError"></p>
                                         </div>
@@ -107,7 +107,7 @@
                                             <p class="text-danger" id="facebookurlError"></p>
                                         </div>
                                         <div class="col-12">
-                                            <label for="company_description" class="mb-2">Company Description*</label>
+                                            <label for="company_description" class="mb-2">Company Description<span class="text-danger">*</span></label>
                                             <textarea name="company_description" id="company_description" rows="5" class="form-control"
                                                 placeholder="Tell candidates about your company" required>{{ old('company_description', $user->company_description) }}</textarea>
                                             <p class="text-danger" id="companydescriptionError"></p>

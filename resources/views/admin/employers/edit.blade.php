@@ -29,17 +29,17 @@
                                         <h3 class="fs-4 mb-4">Update Employer Profile</h3>
                                         <div class="row g-4">
                                             <div class="col-md-6">
-                                                <label for="name" class="mb-2">Name*</label>
+                                                <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                                 <input type="text" name="name" id="name" class="form-control" value="{{ $user->name }}">
                                                 <p class="text-danger" id="nameError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="designation" class="mb-2">Designation*</label>
+                                                <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
                                                 <input type="text" name="designation" id="designation" class="form-control" value="{{ $user->designation }}" placeholder="e.g. HR Manager">
                                                 <p class="text-danger" id="designationError"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="email" class="mb-2">Email*</label>
+                                                <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                                 <input type="email" name="email" id="email" class="form-control" value="{{ $user->email }}">
                                                 <p class="text-danger" id="emailError"></p>
                                             </div>
@@ -49,7 +49,7 @@
                                                 <p class="text-danger" id="email_2Error"></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="mobile" class="mb-2">Mobile*</label>
+                                                <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                                 <input type="text" name="mobile" id="mobile" class="form-control" value="{{ $user->mobile }}" maxlength="7">
                                                 <p class="text-danger" id="mobileError"></p>
                                             </div>

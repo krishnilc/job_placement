@@ -24,12 +24,12 @@
                             <div class="card-body p-4">
                                 <h3 class="fs-4 mb-1">Add Job Type</h3>
                                 <div class="mb-4">
-                                    <label for="name" class="mb-2">Name*</label>
+                                    <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                     <input type="text" name="name" id="name" class="form-control">
                                     <p class="text-danger" id="nameError"></p>
                                 </div>
                                 <div class="mb-4">
-                                    <label for="status" class="mb-2">Status*</label>
+                                    <label for="status" class="mb-2">Status<span class="text-danger">*</span></label>
                                     <select name="status" id="status" class="form-control fw-bold text-success">
                                         <option value="1">Active</option>
                                         <option value="0">Inactive</option>

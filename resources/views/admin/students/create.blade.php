@@ -28,32 +28,32 @@
                                     <div class="card-body p-4">
                                         <h3 class="fs-4 mb-1">Add Student</h3>
                                         <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
+                                            <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                             <input type="text" name="name" id="name" class="form-control">
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="email" class="mb-2">Email*</label>
+                                            <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                             <input type="text" name="email" id="email" class="form-control">
                                             <p class="text-danger" id="emailError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="mobile" class="mb-2">Mobile*</label>
+                                            <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                             <input type="text" name="mobile" id="mobile" class="form-control">
                                             <p class="text-danger" id="mobileError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="student_id" class="mb-2">Student ID*</label>
+                                            <label for="student_id" class="mb-2">Student ID<span class="text-danger">*</span></label>
                                             <input type="text" name="student_id" id="student_id" class="form-control">
                                             <p class="text-danger" id="student_idError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="password" class="mb-2">Password*</label>
+                                            <label for="password" class="mb-2">Password<span class="text-danger">*</span></label>
                                             <input type="password" name="password" id="password" class="form-control">
                                             <p class="text-danger" id="passwordError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="confirm_password" class="mb-2">Confirm Password*</label>
+                                            <label for="confirm_password" class="mb-2">Confirm Password<span class="text-danger">*</span></label>
                                             <input type="password" name="confirm_password" id="confirm_password"
                                                 class="form-control">
                                             <p class="text-danger" id="confirm_passwordError"></p>

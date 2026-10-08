@@ -10,9 +10,9 @@
                     @include('front.message')
                     <div class="card border-0 shadow mb-4"><form id="adminPasswordForm" method="POST">@csrf
                         <div class="card-body p-4"><h1 class="h3 mb-4">Change Password</h1>
-                            <div class="mb-4"><label for="old_password" class="mb-2">Old Password*</label><input type="password" name="old_password" id="old_password" class="form-control" required><p class="text-danger" id="old_passwordError"></p></div>
-                            <div class="mb-4"><label for="new_password" class="mb-2">New Password*</label><input type="password" name="new_password" id="new_password" class="form-control" required><p class="text-danger" id="new_passwordError"></p></div>
-                            <div class="mb-4"><label for="confirm_password" class="mb-2">Confirm Password*</label><input type="password" name="confirm_password" id="confirm_password" class="form-control" required><p class="text-danger" id="confirm_passwordError"></p></div>
+                            <div class="mb-4"><label for="old_password" class="mb-2">Old Password<span class="text-danger">*</span></label><input type="password" name="old_password" id="old_password" class="form-control" required><p class="text-danger" id="old_passwordError"></p></div>
+                            <div class="mb-4"><label for="new_password" class="mb-2">New Password<span class="text-danger">*</span></label><input type="password" name="new_password" id="new_password" class="form-control" required><p class="text-danger" id="new_passwordError"></p></div>
+                            <div class="mb-4"><label for="confirm_password" class="mb-2">Confirm Password<span class="text-danger">*</span></label><input type="password" name="confirm_password" id="confirm_password" class="form-control" required><p class="text-danger" id="confirm_passwordError"></p></div>
                         </div>
                         <div class="card-footer p-4"><button type="submit" class="btn btn-primary">Update Password</button></div>
                     </form></div>

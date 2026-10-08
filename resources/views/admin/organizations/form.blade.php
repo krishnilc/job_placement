@@ -27,7 +27,7 @@
                                 @if ($organization->exists) @method('PUT') @endif
                                 @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'postal_address' => 'Postal address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
                                     <div class="mb-3">
-                                        <label for="{{ $field }}" class="form-label">{{ $label }}{{ in_array($field, ['name', 'address']) ? '*' : '' }}</label>
+                                        <label for="{{ $field }}" class="form-label">{{ $label }}@if (in_array($field, ['name', 'address'])) <span class="text-danger">*</span>@endif</label>
                                         @if (in_array($field, ['address', 'postal_address', 'description']))
                                             <textarea id="{{ $field }}" name="{{ $field }}" class="form-control" rows="3">{{ old($field, $organization->{$field}) }}</textarea>
                                         @else

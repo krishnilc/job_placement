@@ -59,7 +59,13 @@
                                         <div class="row g-3 mt-1">
                                             @foreach ($fields as $name => $f)
                                                 <div class="{{ $f['full'] ?? false ? 'col-12' : 'col-md-6' }}">
-                                                    <label for="{{ $name }}" class="mb-2">{{ $f['label'] }}</label>
+                                                    <label for="{{ $name }}" class="mb-2">
+                                                        @if (str_ends_with($f['label'], '*'))
+                                                            {{ substr($f['label'], 0, -1) }}<span class="text-danger">*</span>
+                                                        @else
+                                                            {{ $f['label'] }}
+                                                        @endif
+                                                    </label>
                                                     @if (($f['type'] ?? 'text') === 'select')
                                                         <select name="{{ $name }}" id="{{ $name }}" class="form-control">
                                                             @foreach ($f['options'] as $value => $text)

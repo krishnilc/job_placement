@@ -23,7 +23,7 @@
                         <form action="{{ route('account.forgotPassword') }}" method="post">
                             @csrf
                             <div class="mb-3">
-                                <label for="" class="mb-2">Email*</label>
+                                <label for="" class="mb-2">Email<span class="text-danger">*</span></label>
                                 <input type="text" name="email" id="email"
                                     class="form-control @error('email') is-invalid @enderror"
                                     placeholder="example@example.com" value="{{ old('email') }}">

@@ -29,13 +29,13 @@
                                     <div class="card-body p-4">
                                         <h3 class="fs-4 mb-1">Edit Category</h3>
                                         <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
+                                            <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                             <input type="text" name="name" id="name" class="form-control"
                                                 value="{{ old('name', $category->name) }}">
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="college_id" class="mb-2">College*</label>
+                                            <label for="college_id" class="mb-2">College<span class="text-danger">*</span></label>
                                             <select name="college_id" id="college_id" class="form-control">
                                                 <option value="">Select a College/Center</option>
                                                 @foreach ($colleges as $college)
@@ -47,7 +47,7 @@
                                             <p class="text-danger" id="college_idError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="status" class="mb-2">Status*</label>
+                                            <label for="status" class="mb-2">Status<span class="text-danger">*</span></label>
                                             <select name="status" id="status" class="form-control fw-bold {{ old('status', $category->status) == 1 ? 'text-success' : 'text-danger' }}">
                                                 <option value="1" class="text-success fw-bold" {{ old('status', $category->status) == 1 ? 'selected' : '' }}>Active</option>
                                                 <option value="0" class="text-danger fw-bold" {{ old('status', $category->status) == 0 ? 'selected' : '' }}>Inactive</option>

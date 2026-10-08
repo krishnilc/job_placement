@@ -28,13 +28,13 @@
                                     <div class="card-body  p-4">
                                         <h3 class="fs-4 mb-1">Admin/Edit</h3>
                                         <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
+                                            <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                             <input type="text" name="name" id="name" class="form-control"
                                                 value="{{ $user->name }}">
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="email" class="mb-2">Email*</label>
+                                            <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                             <input type="text" name="email" id="email" class="form-control"
                                                 value="{{ $user->email }}">
                                             <p class="text-danger" id="emailError"></p>
@@ -46,13 +46,13 @@
                                             <p class="text-danger" id="designationError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="mobile" class="mb-2">Mobile*</label>
+                                            <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                             <input type="text" name="mobile" id="mobile" class="form-control"
                                                 value="{{ $user->mobile }}">
                                             <p class="text-danger" id="mobileError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="role" class="mb-2">Role*</label>
+                                            <label for="role" class="mb-2">Role<span class="text-danger">*</span></label>
                                             <select name="role" id="role" class="form-control">
                                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                                                 <option value="super_admin" {{ $user->role == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
@@ -61,7 +61,7 @@
                                             <p class="text-danger" id="roleError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="status" class="mb-2">Account Status*</label>
+                                            <label for="status" class="mb-2">Account Status<span class="text-danger">*</span></label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="pending" class="text-warning" {{ $user->status == 'pending' ? 'selected' : '' }}>Pending Approval</option>
                                                 <option value="active" class="text-success" {{ $user->status == 'active' ? 'selected' : '' }}>Active</option>

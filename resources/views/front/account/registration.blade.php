@@ -11,7 +11,7 @@
                         <form name="registrationForm" id="registrationForm">
                             @csrf
                             <div class="mb-4">
-                                <label class="mb-2 d-block">I am a*</label>
+                                <label class="mb-2 d-block">I am a<span class="text-danger">*</span></label>
                                 <div class="form-check-inline">
                                     <input class="form-check-input" type="radio" value="student" id="student_role"
                                         name="role" checked>
@@ -38,35 +38,35 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="" class="mb-2">Name*</label>
+                                <label for="" class="mb-2">Name<span class="text-danger">*</span></label>
                                 <input type="text" name="name" id="name" class="form-control"
                                     placeholder="Enter Name" required>
                                 <p class="text-danger" id="nameError"></p>
                             </div>
 
                             <div class="mb-3">
-                                <label for="" class="mb-2">Email*</label>
+                                <label for="" class="mb-2">Email<span class="text-danger">*</span></label>
                                 <input type="email" name="email" id="email" class="form-control"
                                     placeholder="Enter Email" required>
                                 <p class="text-danger" id="emailError"></p>
                             </div>
 
                             <div class="mb-3">
-                                <label for="mobile" class="mb-2">Mobile Number*</label>
+                                <label for="mobile" class="mb-2">Mobile Number<span class="text-danger">*</span></label>
                                 <input type="text" name="mobile" id="mobile" class="form-control"
                                     placeholder="Enter 7-digit mobile number" required>
                                 <p class="text-danger" id="mobileError"></p>
                             </div>
 
                             <div class="mb-3">
-                                <label for="" class="mb-2">Password*</label>
+                                <label for="" class="mb-2">Password<span class="text-danger">*</span></label>
                                 <input type="password" name="password" id="password" class="form-control"
                                     placeholder="Enter Password" required>
                                 <p class="text-danger" id="passwordError"></p>
                             </div>
 
                             <div class="mb-3">
-                                <label for="" class="mb-2">Confirm Password*</label>
+                                <label for="" class="mb-2">Confirm Password<span class="text-danger">*</span></label>
                                 <input type="password" name="confirm_password" id="confirm_password" class="form-control"
                                     placeholder="Please confirm Password" required>
                                 <p class="text-danger" id="confirmPasswordError"></p>
@@ -85,13 +85,13 @@
                             </div>
 
                             <div class="mb-3" id="dobGroup">
-                                <label for="date_of_birth" class="mb-2">Date of Birth*</label>
+                                <label for="date_of_birth" class="mb-2">Date of Birth<span class="text-danger">*</span></label>
                                 <input type="date" name="date_of_birth" id="date_of_birth" class="form-control">
                                 <p class="text-danger" id="dobError"></p>
                             </div>
 
                             <div class="mb-3" id="graduationYearGroup" style="display: none;">
-                                <label for="graduation_year" class="mb-2">Year Graduated*</label>
+                                <label for="graduation_year" class="mb-2">Year Graduated<span class="text-danger">*</span></label>
                                 <input type="number" name="graduation_year" id="graduation_year" class="form-control"
                                     placeholder="e.g. 2023" min="1950" max="{{ date('Y') }}">
                                 <p class="text-danger" id="graduationYearError"></p>
@@ -99,7 +99,7 @@
 
                             <div id="employerFields" style="display: none;">
                                 <div class="mb-3">
-                                    <label for="designation" class="mb-2">Designation*</label>
+                                    <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
                                     <input type="text" name="designation" id="designation" class="form-control"
                                         placeholder="e.g. HR Manager">
                                     <p class="text-danger" id="designationError"></p>
@@ -111,19 +111,19 @@
                                 <div id="newOrganizationFields" style="display: none;">
                                     <p class="text-muted small">Your contact account will remain pending while an administrator reviews the organization request.</p>
                                     <div class="mb-3">
-                                        <label for="company_name" class="mb-2">Organization Name*</label>
+                                        <label for="company_name" class="mb-2">Organization Name<span class="text-danger">*</span></label>
                                         <input type="text" name="company_name" id="company_name" class="form-control"
                                             placeholder="Enter organization name">
                                         <p class="text-danger" id="companyNameError"></p>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="company_address" class="mb-2">Organization Address*</label>
+                                        <label for="company_address" class="mb-2">Organization Address<span class="text-danger">*</span></label>
                                         <textarea name="company_address" id="company_address" class="form-control"
                                             placeholder="Enter organization address" rows="3"></textarea>
                                         <p class="text-danger" id="companyAddressError"></p>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="company_phone" class="mb-2">Organization Phone*</label>
+                                        <label for="company_phone" class="mb-2">Organization Phone<span class="text-danger">*</span></label>
                                         <input type="tel" name="company_phone" id="company_phone" class="form-control"
                                             placeholder="Enter organization phone number">
                                         <p class="text-danger" id="companyPhoneError"></p>

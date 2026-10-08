@@ -28,34 +28,34 @@
                                     <div class="card-body p-4">
                                         <h3 class="fs-4 mb-1">Add Employer</h3>
                                         <div class="mb-4">
-                                            <label for="name" class="mb-2">Name*</label>
+                                            <label for="name" class="mb-2">Name<span class="text-danger">*</span></label>
                                             <input type="text" name="name" id="name" class="form-control">
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="email" class="mb-2">Email*</label>
+                                            <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                             <input type="text" name="email" id="email" class="form-control">
                                             <p class="text-danger" id="emailError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="mobile" class="mb-2">Mobile*</label>
+                                            <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                             <input type="text" name="mobile" id="mobile" class="form-control">
                                             <p class="text-danger" id="mobileError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="designation" class="mb-2">Designation*</label>
+                                            <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
                                             <input type="text" name="designation" id="designation" class="form-control">
                                             <p class="text-danger" id="designationError"></p>
                                         </div>
                                         @include('organizations.picker')
                                         <p class="text-muted">Missing an organization? <a href="{{ route('admin.organizations.index') }}">Search or add it in Manage Organizations</a> first.</p>
                                         <div class="mb-4">
-                                            <label for="password" class="mb-2">Password*</label>
+                                            <label for="password" class="mb-2">Password<span class="text-danger">*</span></label>
                                             <input type="password" name="password" id="password" class="form-control">
                                             <p class="text-danger" id="passwordError"></p>
                                         </div>
                                         <div class="mb-4">
-                                            <label for="confirm_password" class="mb-2">Confirm Password*</label>
+                                            <label for="confirm_password" class="mb-2">Confirm Password<span class="text-danger">*</span></label>
                                             <input type="password" name="confirm_password" id="confirm_password"
                                                 class="form-control">
                                             <p class="text-danger" id="confirm_passwordError"></p>

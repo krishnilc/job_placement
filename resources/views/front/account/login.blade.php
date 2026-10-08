@@ -23,7 +23,7 @@
                         <form action="{{ route('account.authenticate') }}" method="post">
                             @csrf
                             <div class="mb-3">
-                                <label for="" class="mb-2">Email*</label>
+                                <label for="" class="mb-2">Email<span class="text-danger">*</span></label>
                                 <input type="email" name="email" id="email"
                                     class="form-control @error('email') is-invalid @enderror"
                                     placeholder="example@example.com" value="{{ old('email') }}" required>
@@ -33,7 +33,7 @@
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="" class="mb-2">Password*</label>
+                                <label for="" class="mb-2">Password<span class="text-danger">*</span></label>
                                 <input type="password" name="password" id="password"
                                     class="form-control @error('password') is-invalid @enderror"
                                     placeholder="Enter Password" required>
