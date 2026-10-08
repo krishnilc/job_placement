@@ -103,6 +103,13 @@
                                 <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-building-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Company information</h2><p class="profile-section-caption">Company identity and location</p></div></div><div class="row g-3">
                                     @include('front.account.profile-field', ['icon' => 'building-o', 'label' => 'Company Name', 'value' => $user->company_name])
                                     @include('front.account.profile-field', ['icon' => 'briefcase', 'label' => 'Designation', 'value' => $user->designation])
+                                    @include('front.account.profile-field', [
+                                        'icon' => 'check-circle-o',
+                                        'label' => 'Account Status',
+                                        'value' => $user->status
+                                            ? ($user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status))
+                                            : 'Not provided',
+                                    ])
                                     @include('front.account.profile-field', ['icon' => 'map-marker', 'label' => 'Company Address', 'value' => $user->company_address])
                                     @include('front.account.profile-field', ['icon' => 'mail-forward', 'label' => 'Company Postal Address', 'value' => optional($user->employerProfile)->postal_address])
                                 </div></div>
@@ -118,11 +125,6 @@
                                 </div></div>
                             @else
                             <div class="row g-3">
-                                {{-- @include('admin.users.profile-field', [
-                                    'label' => 'Status',
-                                    'value' =>
-                                        $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status),
-                                ]) --}}
                                 @include('admin.users.profile-field', [
                                     'label' => 'Email',
                                     'value' => $user->email,
@@ -159,8 +161,9 @@
                                     ])
                                     @include('admin.users.profile-field', [
                                         'label' => 'Account Status',
-                                        'value' =>
-                                            $user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status),
+                                        'value' => $user->status
+                                            ? ($user->status === 'pending' ? 'Pending Approval' : ucfirst($user->status))
+                                            : 'Not provided',
                                     ])
                                 </div>
                             @endif

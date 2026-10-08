@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -71,6 +73,31 @@ class AdminProfileViewFieldsTest extends TestCase
             ->assertSee('Education')
             ->assertSee('Availability')
             ->assertDontSee('Administrator profile');
+    }
+
+    public function test_super_admin_profile_routes_handle_null_account_status_without_500(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('status')->nullable()->change();
+        });
+
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => null,
+        ]);
+        $employer = User::factory()->create([
+            'role' => 'employer',
+            'status' => null,
+        ]);
+
+        foreach ([$admin, $employer] as $user) {
+            $this->actingAs($superAdmin)
+                ->get(route('admin.users.profile', $user->id))
+                ->assertOk()
+                ->assertSee('Account Status')
+                ->assertSee('Not provided');
+        }
     }
 
     public function test_super_admin_viewing_an_employer_still_sees_employer_fields(): void
