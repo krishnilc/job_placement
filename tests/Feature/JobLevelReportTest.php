@@ -19,8 +19,8 @@ class JobLevelReportTest extends TestCase
     {
         $this->seed(\Database\Seeders\ApplicationStatusSeeder::class);
         $owner = User::factory()->create(['role' => 'employer']);
-        $organization = Organization::create(['name' => 'Funnel Organization']);
-        $other = Organization::create(['name' => 'Other Organization']);
+        $organization = Organization::create(['name' => 'Funnel Organization', 'phone' => '1111111', 'email' => 'funnel@example.com']);
+        $other = Organization::create(['name' => 'Other Organization', 'phone' => '2222222', 'email' => 'other@example.com']);
         $base = [
             'user_id' => $owner->id, 'category_id' => Category::factory()->create()->id,
             'job_type_id' => JobType::create(['name' => 'Attachment', 'status' => 1])->id,
@@ -69,8 +69,8 @@ class JobLevelReportTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $otherContact = User::factory()->create(['role' => 'employer']);
-        $organization = Organization::create(['name' => 'Shared Organization']);
-        $empty = Organization::create(['name' => 'Empty Organization']);
+        $organization = Organization::create(['name' => 'Shared Organization', 'phone' => '1111111', 'email' => 'shared@example.com']);
+        $empty = Organization::create(['name' => 'Empty Organization', 'phone' => '2222222', 'email' => 'empty@example.com']);
         $category = Category::factory()->create();
         $type = JobType::create(['name' => 'Attachment', 'status' => 1]);
         $base = ['user_id' => $admin->id, 'category_id' => $category->id, 'job_type_id' => $type->id];

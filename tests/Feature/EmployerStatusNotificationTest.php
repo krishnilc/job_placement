@@ -29,7 +29,7 @@ class EmployerStatusNotificationTest extends TestCase
         $user = User::factory()->create([
             'role' => 'employer', 'status' => 'pending', 'name' => 'Test Employer',
         ]);
-        $organization = Organization::create(['name' => 'Test Company', 'address' => 'Suva']);
+        $organization = Organization::create(['name' => 'Test Company', 'address' => 'Suva', 'phone' => '1111111', 'email' => 'test@example.com']);
         $user->employerProfile()->create(['organization_id' => $organization->id]);
 
         return $user;

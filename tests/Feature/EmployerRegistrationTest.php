@@ -14,7 +14,7 @@ class EmployerRegistrationTest extends TestCase
     public function test_employer_can_register(): void
     {
         $this->withoutMiddleware();
-        $organization = Organization::create(['name' => 'Example Company', 'address' => 'Suva']);
+        $organization = Organization::create(['name' => 'Example Company', 'address' => 'Suva', 'phone' => '1111111', 'email' => 'example@example.com']);
 
         $response = $this->post('/account/process-registration', [
             'name' => 'Employer One',

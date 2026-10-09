@@ -117,7 +117,7 @@ class ManagementRoleTest extends TestCase
 
     public function test_management_can_view_organizations_and_requests_without_decision_controls(): void
     {
-        $organization = Organization::create(['name' => 'Example Organization', 'address' => 'Suva']);
+        $organization = Organization::create(['name' => 'Example Organization', 'address' => 'Suva', 'phone' => '1111111', 'email' => 'example@example.com']);
         $request = OrganizationRequest::create([
             'user_id' => User::factory()->create(['role' => 'employer'])->id,
             'name' => 'Requested Organization', 'address' => 'Lautoka', 'status' => 'pending',
@@ -134,7 +134,7 @@ class ManagementRoleTest extends TestCase
     public function test_every_admin_write_and_non_view_page_is_forbidden_even_with_direct_requests(): void
     {
         $application = $this->application();
-        $organization = Organization::create(['name' => 'Unchanged Organization', 'address' => 'Suva']);
+        $organization = Organization::create(['name' => 'Unchanged Organization', 'address' => 'Suva', 'phone' => '1111111', 'email' => 'unchanged@example.com']);
         $organizationRequest = OrganizationRequest::create([
             'user_id' => $application->employer_id, 'name' => 'Pending Organization',
             'address' => 'Suva', 'status' => 'pending',
@@ -308,6 +308,8 @@ class ManagementRoleTest extends TestCase
         $this->get(route('admin.jobs.create'))->assertOk();
         $this->post(route('admin.organizations.store'), [
             'name' => 'Admin Created Organization', 'address' => 'Suva',
+            'phone' => '1111111',
+            'email' => 'office@example.com',
         ])->assertRedirect();
         $this->assertDatabaseHas('organizations', ['name' => 'Admin Created Organization']);
         $this->get(route('admin.users.admins'))->assertRedirect();

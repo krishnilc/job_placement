@@ -50,6 +50,8 @@ class AuthController extends Controller
                 ? 'required|string|max:1000' : 'nullable',
             'company_phone' => $role === 'employer' && $request->input('organization_mode') === 'request'
                 ? 'required|string|max:50' : 'nullable',
+            'company_email' => $role === 'employer' && $request->input('organization_mode') === 'request'
+                ? 'required|email|max:255' : 'nullable',
         ], [
             'student_id.unique' => 'The University Student ID has already been taken. Please enter a unique one.',
         ]);
@@ -91,6 +93,7 @@ class AuthController extends Controller
                             'user_id' => $user->id, 'name' => $request->company_name,
                             'address' => $request->company_address,
                             'phone' => $request->company_phone,
+                            'email' => $request->company_email,
                         ]);
                     }
                 }

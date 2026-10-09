@@ -13,6 +13,7 @@
                             <h2 class="h5">{{ $organizationRequest->name }}</h2>
                             <p>{{ $organizationRequest->address }}</p>
                             <p>Organization phone: {{ $organizationRequest->phone }}</p>
+                            <p>Organization email: {{ $organizationRequest->email ?: 'Not provided' }}</p>
                             <p>Contact: {{ $organizationRequest->user?->name ?? 'Deleted contact' }} ({{ $organizationRequest->user?->email }})</p>
                             <p>Status: {{ ucfirst($organizationRequest->status) }}</p>
                             @if ($organizationRequest->organization)<p>Organization: {{ $organizationRequest->organization->name }}</p>@endif

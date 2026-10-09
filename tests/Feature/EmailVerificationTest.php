@@ -35,7 +35,7 @@ class EmailVerificationTest extends TestCase
         } elseif ($role === 'alumni') {
             $data['graduation_year'] = '2020';
         } else {
-            $organization = Organization::create(['name' => 'Test Company', 'address' => 'Suva']);
+            $organization = Organization::create(['name' => 'Test Company', 'address' => 'Suva', 'phone' => '1111111', 'email' => 'test@example.com']);
             $data['designation'] = 'HR Manager';
             $data['organization_mode'] = 'existing';
             $data['organization_id'] = $organization->id;

@@ -47,6 +47,8 @@ class AdminJobOrganizationTest extends TestCase
     {
         $organization = Organization::create([
             'name' => 'Selected Company',
+            'phone' => '1111111',
+            'email' => 'selected@example.com',
             'address' => str_repeat('Address ', 100),
             'website_url' => 'https://example.com',
         ]);
@@ -85,9 +87,11 @@ class AdminJobOrganizationTest extends TestCase
     {
         $organization = Organization::create([
             'name' => 'Shared Organization', 'address' => 'Shared Office',
+            'phone' => '1111111',
+            'email' => 'shared@example.com',
             'website_url' => 'https://example.com',
         ]);
-        $other = Organization::create(['name' => 'Another Organization']);
+        $other = Organization::create(['name' => 'Another Organization', 'phone' => '2222222', 'email' => 'another@example.com']);
         $data = $this->jobData();
         foreach (['admin', 'super_admin'] as $role) {
             $admin = User::factory()->create(['role' => $role]);
@@ -129,7 +133,7 @@ class AdminJobOrganizationTest extends TestCase
 
     public function test_organization_optional_details_and_job_settings_are_preserved(): void
     {
-        $organization = Organization::create(['name' => 'Minimal Company']);
+        $organization = Organization::create(['name' => 'Minimal Company', 'phone' => '1111111', 'email' => 'minimal@example.com']);
         $this->actingAs(User::factory()->create(['role' => 'super_admin']));
         $data = $this->jobData(['organization_id' => $organization->id, 'isFeatured' => 1, 'salary' => '25000']);
         foreach (['pending' => 0, 'active' => 1, 'blocked' => 2] as $status => $expected) {

@@ -18,6 +18,8 @@ class EmployerOrganizationTest extends TestCase
     {
         $organization = Organization::create([
             'name' => 'Linked Organization', 'address' => 'Suva Office',
+            'phone' => '1111111',
+            'email' => 'linked@example.com',
             'website_url' => 'https://example.com',
         ]);
         $employer = User::factory()->create(['role' => 'employer', 'status' => 'active']);
@@ -49,14 +51,14 @@ class EmployerOrganizationTest extends TestCase
         $organization = Organization::create([
             'name' => 'My Company',
             'address' => 'Suva Office',
+            'email' => 'my-company@example.com',
             'phone' => '331 4411',
-            'head_office_address' => 'Level 5, Head Office Tower, Suva',
             'website_url' => 'https://example.com',
             'linkedin_url' => 'https://www.linkedin.com/company/example',
             'facebook_url' => 'https://www.facebook.com/example',
             'description' => 'Our organization description.',
         ]);
-        $other = Organization::create(['name' => 'Other Private Company', 'phone' => '9999999']);
+        $other = Organization::create(['name' => 'Other Private Company', 'phone' => '9999999', 'email' => 'other@example.com']);
         $employer = User::factory()->create(['role' => 'employer', 'status' => 'active']);
         $employer->employerProfile()->create(['organization_id' => $organization->id]);
 
@@ -70,7 +72,7 @@ class EmployerOrganizationTest extends TestCase
             ->assertDontSee('9999999')
             ->assertDontSee('Edit details');
         $response = $this->get(route('employer.organization'));
-        foreach ($organization->only(['name', 'address', 'phone', 'head_office_address', 'website_url', 'linkedin_url', 'facebook_url', 'description']) as $value) {
+        foreach ($organization->only(['name', 'address', 'phone', 'website_url', 'linkedin_url', 'facebook_url', 'description']) as $value) {
             $response->assertSee($value);
         }
         $this->get(route('employer.dashboard'))->assertOk()
@@ -87,7 +89,7 @@ class EmployerOrganizationTest extends TestCase
         $employer->employerProfile()->create();
         $this->get(route('employer.organization'))->assertOk()
             ->assertSee('No organization is linked to your account yet.');
-        $organization = Organization::create(['name' => 'Minimal Organization']);
+        $organization = Organization::create(['name' => 'Minimal Organization', 'phone' => '1111111', 'email' => 'minimal@example.com']);
         $employer->employerProfile()->update(['organization_id' => $organization->id]);
         $this->actingAs($employer->fresh())->get(route('employer.organization'))->assertOk()
             ->assertSee('Minimal Organization')->assertSee('Not provided');

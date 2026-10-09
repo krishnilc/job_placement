@@ -93,8 +93,8 @@ class OrganizationController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/\S/u'],
             'address' => ['required', 'string', 'max:1000'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'head_office_address' => ['nullable', 'string', 'max:1000'],
+            'phone' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'email', 'max:255'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
@@ -132,7 +132,11 @@ class OrganizationController extends Controller
             if ($data['decision'] === 'approve') {
                 $organization = Organization::createOrFirst(
                     ['name_key' => Organization::nameKey($pending->name)],
-                    $pending->only(['name', 'address', 'phone', 'website_url', 'description'])
+                    [
+                        ...$pending->only(['name', 'address', 'phone', 'website_url', 'description']),
+                        'email' => $pending->email ?: $user->email,
+                        'phone' => $pending->phone ?: $user->mobile,
+                    ]
                 );
                 if (! $organization->wasRecentlyCreated) {
                     throw ValidationException::withMessages(['decision' => 'An organization with this name already exists. Link the request to the existing record instead.']);

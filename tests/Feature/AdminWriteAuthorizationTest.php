@@ -19,7 +19,7 @@ class AdminWriteAuthorizationTest extends TestCase
     {
         $employer = User::factory()->create(['role' => 'employer']);
         $other = User::factory()->create(['role' => 'employer']);
-        $organization = Organization::create(['name' => 'Test Organization']);
+        $organization = Organization::create(['name' => 'Test Organization', 'phone' => '1111111', 'email' => 'test@example.com']);
         $category = Category::factory()->create();
         $jobType = JobType::factory()->create();
         $data = [

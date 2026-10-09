@@ -31,6 +31,8 @@ class EmployerJobPostedNotificationTest extends TestCase
         $organization = Organization::create([
             'name' => 'Example Company',
             'address' => 'Suva',
+            'phone' => '1111111',
+            'email' => 'example@example.com',
             'website_url' => 'https://example.com',
         ]);
         $employer = User::factory()->create([
@@ -100,7 +102,7 @@ class EmployerJobPostedNotificationTest extends TestCase
     {
         Mail::fake();
         $admin = User::factory()->create(['role' => 'admin']);
-        $organization = Organization::create(['name' => 'Admin Company']);
+        $organization = Organization::create(['name' => 'Admin Company', 'phone' => '1111111', 'email' => 'admin-company@example.com']);
         $data = $this->jobData();
         unset($data['closing_date']);
         $data['organization_id'] = $organization->id;

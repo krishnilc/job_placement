@@ -25,13 +25,13 @@
                             <form method="POST" action="{{ $organization->exists ? route('admin.organizations.update', $organization) : route('admin.organizations.store') }}">
                                 @csrf
                                 @if ($organization->exists) @method('PUT') @endif
-                                @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'head_office_address' => 'Head office address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
+                                @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'email' => 'Email', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
                                     <div class="mb-3">
-                                        <label for="{{ $field }}" class="form-label">{{ $label }}@if (in_array($field, ['name', 'address'])) <span class="text-danger">*</span>@endif</label>
-                                        @if (in_array($field, ['address', 'head_office_address', 'description']))
+                                        <label for="{{ $field }}" class="form-label">{{ $label }}@if (in_array($field, ['name', 'address', 'phone', 'email'])) <span class="text-danger">*</span>@endif</label>
+                                        @if (in_array($field, ['address', 'description']))
                                             <textarea id="{{ $field }}" name="{{ $field }}" class="form-control" rows="3">{{ old($field, $organization->{$field}) }}</textarea>
                                         @else
-                                            <input id="{{ $field }}" name="{{ $field }}" type="{{ str_ends_with($field, '_url') ? 'url' : ($field === 'phone' ? 'tel' : 'text') }}" class="form-control" value="{{ old($field, $organization->{$field}) }}">
+                                            <input id="{{ $field }}" name="{{ $field }}" type="{{ str_ends_with($field, '_url') ? 'url' : ($field === 'phone' ? 'tel' : ($field === 'email' ? 'email' : 'text')) }}" class="form-control" value="{{ old($field, $organization->{$field}) }}" @required(in_array($field, ['name', 'address', 'phone', 'email']))>
                                         @endif
                                         @error($field)<p class="text-danger">{{ $message }}</p>@enderror
                                     </div>

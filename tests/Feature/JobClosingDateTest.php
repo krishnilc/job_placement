@@ -18,7 +18,7 @@ class JobClosingDateTest extends TestCase
     public function test_job_creation_persists_closing_date(): void
     {
         Mail::fake();
-        $organization = Organization::create(['name' => 'Acme Tech']);
+        $organization = Organization::create(['name' => 'Acme Tech', 'phone' => '1111111', 'email' => 'acme@example.com']);
         $user = User::factory()->create(['role' => 'employer']);
         $user->employerProfile()->create(['organization_id' => $organization->id]);
         $category = Category::factory()->create();
@@ -46,7 +46,7 @@ class JobClosingDateTest extends TestCase
     public function test_employer_job_requires_admin_approval_before_public_visibility(): void
     {
         Mail::fake();
-        $organization = Organization::create(['name' => 'BrightWork Ltd']);
+        $organization = Organization::create(['name' => 'BrightWork Ltd', 'phone' => '2222222', 'email' => 'brightwork@example.com']);
         $user = User::factory()->create(['role' => 'employer']);
         $user->employerProfile()->create(['organization_id' => $organization->id]);
         $category = Category::factory()->create();
