@@ -36,8 +36,8 @@
                                 <dt class="col-sm-3">Phone</dt>
                                 <dd class="col-sm-9">{{ $organization->phone ?: '-' }}</dd>
 
-                                <dt class="col-sm-3">Postal address</dt>
-                                <dd class="col-sm-9">{{ $organization->postal_address ?: '-' }}</dd>
+                                <dt class="col-sm-3">Head office address</dt>
+                                <dd class="col-sm-9">{{ $organization->head_office_address ?: '-' }}</dd>
 
                                 <dt class="col-sm-3">Website</dt>
                                 <dd class="col-sm-9">

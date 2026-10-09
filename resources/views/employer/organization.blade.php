@@ -23,7 +23,7 @@
                             @if ($organization)
                                 <p class="text-muted">Organization details are managed by an administrator. Contact the administrator if these details need updating.</p>
                                 <dl class="row mb-0">
-                                    @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'postal_address' => 'Postal address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn', 'facebook_url' => 'Facebook', 'description' => 'Description'] as $field => $label)
+                                    @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'head_office_address' => 'Head office address', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn', 'facebook_url' => 'Facebook', 'description' => 'Description'] as $field => $label)
                                         <dt class="col-sm-3">{{ $label }}</dt>
                                         <dd class="col-sm-9">
                                             @if (str_ends_with($field, '_url') && $organization->{$field})

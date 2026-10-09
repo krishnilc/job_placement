@@ -94,7 +94,7 @@ class OrganizationController extends Controller
             'name' => ['required', 'string', 'max:255', 'regex:/\S/u'],
             'address' => ['required', 'string', 'max:1000'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'postal_address' => ['nullable', 'string', 'max:1000'],
+            'head_office_address' => ['nullable', 'string', 'max:1000'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],

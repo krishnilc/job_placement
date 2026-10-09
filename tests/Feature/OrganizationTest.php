@@ -322,6 +322,35 @@ class OrganizationTest extends TestCase
         $this->assertSame('Other Company', $other->fresh()->name);
     }
 
+    public function test_admin_organization_forms_capture_head_office_address(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $this->get(route('admin.organizations.create'))->assertOk()
+            ->assertSee('Head office address')
+            ->assertSee('name="head_office_address"', false)
+            ->assertDontSee('Postal address');
+
+        $this->post(route('admin.organizations.store'), [
+            'name' => 'Head Office Company', 'address' => 'Suva Branch',
+            'head_office_address' => 'Level 5, Head Office Tower, Suva',
+        ])->assertRedirect();
+
+        $organization = Organization::where('name', 'Head Office Company')->firstOrFail();
+        $this->assertSame('Level 5, Head Office Tower, Suva', $organization->head_office_address);
+
+        $this->get(route('admin.organizations.show', $organization))->assertOk()
+            ->assertSee('Head office address')
+            ->assertSee('Level 5, Head Office Tower, Suva')
+            ->assertDontSee('Postal address');
+
+        $this->put(route('admin.organizations.update', $organization), [
+            'name' => 'Head Office Company', 'address' => 'Suva Branch',
+            'head_office_address' => 'Level 9, New Head Office, Nadi',
+        ])->assertRedirect();
+        $this->assertSame('Level 9, New Head Office, Nadi', $organization->fresh()->head_office_address);
+    }
+
     public function test_contact_deletion_and_shared_organization_do_not_transfer_job_access(): void
     {
         $organization = Organization::create(['name' => 'Shared Company', 'address' => 'Suva']);

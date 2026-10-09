@@ -50,7 +50,7 @@ class EmployerOrganizationTest extends TestCase
             'name' => 'My Company',
             'address' => 'Suva Office',
             'phone' => '331 4411',
-            'postal_address' => 'PO Box 123',
+            'head_office_address' => 'Level 5, Head Office Tower, Suva',
             'website_url' => 'https://example.com',
             'linkedin_url' => 'https://www.linkedin.com/company/example',
             'facebook_url' => 'https://www.facebook.com/example',
@@ -70,7 +70,7 @@ class EmployerOrganizationTest extends TestCase
             ->assertDontSee('9999999')
             ->assertDontSee('Edit details');
         $response = $this->get(route('employer.organization'));
-        foreach ($organization->only(['name', 'address', 'phone', 'postal_address', 'website_url', 'linkedin_url', 'facebook_url', 'description']) as $value) {
+        foreach ($organization->only(['name', 'address', 'phone', 'head_office_address', 'website_url', 'linkedin_url', 'facebook_url', 'description']) as $value) {
             $response->assertSee($value);
         }
         $this->get(route('employer.dashboard'))->assertOk()
