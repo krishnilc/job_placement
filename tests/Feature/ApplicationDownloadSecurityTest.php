@@ -53,6 +53,14 @@ class ApplicationDownloadSecurityTest extends TestCase
         ]);
     }
 
+    public function test_application_documents_use_private_storage(): void
+    {
+        $disk = config('filesystems.disks.applications');
+
+        $this->assertSame(storage_path('app/private/applications'), $disk['root']);
+        $this->assertArrayNotHasKey('url', $disk);
+    }
+
     public function test_application_participants_and_staff_can_download_saved_documents(): void
     {
         $readers = [
@@ -67,6 +75,14 @@ class ApplicationDownloadSecurityTest extends TestCase
             $this->get($this->downloadUrl('certificate', ['file' => base64_encode('certificates/approved.pdf')]))
                 ->assertOk()->assertDownload('approved.pdf');
         }
+    }
+
+    public function test_migrated_upload_paths_remain_available_from_private_storage(): void
+    {
+        Storage::disk('applications')->put('uploads/resumes/legacy-resume.pdf', 'Legacy resume fixture');
+        $this->application->update(['resume_file' => 'uploads/resumes/legacy-resume.pdf']);
+
+        $this->get($this->downloadUrl('resume'))->assertOk()->assertDownload('legacy-resume.pdf');
     }
 
     public function test_unrelated_accounts_cannot_download_application_documents(): void

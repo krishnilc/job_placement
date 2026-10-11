@@ -9,6 +9,7 @@
     <h1>New job application</h1>
     <p>Hello {{ $employer->name }},</p>
     <p>You have received a new application for {{ $job->title }} at {{ $job->company_name }}.</p>
+    <p><strong>Application ID:</strong> {{ $application->id }}</p>
     <p><strong>Applicant:</strong> {{ $applicant->name }}</p>
     <p><strong>Email:</strong> {{ $applicant->email }}</p>
     <p><strong>Phone:</strong> {{ $applicant->mobile }}</p>

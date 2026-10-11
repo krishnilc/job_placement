@@ -79,12 +79,19 @@ names, and the reorganized route targets.
 
 ## Uploads and legacy databases
 
-Application documents in `public/assets/applications/` and profile images in
-`public/profile_pic/` (including `thumb/`) are runtime data, not source code.
-They are ignored by Git; committed ignore files preserve the directories on
-fresh checkouts. The cleanup removed existing uploads from Git tracking only,
-not from the local filesystem. Back up and provision uploads separately when
-deploying; do not rely on a fresh checkout to restore them.
+Student application documents are stored privately in
+`storage/app/private/applications/{application_id}/` and served through the
+authenticated application-download route. Resumes and application documents
+are kept in that folder; certificates are grouped under its `certificates/`
+subfolder. Keep any existing files from
+`public/assets/applications/` by moving them into that private directory.
+Move files from `storage/app/public/uploads/applications/`, `resumes/`, and
+`certificates/` into matching `uploads/<type>/` subdirectories there. Preserve
+relative filenames and paths because the database stores them.
+Profile images remain public in `public/profile_pic/` (including `thumb/`).
+Other files under `storage/app/public/uploads/` remain public-storage uploads.
+Back up and provision runtime uploads separately when deploying; do not rely
+on a fresh checkout to restore them.
 
 The root `job_portal` SQLite file and `job_placement_sql.sql` legacy export are
 also untracked and ignored. Their local names and contents were preserved to

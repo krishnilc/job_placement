@@ -63,9 +63,11 @@ class ApplicationSubmissionNotificationTest extends TestCase
                 'status' => true, 'warning' => false,
                 'notifications' => ['job_poster' => true, 'student' => true],
             ]);
+            $application = JobApplication::where('job_id', $job->id)->firstOrFail();
             Mail::assertSent(JobNotificationEmail::class, fn ($mail) => $mail->hasTo($job->user->email)
                 && $mail->applicant->id === $student->id
                 && $mail->job->id === $job->id
+                && $mail->application->id === $application->id
                 && $mail->envelope()->replyTo[0]->address === $student->email);
             Mail::assertSent(ApplicationSubmissionConfirmation::class, fn ($mail) => $mail->hasTo($student->email)
                 && $mail->job->id === $job->id
@@ -80,9 +82,38 @@ class ApplicationSubmissionNotificationTest extends TestCase
                 'changed_by' => $student->id,
             ]);
             Storage::disk('applications')->assertExists($application->resume_file);
+            $this->assertStringStartsWith($application->id.'/', $application->resume_file);
             $this->assertSame('My Resume.pdf', $application->resume_file_name);
         }
         Mail::assertSentCount(6);
+    }
+
+    public function test_submission_stores_each_document_under_the_application_id(): void
+    {
+        Mail::fake();
+        $job = $this->job();
+        $student = User::factory()->create(['role' => 'student']);
+        $this->actingAs($student)->postJson(route('applyJob'), [
+            'job_id' => $job->id,
+            'application' => UploadedFile::fake()->create('Cover Letter.pdf', 10, 'application/pdf'),
+            'resume' => UploadedFile::fake()->create('Resume.pdf', 10, 'application/pdf'),
+            'certificates' => [
+                UploadedFile::fake()->create('Transcript.pdf', 10, 'application/pdf'),
+                UploadedFile::fake()->create('Degree.pdf', 10, 'application/pdf'),
+            ],
+        ])->assertOk()->assertJsonPath('status', true);
+
+        $application = JobApplication::where('job_id', $job->id)->firstOrFail();
+        $this->assertStringStartsWith($application->id.'/', $application->application_file);
+        $this->assertStringStartsWith($application->id.'/', $application->resume_file);
+        $certificatePaths = json_decode($application->certificates_file, true);
+        $this->assertCount(2, $certificatePaths);
+        foreach ($certificatePaths as $path) {
+            $this->assertStringStartsWith($application->id.'/certificates/', $path);
+            Storage::disk('applications')->assertExists($path);
+        }
+        Storage::disk('applications')->assertExists($application->application_file);
+        Storage::disk('applications')->assertExists($application->resume_file);
     }
 
     public function test_duplicate_application_does_not_resend_emails(): void
@@ -192,6 +223,8 @@ class ApplicationSubmissionNotificationTest extends TestCase
         $this->assertSame('New application for Graduate Developer', $posterMail->getSubject());
         $this->assertStringContainsString('&lt;b&gt;Student&lt;/b&gt;', $posterMail->getHtmlBody());
         $this->assertStringContainsString('Example Company', $posterMail->getHtmlBody());
+        $application = JobApplication::where('job_id', $job->id)->firstOrFail();
+        $this->assertStringContainsString('<strong>Application ID:</strong> '.$application->id, $posterMail->getHtmlBody());
         $this->assertStringContainsString('Review applications and submitted documents', $posterMail->getHtmlBody());
         $this->assertCount(0, $posterMail->getAttachments());
 

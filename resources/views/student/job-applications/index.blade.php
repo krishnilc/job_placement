@@ -40,10 +40,32 @@
                                 </div>
                             </form>
                             <div class="table-responsive">
+                                @php
+                                    $sortUrl = function ($column) use ($sort, $direction) {
+                                        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+
+                                        return request()->fullUrlWithQuery([
+                                            'sort' => $column,
+                                            'direction' => $nextDirection,
+                                            'page' => null,
+                                        ]);
+                                    };
+                                    $sortIcon = function ($column) use ($sort, $direction) {
+                                        if ($sort !== $column) {
+                                            return 'fa-sort';
+                                        }
+
+                                        return $direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+                                    };
+                                @endphp
                                 <table class="table ">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Title</th>
+                                            <th scope="col">Application ID</th>
+                                            <th scope="col"><a href="{{ $sortUrl('title') }}"
+                                                    class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
+                                                    aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
+                                                        aria-hidden="true"></i></a></th>
                                             <th scope="col">Applied Date</th>
                                             <th scope="col">Closing Date</th>
                                             {{-- <th scope="col">Applicants</th> --}}
@@ -56,6 +78,7 @@
                                         @if ($jobApplications->isNotEmpty())
                                             @foreach ($jobApplications as $jobApplication)
                                                 <tr class="active">
+                                                    <td>{{ $jobApplication->id }}</td>
                                                     <td>
                                                         <div class="info1 job-name fw-500">{{ $jobApplication->job->title }}</div>
                                                         <div class="">{{ $jobApplication->job->jobType->name }}.
@@ -230,7 +253,7 @@
                                             @endforeach
                                             @else
                                             <tr>
-                                                <td colspan="5"> No job applications found. </td>
+                                                <td colspan="6"> No job applications found. </td>
                                             </tr>
                                         @endif
                                     </tbody>

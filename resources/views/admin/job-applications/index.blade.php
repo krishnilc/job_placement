@@ -76,6 +76,7 @@
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
+                                            <th scope="col" class="fw-semibold">Application ID</th>
                                             <th scope="col"><a href="{{ $sortUrl('title') }}"
                                                     class="d-inline-flex align-items-center gap-1 text-decoration-none text-dark text-nowrap"
                                                     aria-label="Sort by title">Title <i class="fa {{ $sortIcon('title') }}"
@@ -103,6 +104,7 @@
                                         @if ($applications->isNotEmpty())
                                             @foreach ($applications as $application)
                                                 <tr>
+                                                    <td>{{ $application->id }}</td>
                                                     <td style="min-width: 200px; white-space: normal;">
                                                         <p class="mb-0">{{ $application->job->title }}</p>
                                                     </td>

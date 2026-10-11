@@ -15,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -212,17 +213,11 @@ class ManagementRoleTest extends TestCase
             $this->get(route('admin.feedback.export', ['format' => $format]))->assertOk();
         }
         $filename = 'management-test-'.Str::uuid().'.pdf';
-        $path = public_path('assets/applications/'.$filename);
-        try {
-            file_put_contents($path, 'Test resume');
-            $application->update(['resume_file' => $filename]);
-            $this->get(route('application.download', ['application' => $application->id, 'type' => 'resume']))
-                ->assertOk()->assertHeader('Content-Type', 'application/pdf');
-        } finally {
-            if (is_file($path)) {
-                unlink($path);
-            }
-        }
+        Storage::fake('applications');
+        Storage::disk('applications')->put($filename, 'Test resume');
+        $application->update(['resume_file' => $filename]);
+        $this->get(route('application.download', ['application' => $application->id, 'type' => 'resume']))
+            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
     }
 
     public function test_management_can_change_only_their_own_contact_details_and_password(): void

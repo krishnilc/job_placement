@@ -49,9 +49,7 @@ return [
 
         'applications' => [
             'driver' => 'local',
-            'root' => public_path('assets/applications'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/assets/applications',
-            'visibility' => 'public',
+            'root' => storage_path('app/private/applications'),
             'throw' => false,
             'report' => false,
         ],

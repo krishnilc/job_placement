@@ -11,9 +11,20 @@ class JobApplicationController extends Controller
 {
     public function index(Request $request)
     {
+        $sort = $request->query('sort', 'created_at');
+        $direction = $request->query('direction', 'desc');
+
+        if (! in_array($sort, ['title', 'created_at'], true)) {
+            $sort = 'created_at';
+        }
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
         $search = trim((string) $request->query('search', ''));
 
-        $jobApplications = JobApplication::where('user_id', Auth::user()->id)
+        $jobApplications = JobApplication::where('job_applications.user_id', Auth::user()->id)
             ->when($search !== '', function ($query) use ($search) {
                 $like = '%'.$search.'%';
                 $query->whereHas('job', function ($j) use ($like) {
@@ -23,12 +34,18 @@ class JobApplicationController extends Controller
                 });
             })
             ->with(['job', 'job.JobType', 'job.applications', 'applicationStatus', 'studentFeedback'])
-            ->orderBy('created_at', 'desc')
+            ->when($sort === 'title', fn ($query) => $query
+                ->leftJoin('jobs', 'jobs.id', '=', 'job_applications.job_id')
+                ->select('job_applications.*')
+                ->orderBy('jobs.title', $direction))
+            ->when($sort === 'created_at', fn ($query) => $query->orderBy('job_applications.created_at', $direction))
             ->paginate(10)
             ->withQueryString(); // Retrieve job applications submitted by the authenticated user
 
         return view('student.job-applications.index', [
             'jobApplications' => $jobApplications,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

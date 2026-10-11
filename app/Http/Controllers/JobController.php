@@ -204,51 +204,71 @@ class JobController extends Controller
       $application->status = 'pending';
       $application->application_status_id = ApplicationStatus::where('name', 'Submitted')->value('id');
 
-      // Store single application file
-      if ($request->hasFile('application')) {
-         $file = $request->file('application');
-         $fileName = 'application_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
-         $path = $file->storeAs('', $fileName, 'applications');
-         $application->application_file = $path;
-         $application->application_file_name = $file->getClientOriginalName();
+      $uploadedPaths = [];
+      try {
+         DB::transaction(function () use ($application, $request, &$uploadedPaths) {
+            $application->save();
+
+            $applicationDirectory = (string) $application->id;
+
+            if ($request->hasFile('application')) {
+               $file = $request->file('application');
+               $fileName = 'application_' . Auth::user()->id . '_' . $application->job_id . '_' . time() . '.' . $file->getClientOriginalExtension();
+               $path = $file->storeAs($applicationDirectory, $fileName, 'applications');
+               if ($path === false) {
+                  throw new \RuntimeException('Unable to store the application document.');
+               }
+               $uploadedPaths[] = $path;
+               $application->application_file = $path;
+               $application->application_file_name = $file->getClientOriginalName();
+            }
+
+            if ($request->hasFile('resume')) {
+               $file = $request->file('resume');
+               $fileName = 'resume_' . Auth::user()->id . '_' . $application->job_id . '_' . time() . '.' . $file->getClientOriginalExtension();
+               $path = $file->storeAs($applicationDirectory, $fileName, 'applications');
+               if ($path === false) {
+                  throw new \RuntimeException('Unable to store the resume.');
+               }
+               $uploadedPaths[] = $path;
+               $application->resume_file = $path;
+               $application->resume_file_name = $file->getClientOriginalName();
+            }
+
+            $certificatePaths = [];
+            $certificateNames = [];
+            if ($request->hasFile('certificates')) {
+               foreach ($request->file('certificates') as $file) {
+                  $fileName = 'certificate_' . Auth::user()->id . '_' . $application->job_id . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                  $path = $file->storeAs($applicationDirectory . '/certificates', $fileName, 'applications');
+                  if ($path === false) {
+                     throw new \RuntimeException('Unable to store a certificate.');
+                  }
+                  $uploadedPaths[] = $path;
+                  $certificatePaths[] = $path;
+                  $certificateNames[] = $file->getClientOriginalName();
+               }
+            }
+
+            if ($certificatePaths !== []) {
+               $application->certificates_file = json_encode($certificatePaths);
+               $application->certificates_file_names = json_encode($certificateNames);
+            }
+
+            $application->save();
+            DB::table('application_status_history')->insert([
+               'job_application_id' => $application->id,
+               'application_status_id' => $application->application_status_id,
+               'changed_by' => Auth::id(),
+               'created_at' => now(),
+            ]);
+         });
+      } catch (\Throwable $exception) {
+         Storage::disk('applications')->delete($uploadedPaths);
+         throw $exception;
       }
 
-      // Store resume
-      if ($request->hasFile('resume')) {
-         $file = $request->file('resume');
-         $fileName = 'resume_' . Auth::user()->id . '_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
-         $path = $file->storeAs('', $fileName, 'applications');
-         $application->resume_file = $path;
-         $application->resume_file_name = $file->getClientOriginalName();
-      }
-
-      // Store certificates (allow multiple)
-      $certificatePaths = [];
-      $certificateNames = [];
-      if ($request->hasFile('certificates')) {
-         foreach ($request->file('certificates') as $file) {
-            $fileName = 'certificate_' . Auth::user()->id . '_' . $id . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $certificatePaths[] = $file->storeAs('', $fileName, 'applications');
-            $certificateNames[] = $file->getClientOriginalName();
-         }
-      }
-
-      if (!empty($certificatePaths)) {
-         $application->certificates_file = json_encode($certificatePaths);
-         $application->certificates_file_names = json_encode($certificateNames);
-      }
-
-      DB::transaction(function () use ($application) {
-         $application->save();
-         DB::table('application_status_history')->insert([
-            'job_application_id' => $application->id,
-            'application_status_id' => $application->application_status_id,
-            'changed_by' => Auth::id(),
-            'created_at' => now(),
-         ]);
-      });
-
-      $notifications = $notifier->send($job, Auth::user());
+      $notifications = $notifier->send($job, Auth::user(), $application);
       $warning = !$notifications['job_poster'] || !$notifications['student'];
       $message = 'You have successfully applied for the job.';
       if (!$notifications['job_poster']) {

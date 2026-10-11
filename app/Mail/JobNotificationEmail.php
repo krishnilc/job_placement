@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Job;
+use App\Models\JobApplication;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -22,6 +23,7 @@ class JobNotificationEmail extends Mailable
         public User $employer,
         public User $applicant,
         public Job $job,
+        public JobApplication $application,
     ) {}
 
     /**
