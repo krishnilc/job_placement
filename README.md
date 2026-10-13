@@ -41,6 +41,41 @@ a separate queue table and its migration before enabling a database queue.
 `composer run dev` starts the PHP server and optional Vite watcher without
 requiring a queue worker or Unix-only log watcher.
 
+## Tester accounts (local/testing only)
+
+Run the dedicated, opt-in seeder against your configured local database:
+
+```sh
+php artisan db:seed --class=TesterAccountSeeder
+```
+
+This creates 28 separate, active, email-verified accounts: seven per tester.
+It is not included in the default database seeder and refuses to run outside
+the `local` and `testing` environments. All passwords are `test123` (stored
+hashed). These are test-only credentials; never use these accounts in production.
+
+| Tester | Email prefix | Record-name prefix |
+| --- | --- | --- |
+| Systems Developer | `sd.` | `sd_` |
+| Webmaster | `wm.` | `wm_` |
+| Web Content Developer | `wcd.` | `wcd_` |
+| IT Specialist | `its.` | `its_` |
+
+For each email prefix, the accounts are `student1`, `student2`, `employer1`,
+`employer2`, `admin`, `management`, and `super_admin` at `test.example`.
+For example, `its.student1@test.example`, `its.management@test.example`,
+and `its.super_admin@test.example`. Each login has exactly one role;
+management retains its existing read-only permissions.
+
+Students have complete sample profiles and unique student IDs linked to a
+dedicated `TEST` college. Each employer has its own sample organization.
+Re-running the seeder restores these accounts' passwords, roles, active status,
+verification, and sample profile/organization values without creating duplicates.
+Other accounts are not changed.
+
+Run the seeder regression tests with
+`php artisan test --filter=TesterAccountSeederTest`.
+
 ## Structure and naming conventions
 
 - PHP classes and namespace directories use PascalCase and match PSR-4 paths,

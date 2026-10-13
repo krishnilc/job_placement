@@ -2,10 +2,16 @@
     <div class="card-body p-0">
         <ul class="list-group list-group-flush ">
             @if (request()->routeIs('admin.account.*'))
-                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.profile')])>
+                <li @class([
+                    'list-group-item d-flex justify-content-between align-items-center p-3',
+                    'account-nav-active' => request()->routeIs('admin.account.profile'),
+                ])>
                     <a href="{{ route('admin.account.profile') }}"> <i class="fa fa-arrow-right"></i> View Profile</a>
                 </li>
-                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.editProfile')])>
+                <li @class([
+                    'list-group-item d-flex justify-content-between align-items-center p-3',
+                    'account-nav-active' => request()->routeIs('admin.account.editProfile'),
+                ])>
                     <a href="{{ route('admin.account.editProfile') }}"> <i class="fa fa-arrow-right"></i> Profile
                         Update</a>
                 </li>
@@ -15,8 +21,12 @@
                         <i class="fa fa-camera"></i> Change Profile Picture
                     </button>
                 </li>
-                <li @class(['list-group-item d-flex justify-content-between align-items-center p-3', 'account-nav-active' => request()->routeIs('admin.account.editPassword')])>
-                    <a href="{{ route('admin.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change Password</a>
+                <li @class([
+                    'list-group-item d-flex justify-content-between align-items-center p-3',
+                    'account-nav-active' => request()->routeIs('admin.account.editPassword'),
+                ])>
+                    <a href="{{ route('admin.account.editPassword') }}"> <i class="fa fa-arrow-right"></i> Change
+                        Password</a>
                 </li>
             @else
                 @php
@@ -26,61 +36,118 @@
                 @endphp
 
                 <li class="{{ $headingClass }}">User Management</li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.users.students', 'admin.users.students.create') || ($profileRoutes && isset($user) && in_array($user->role, ['user', 'student'], true))])>
+                <li @class([
+                    $itemClass,
+                    'account-nav-active' =>
+                        request()->routeIs(
+                            'admin.users.students',
+                            'admin.users.students.create') ||
+                        ($profileRoutes &&
+                            isset($user) &&
+                            in_array($user->role, ['user', 'student'], true)),
+                ])>
                     <a href="{{ route('admin.users.students') }}">
                         <i class="fa fa-arrow-right"></i> Students
                     </a>
                 </li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.users.employers', 'admin.users.employers.create') || ($profileRoutes && isset($user) && $user->role === 'employer')])>
+                <li @class([
+                    $itemClass,
+                    'account-nav-active' =>
+                        request()->routeIs(
+                            'admin.users.employers',
+                            'admin.users.employers.create') ||
+                        ($profileRoutes && isset($user) && $user->role === 'employer'),
+                ])>
                     <a href="{{ route('admin.users.employers') }}">
                         <i class="fa fa-arrow-right"></i> Employers
                     </a>
                 </li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.organizations.*')])>
-                        <a href="{{ route('admin.organizations.index') }}">
-                            <i class="fa fa-arrow-right"></i> Organizations
-                        </a>
-                    </li>
+
                 @if (Auth::user()->role === 'super_admin')
-                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.users.admins', 'admin.users.admins.create') || ($profileRoutes && isset($user) && in_array($user->role, ['admin', 'super_admin'], true))])>
+                    <li @class([
+                        $itemClass,
+                        'account-nav-active' =>
+                            request()->routeIs('admin.users.admins', 'admin.users.admins.create') ||
+                            ($profileRoutes &&
+                                isset($user) &&
+                                in_array($user->role, ['admin', 'super_admin'], true)),
+                    ])>
                         <a href="{{ route('admin.users.admins') }}">
-                            <i class="fa fa-arrow-right"></i> Admins
+                            <i class="fa fa-arrow-right"></i> Administrators
                         </a>
                     </li>
                 @endif
 
                 <li class="{{ $headingClass }}">Recruitment</li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.jobs', 'admin.jobs.edit', 'admin.jobs.create')])>
+                <li @class([
+                    $itemClass,
+                    'account-nav-active' => request()->routeIs(
+                        'admin.jobs',
+                        'admin.jobs.edit',
+                        'admin.jobs.create'),
+                ])>
                     <a href="{{ route('admin.jobs') }}">
                         <i class="fa fa-arrow-right"></i> Jobs
                     </a>
                 </li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.jobApplications')])>
+                <li @class([
+                    $itemClass,
+                    'account-nav-active' => request()->routeIs('admin.jobApplications'),
+                ])>
                     <a href="{{ route('admin.jobApplications') }}">
                         <i class="fa fa-arrow-right"></i> Applications
                     </a>
                 </li>
-                <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.feedback')])>
+                <li @class([
+                    $itemClass,
+                    'account-nav-active' => request()->routeIs('admin.feedback'),
+                ])>
                     <a href="{{ route('admin.feedback') }}">
                         <i class="fa fa-arrow-right"></i> Feedback
                     </a>
                 </li>
 
                 @if (Auth::user()->hasAdminAccess())
-                    <li class="{{ $headingClass }}"> System Setup</li>                    
-                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.colleges', 'admin.colleges.create', 'admin.colleges.edit')])>
-                        <a href="{{ route('admin.colleges') }}">
-                            <i class="fa fa-arrow-right"></i> Colleges/Centers
+                    <li class="{{ $headingClass }}"> System Setup</li>
+                    <li @class([
+                        $itemClass,
+                        'account-nav-active' => request()->routeIs('admin.organizations.*'),
+                    ])>
+                        <a href="{{ route('admin.organizations.index') }}">
+                            <i class="fa fa-arrow-right"></i> Organizations
                         </a>
                     </li>
-                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.categories', 'admin.categories.create', 'admin.categories.edit')])>
+                    <li @class([
+                        $itemClass,
+                        'account-nav-active' => request()->routeIs(
+                            'admin.jobTypes',
+                            'admin.jobTypes.create',
+                            'admin.jobTypes.edit'),
+                    ])>
+                        <a href="{{ route('admin.jobTypes') }}">
+                            <i class="fa fa-arrow-right"></i> Job Types
+                        </a>
+                    </li>
+                    <li @class([
+                        $itemClass,
+                        'account-nav-active' => request()->routeIs(
+                            'admin.categories',
+                            'admin.categories.create',
+                            'admin.categories.edit'),
+                    ])>
                         <a href="{{ route('admin.categories') }}">
                             <i class="fa fa-arrow-right"></i> Categories
                         </a>
                     </li>
-                    <li @class([$itemClass, 'account-nav-active' => request()->routeIs('admin.jobTypes', 'admin.jobTypes.create', 'admin.jobTypes.edit')])>
-                        <a href="{{ route('admin.jobTypes') }}">
-                            <i class="fa fa-arrow-right"></i> Job Types
+                    <li @class([
+                        $itemClass,
+                        'account-nav-active' => request()->routeIs(
+                            'admin.colleges',
+                            'admin.colleges.create',
+                            'admin.colleges.edit'),
+                    ])>
+                        <a href="{{ route('admin.colleges') }}">
+                            <i class="fa fa-arrow-right"></i> Colleges/Centers
                         </a>
                     </li>
                 @endif
@@ -90,20 +157,21 @@
 </div>
 
 @unless (request()->routeIs('admin.account.*'))
-<!-- <div class="card account-nav border-0 shadow mb-4 mb-lg-0"></div> -->
-<div class="card border-0 shadow mt-4 p-3">
-    <div class="s-body text-center mt-3">
+    <!-- <div class="card account-nav border-0 shadow mb-4 mb-lg-0"></div> -->
+    <div class="card border-0 shadow mt-4 p-3">
+        <div class="s-body text-center mt-3">
 
-        @if (Auth::user()->image != '')
-            <img src="{{ asset('profile_pic/thumb/' . Auth::user()->image) }}" alt="avatar" class="rounded-circle img-fluid"
-                style="width: 150px;">
-        @else
-            <img src="assets/images/avatar7.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-        @endif
+            @if (Auth::user()->image != '')
+                <img src="{{ asset('profile_pic/thumb/' . Auth::user()->image) }}" alt="avatar"
+                    class="rounded-circle img-fluid" style="width: 150px;">
+            @else
+                <img src="assets/images/avatar7.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+            @endif
 
-        <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
-        <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
-        <p class="text-muted mb-1 fs-6">Role: {{ Auth::user()->isReadOnlyManagement() ? 'Management (Read-only)' : Auth::user()->role }}</p>
+            <h5 class="mt-3 pb-0">{{ Auth::user()->name }}</h5>
+            <p class="text-muted mb-1 fs-6">{{ Auth::user()->designation }}</p>
+            <p class="text-muted mb-1 fs-6">Role:
+                {{ Auth::user()->isReadOnlyManagement() ? 'Management (Read-only)' : Auth::user()->role }}</p>
+        </div>
     </div>
-</div>
 @endunless
