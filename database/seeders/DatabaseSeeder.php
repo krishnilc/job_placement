@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Job;
 use App\Models\JobType;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,23 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ApplicationStatusSeeder::class);
         $this->call(CollegeSeeder::class);
         $this->call(CategorySeeder::class);
-
-        User::firstOrCreate([
-            'email' => 'superadmin@jobplacement.test',
-        ], [
-            'name' => 'Super Admin',
-            'password' => bcrypt('password'),
-            'role' => 'super_admin',
-            'status' => 'active',
-            'mobile' => '0000000',
-        ]);
-
-        //  User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
 
         // Category::factory(5)->create();
         // JobType::factory(5)->create();
