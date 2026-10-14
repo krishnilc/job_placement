@@ -1,20 +1,19 @@
 @extends('front.layouts.app')
 
 @section('main')
-    <section class="py-5 bg-light">
-        <div class="container">
+    <section class="section-5">
+        <div class="container my-5">
+            <h2 class="mb-4">Contact Us</h2>
+            <p class="text-secondary mb-4">Have a question or need help? Send us a message and our team will get back to you as soon as possible.</p>
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="card shadow-sm border-0">
                         <div class="card-body p-5">
                             <div class="row g-4">
                                 <div class="col-lg-6">
-                                    <h1 class="mb-3">Contact Us</h1>
-                                    <p class="text-secondary mb-4">Have a question or need help? Send us a message and our team will get back to you as soon as possible.</p>
-
                                     <div class="mb-4">
                                         <h5 class="mb-2">Our contact details</h5>
-                                        <p class="mb-1"><strong>Contact Person:</strong> Mr. Krishnil Chand</p>
+                                        <p class="mb-1"><strong>Contact Person:</strong> Ms Laisa M. Narayan</p>
                                         <p class="mb-1"><strong>Position:</strong> Placement Officer</p>
                                         <p class="mb-1"><strong>Address:</strong> Fiji National University (Nasinu Campus)</p>
                                         <p class="mb-1"><strong>Email:</strong> <a href="mailto:{{ config('mail.contact.address') }}">{{ config('mail.contact.address') }}</a></p>

@@ -73,6 +73,9 @@
             {{-- <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                 <a href="{{ route('account.logout') }}">Logout</a>
             </li> --}}
+            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <a href="{{ route('userManual.index') }}"><i class="fa fa-book"></i> User Manuals</a>
+            </li>
         </ul>
     </div>
 </div>

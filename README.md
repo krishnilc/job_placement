@@ -76,6 +76,35 @@ Other accounts are not changed.
 Run the seeder regression tests with
 `php artisan test --filter=TesterAccountSeederTest`.
 
+## User manuals
+
+**User Manuals** in the shared navigation and account sidebars opens
+`GET /user-manuals`. Visitors see Quick Start and Navigation (registration,
+verification, login, job browsing, and support). Signed-in users also see exactly
+their own role guide: Student and Alumni, Employer, Administrator, Management
+Read-only, or Super Administrator. Each guide offers inline PDF viewing and PDF
+download only. Word downloads are not exposed on the site, including direct DOCX
+URLs. Direct PDF downloads enforce the same role
+restriction; generated documents stay outside the public web directory.
+The docs directory also denies direct Apache access for XAMPP installations
+that expose the project parent directory. Production web servers should use
+`public/` as the document root, never the repository root.
+
+The six PDF/DOCX pairs are committed in [`docs/manuals/`](docs/manuals/).
+Their shared editable content source is [`docs/manuals.php`](docs/manuals.php).
+After changing content or user-facing workflows, run `php artisan manuals:build`
+to regenerate both formats (uses existing Dompdf and PHP Phar; no office software
+or extra dependencies required). Rebuilds overwrite the generated documents.
+If you edit a Word copy directly, transfer those edits to the source before
+rebuilding so the PDF and Word versions stay consistent.
+
+The original combined Word manual at
+[`docs/FNU-Job-Placement-User-Manual.docx`](docs/FNU-Job-Placement-User-Manual.docx)
+remains available locally for editing. The legacy `GET /user-manual` URL redirects
+to the PDF help page instead of downloading Word.
+Run `php artisan test --filter=UserManualDownloadTest` to verify navigation,
+role visibility/access, and both document formats.
+
 ## Structure and naming conventions
 
 - PHP classes and namespace directories use PascalCase and match PSR-4 paths,
@@ -273,7 +302,7 @@ includes the sender's name, email, subject, and message, with Reply-To set to th
 sender. Confirmation replies go to the Placement Officer.
 
 Set `PLACEMENT_OFFICER_EMAIL` to override the default recipient
-`krishnil.chand@fnu.ac.fj`; the contact page displays the same configured address.
+`laisa.narayan@fnu.ac.fj`; the contact page displays the same configured address.
 Configure a working delivery mailer (for example, `MAIL_MAILER=smtp` with
 `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SCHEME`, and
 `MAIL_FROM_ADDRESS`). The `log` and `array` mailers do not deliver real emails.

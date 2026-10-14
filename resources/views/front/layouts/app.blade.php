@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css"
         integrity="sha512-Fm8kRNVGCBZn0sPmwJbVXlqfJmPC13zRsMElZenX6v721g/H7OukJd8XzDEBRQ2FSATK8xNF9UYvzsCtUpfeJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}" />
+    <link rel="stylesheet" type="text/css"
+        href="{{ asset('assets/css/style.css') }}?v={{ filemtime(public_path('assets/css/style.css')) }}" />
     <style>
         /* Keep navbar fixed at top and prevent content overlap */
         .navbar.fixed-top {
@@ -61,6 +62,10 @@
                         </li>
                         <li class="nav-item">
                             <a @class(['nav-link', 'main-nav-active' => request()->routeIs('front.contact')]) aria-current="page" href="{{ route('front.contact') }}">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a @class(['nav-link', 'main-nav-active' => request()->routeIs('userManual.*')])
+                                href="{{ route('userManual.index') }}">User Manuals</a>
                         </li>
                     </ul>
 

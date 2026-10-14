@@ -30,6 +30,17 @@ class ContactFormTest extends TestCase
         ];
     }
 
+    public function test_contact_page_displays_the_updated_contact_person_and_email(): void
+    {
+        config(['mail.contact.address' => 'laisa.narayan@fnu.ac.fj']);
+
+        $this->get(route('front.contact'))
+            ->assertOk()
+            ->assertSee('Laisa M. Narayan')
+            ->assertSee('mailto:laisa.narayan@fnu.ac.fj', false)
+            ->assertDontSee('Mr. Krishnil Chand');
+    }
+
     public function test_guest_submission_emails_the_officer_and_confirms_to_the_sender(): void
     {
         Mail::fake();

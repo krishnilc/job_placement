@@ -23,9 +23,13 @@ use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\JobApplicationController as StudentJobApplicationController;
 use App\Http\Controllers\Student\SavedJobController;
+use App\Http\Controllers\UserManualController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/user-manuals', [UserManualController::class, 'index'])->name('userManual.index');
+Route::get('/user-manuals/{manual}/{format}', [UserManualController::class, 'download'])->name('userManual.file');
+Route::get('/user-manual', fn () => redirect()->route('userManual.index'))->name('userManual.download');
 Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
 Route::post('/contact/send', [HomeController::class, 'submitContact'])->name('front.contact.send');
 Route::get('/account/verify-email', [EmailVerificationController::class, 'notice'])->name('verification.notice');

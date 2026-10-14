@@ -10107,3 +10107,63 @@ footer .nav-link {
 .pagination span{
   font-size: inherit;
 }
+
+.user-manuals .manual-login-notice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #eef3fa;
+  border-left: 4px solid #163b65;
+  border-radius: 0.375rem;
+  color: #163b65;
+}
+
+.user-manuals .manual-login-notice a {
+  color: #163b65;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.user-manuals .manual-topics-heading {
+  margin: 0.5rem 0 0.75rem;
+  color: #163b65;
+}
+
+.user-manuals .manual-topics {
+  padding-left: 1.25rem;
+}
+
+.user-manuals .manual-topics li {
+  list-style: disc;
+  padding-left: 0.25rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.user-manuals .manual-topics li::marker {
+  color: #163b65;
+}
+
+.user-manuals .manual-actions {
+  border-top: 1px solid #e1e7ef;
+}
+
+.user-manuals .btn.btn-outline-primary {
+  color: #163b65;
+  border-color: #163b65;
+  background: #fff;
+}
+
+.user-manuals .btn.btn-outline-primary:hover,
+.user-manuals .btn.btn-outline-primary:focus,
+.user-manuals .btn.btn-outline-primary:active {
+  color: #fff;
+  background: #163b65;
+  border-color: #163b65;
+}
+
+.user-manuals a:focus-visible {
+  outline: 3px solid #163b65;
+  outline-offset: 3px;
+}
