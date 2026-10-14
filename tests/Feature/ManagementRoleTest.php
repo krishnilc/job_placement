@@ -281,7 +281,7 @@ class ManagementRoleTest extends TestCase
         $this->get(route('admin.users.admins.create'))->assertOk()->assertSee('Management (Read-only)');
         $this->postJson(route('admin.users.admins.store'), [
             'name' => 'Management Account', 'email' => 'director@example.com',
-            'mobile' => '1234567', 'role' => 'management',
+            'mobile' => '1234567', 'designation' => 'Director', 'role' => 'management',
             'password' => 'secret123', 'confirm_password' => 'secret123',
         ])->assertOk()->assertJson(['status' => true]);
         $created = User::where('email', 'director@example.com')->firstOrFail();

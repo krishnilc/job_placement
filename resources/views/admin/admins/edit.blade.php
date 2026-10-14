@@ -33,18 +33,18 @@
                                                 value="{{ $user->name }}">
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
-                                            <input type="text" name="email" id="email" class="form-control"
-                                                value="{{ $user->email }}">
-                                            <p class="text-danger" id="emailError"></p>
-                                        </div>
-                                        <div class="mb-4">
+                                         <div class="mb-4">
                                             <label for="designation" class="mb-2">Designation</label>
                                             <input type="text" name="designation" id="designation" class="form-control"
                                                 value="{{ $user->designation }}">
                                             <p class="text-danger" id="designationError"></p>
                                         </div>
+                                        <div class="mb-4">
+                                            <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
+                                            <input type="text" name="email" id="email" class="form-control"
+                                                value="{{ $user->email }}">
+                                            <p class="text-danger" id="emailError"></p>
+                                        </div>                                       
                                         <div class="mb-4">
                                             <label for="mobile" class="mb-2">Mobile<span class="text-danger">*</span></label>
                                             <input type="text" name="mobile" id="mobile" class="form-control"

@@ -33,6 +33,11 @@
                                             <p class="text-danger" id="nameError"></p>
                                         </div>
                                         <div class="mb-4">
+                                            <label for="designation" class="mb-2">Designation<span class="text-danger">*</span></label>
+                                            <input type="text" name="designation" id="designation" class="form-control" required>
+                                            <p class="text-danger" id="designationError"></p>
+                                        </div>
+                                        <div class="mb-4">
                                             <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
                                             <input type="text" name="email" id="email" class="form-control">
                                             <p class="text-danger" id="emailError"></p>
@@ -90,6 +95,7 @@
 
                 success: function(response) {
                     $("#nameError").text('');
+                    $("#designationError").text('');
                     $("#emailError").text('');
                     $("#mobileError").text('');
                     $("#roleError").text('');
@@ -103,6 +109,9 @@
 
                         if (errors.name) {
                             $("#nameError").text(errors.name[0]);
+                        }
+                        if (errors.designation) {
+                            $("#designationError").text(errors.designation[0]);
                         }
                         if (errors.email) {
                             $("#emailError").text(errors.email[0]);

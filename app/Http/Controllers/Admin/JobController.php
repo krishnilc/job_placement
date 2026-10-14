@@ -86,7 +86,7 @@ class JobController extends Controller
             'location' => 'required|max:50',
             'description' => 'required',
             'organization_id' => 'required|integer|exists:organizations,id',
-            'closing_date' => 'nullable|date',
+            'closing_date' => 'required|date',
             'experience' => 'required',
             'job_status' => 'required|in:pending,active,blocked',
         ]);

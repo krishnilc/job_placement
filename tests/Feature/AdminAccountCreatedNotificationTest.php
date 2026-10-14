@@ -20,6 +20,7 @@ class AdminAccountCreatedNotificationTest extends TestCase
 
         $response = $this->actingAs($superAdmin)->post(route('admin.users.admins.store'), [
             'name' => 'New Admin',
+            'designation' => 'Placement Officer',
             'email' => 'new.admin@example.com',
             'mobile' => '1234567',
             'role' => 'admin',
@@ -33,6 +34,46 @@ class AdminAccountCreatedNotificationTest extends TestCase
                 && $mail->user->name === 'New Admin'
                 && $mail->user->role === 'admin'
                 && !str_contains($mail->render(), 'secret123');
+        });
+    }
+
+    public function test_admin_creation_requires_a_designation(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+
+        $this->actingAs($superAdmin)->postJson(route('admin.users.admins.store'), [
+            'name' => 'New Admin',
+            'email' => 'new.admin@example.com',
+            'mobile' => '1234567',
+            'role' => 'admin',
+            'password' => 'secret123',
+            'confirm_password' => 'secret123',
+        ])->assertOk()
+            ->assertJsonPath('status', false)
+            ->assertJsonStructure(['errors' => ['designation']]);
+
+        $this->assertDatabaseMissing('users', ['email' => 'new.admin@example.com']);
+    }
+
+    public function test_management_account_email_displays_management_role(): void
+    {
+        Mail::fake();
+
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+
+        $this->actingAs($superAdmin)->post(route('admin.users.admins.store'), [
+            'name' => 'Management Account',
+            'designation' => 'Director',
+            'email' => 'management@example.com',
+            'mobile' => '1234567',
+            'role' => 'management',
+            'password' => 'secret123',
+            'confirm_password' => 'secret123',
+        ])->assertOk()->assertJson(['status' => true]);
+
+        Mail::assertSent(AdminAccountCreated::class, function (AdminAccountCreated $mail): bool {
+            return $mail->hasTo('management@example.com')
+                && str_contains($mail->render(), '<strong>Role:</strong> Management (Read-only)');
         });
     }
 }

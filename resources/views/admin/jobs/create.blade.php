@@ -105,9 +105,10 @@
                                         </div>
 
                                         <div class="mb-4 col-md-6">
-                                            <label for="" class="mb-2">Closing Date</label>
+                                            <label for="closing_date" class="mb-2">Closing Date<span
+                                                    class="req">*</span></label>
                                             <input type="date" id="closing_date" name="closing_date"
-                                                class="form-control" value="">
+                                                class="form-control" value="" required>
                                         </div>
                                     </div>
 
@@ -156,7 +157,7 @@
 
 
                                         <div class="mb-4">
-                                            <label for="" class="mb-2">Keywords</label>
+                                            <label for="" class="mb-2">Keywords (used for search)</label>
                                             <input type="text" placeholder="keywords" id="keywords" name="keywords"
                                                 class="form-control" value="">
                                         </div>

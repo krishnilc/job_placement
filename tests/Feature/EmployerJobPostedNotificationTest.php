@@ -104,7 +104,6 @@ class EmployerJobPostedNotificationTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         $organization = Organization::create(['name' => 'Admin Company', 'phone' => '1111111', 'email' => 'admin-company@example.com']);
         $data = $this->jobData();
-        unset($data['closing_date']);
         $data['organization_id'] = $organization->id;
         $data['job_status'] = 'active';
 
@@ -112,6 +111,22 @@ class EmployerJobPostedNotificationTest extends TestCase
             ->assertOk()->assertJson(['status' => true]);
         $this->assertDatabaseCount('jobs', 1);
         Mail::assertNothingSent();
+    }
+
+    public function test_admin_job_creation_requires_a_closing_date(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $organization = Organization::create(['name' => 'Admin Company', 'phone' => '1111111', 'email' => 'admin-company@example.com']);
+        $data = $this->jobData();
+        unset($data['closing_date']);
+        $data['organization_id'] = $organization->id;
+        $data['job_status'] = 'active';
+
+        $this->actingAs($admin)->postJson(route('admin.jobs.store'), $data)
+            ->assertOk()
+            ->assertJsonPath('status', false)
+            ->assertJsonStructure(['errors' => ['closing_date']]);
+        $this->assertDatabaseCount('jobs', 0);
     }
 
     public function test_notification_delivery_failure_preserves_job_and_warns_employer(): void
