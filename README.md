@@ -326,6 +326,25 @@ deployment settings. Verification mail is sent synchronously.
 
 Run verification tests with `php artisan test --filter=EmailVerificationTest`.
 
+## Self-service password recovery
+
+Login > Forgot Password accepts an account email and sends Laravel's standard
+password reset notification. The POST endpoint and reset form use the password
+broker's hashed tokens in `password_reset_tokens`; no new migration is needed.
+Links expire after 60 minutes and are single-use. Link requests are throttled
+per account (60 seconds) and both POST routes are limited to six requests per
+minute. Unknown emails and throttled account requests receive the same generic
+confirmation. Mail transport errors are reported and displayed explicitly.
+
+New passwords require at least eight characters and confirmation. Successful
+resets rotate the remember token and return to Login without automatically
+signing in, changing account status, or marking email verified. Existing
+administrator-assisted resets remain available.
+
+Configure a working delivery mailer and the correct HTTPS `APP_URL` in production;
+the log mailer does not deliver reset emails. Run
+`php artisan test --filter=PasswordRecoveryTest` to verify recovery.
+
 ## Last successful sign-in
 
 `users.last_login_at` records the most recent successful, permitted sign-in for

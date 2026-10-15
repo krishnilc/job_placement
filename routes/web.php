@@ -20,6 +20,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController as PublicJobController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\JobApplicationController as StudentJobApplicationController;
 use App\Http\Controllers\Student\SavedJobController;
@@ -46,6 +47,13 @@ Route::get('/download-application/{application}/{type}', [PublicJobController::c
     ->name('application.download');
 
 Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->name('account.forgotPassword');
+Route::middleware('guest')->group(function () {
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendLink'])
+        ->middleware('throttle:6,1')->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])
+        ->middleware('throttle:6,1')->name('password.update');
+});
 Route::get('/organizations/search', [OrganizationController::class, 'search'])->middleware('throttle:60,1')->name('organizations.search');
 
 Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function () {

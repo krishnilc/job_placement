@@ -11,7 +11,7 @@ $account = [
     'Troubleshooting and support' => [
         'Pending approval: contact the Placement Officer if approval is delayed. Email verification and administrator approval are separate requirements.',
         'Blocked account: contact an administrator; registering again is not a solution. Unverified email: use the verification/resend link on Login and check your spam folder.',
-        'Forgotten password: self-service recovery is not implemented in this version. Ask an administrator to reset a student/employer password, or a super administrator to reset a staff password. Arrange the replacement privately.',
+        'Forgotten password: select Forgot Password on Login, enter your account email, and select Send reset link. Check your inbox and spam folder. Open the single-use link within 60 minutes and enter a new password of at least 8 characters twice. Wait at least one minute between link requests. Resetting a password does not approve or unblock an account or verify its email. If email recovery is unavailable, contact an administrator for student/employer accounts or a super administrator for staff accounts.',
         'Read submission messages carefully. A notification-email warning may mean the record was saved but the email failed; check the saved record before submitting again.',
         'Use Contact Us to reach the Placement Officer. Include the page, action, time, and error message, but never send your password or unnecessary personal documents.',
     ],

@@ -20,11 +20,12 @@
                 <div class="col-md-5">
                     <div class="card shadow border-0 p-5">
                         <h1 class="h3">Forgot Password</h1>
-                        <form action="{{ route('account.forgotPassword') }}" method="post">
+                        <p>Enter your account email address to receive a password reset link. The link expires after {{ config('auth.passwords.users.expire') }} minutes.</p>
+                        <form action="{{ route('password.email') }}" method="post">
                             @csrf
                             <div class="mb-3">
-                                <label for="" class="mb-2">Email<span class="text-danger">*</span></label>
-                                <input type="text" name="email" id="email"
+                                <label for="email" class="mb-2">Email<span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="email" required autocomplete="email"
                                     class="form-control @error('email') is-invalid @enderror"
                                     placeholder="example@example.com" value="{{ old('email') }}">
 
@@ -33,7 +34,7 @@
                                 @enderror
                             </div>                            
                             <div class="justify-content-between d-flex">
-                                <button class="btn btn-primary mt-2">Submit</button>
+                                <button type="submit" class="btn btn-primary mt-2">Send reset link</button>
                                 <a href="{{ route('account.login') }}" class="mt-3">Back to Login?</a>
                             </div>
                         </form>

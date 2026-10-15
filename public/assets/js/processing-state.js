@@ -58,12 +58,12 @@
             return;
         }
 
-        // Let AJAX handlers and validation cancel submission before locking native forms.
-        queueMicrotask(() => {
+        // A microtask can run between native event listeners, before AJAX prevents submission.
+        setTimeout(() => {
             if (!event.defaultPrevented) {
                 begin();
             }
-        });
+        }, 0);
     }, true);
 
     $.ajaxPrefilter(function (options, originalOptions, xhr) {

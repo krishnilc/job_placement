@@ -51,6 +51,7 @@ function page() {
             };
             for (const listener of listeners[type] ?? []) {
                 listener(event);
+                microtasks.splice(0).forEach(callback => callback());
                 if (event.stopped) break;
             }
             return event;
@@ -68,7 +69,10 @@ function page() {
                 },
             };
         },
-        flush() { microtasks.splice(0).forEach(callback => callback()); },
+        flush() {
+            microtasks.splice(0).forEach(callback => callback());
+            timers.splice(0).forEach(callback => callback());
+        },
         pageshow() { windowListeners.pageshow(); },
     };
 }
@@ -161,5 +165,26 @@ test('cancelled AJAX submissions, invalid forms and new-tab submissions do not l
         submitter: { getAttribute(name) { return name === 'formtarget' ? '_blank' : null; } },
     });
     ui.flush();
+    assert.equal(ui.overlay.hidden, true);
+});
+
+test('AJAX form completion releases the only lock after browser event-listener microtask checkpoints', () => {
+    const ui = page();
+    const event = ui.dispatch('submit');
+    // The form's target handler runs after document capture listeners and their microtasks.
+    event.preventDefault();
+    const request = ui.request();
+    ui.flush();
+    assert.equal(ui.overlay.hidden, false);
+    request.complete();
+    assert.equal(ui.overlay.hidden, true);
+    assert.equal(ui.content.inert, false);
+
+    const retry = ui.dispatch('submit');
+    assert.equal(retry.defaultPrevented, false);
+    retry.preventDefault();
+    const nextRequest = ui.request();
+    ui.flush();
+    nextRequest.complete();
     assert.equal(ui.overlay.hidden, true);
 });
