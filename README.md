@@ -77,6 +77,16 @@ role visibility/access, and both document formats.
 
 ## Structure and naming conventions
 
+The shared layout loads `public/assets/js/processing-state.js`. Native form
+submissions and AJAX writes show a "Processing..." overlay and temporarily make
+the page non-interactive to prevent repeated clicks or keyboard submissions.
+Form values and disabled states are not modified. AJAX completion (including
+validation and network errors) restores interaction; returning via browser Back
+also clears the state. Read-only AJAX searches and new-tab/download links are
+not locked. Existing request error handlers are preserved, with an alert for
+AJAX writes that do not provide one. This is a client-side interaction guard,
+not a replacement for server-side validation, authorization, or uniqueness checks.
+
 - PHP classes and namespace directories use PascalCase and match PSR-4 paths,
   including `app/Http/Controllers/Admin`, `Employer`, and `Student`.
 - `AuthController` handles login/registration; `AccountController` handles
@@ -315,6 +325,28 @@ generated outside web requests, and rebuild cached configuration when changing
 deployment settings. Verification mail is sent synchronously.
 
 Run verification tests with `php artisan test --filter=EmailVerificationTest`.
+
+## Last successful sign-in
+
+`users.last_login_at` records the most recent successful, permitted sign-in for
+every role, including alumni stored as students. It is a nullable UTC timestamp
+cast to a datetime by the User model. Existing accounts remain null until their
+next successful sign-in; null means "No sign-in recorded", not necessarily that
+the account has never signed in.
+
+Failed credentials, validation errors, account-status rejections, and required
+email-verification rejections do not change this value. Browsing and logout do
+not update it. No IP addresses, device details, or login-history records are
+collected, and no public display or editing field is added.
+
+The administrative Students, Employers, and Admins lists show a sortable
+**Last sign-in** column only to super admins. Admins and read-only management
+cannot see the column or sort by it. Existing list access restrictions are unchanged.
+Dates use `REPORT_TIMEZONE` (default `Pacific/Fiji`) and include the timezone;
+empty values show "No sign-in recorded". Stored timestamps remain UTC.
+
+Run `php artisan migrate` to add the column, and
+`php artisan test --filter=AuthLoginTest` to verify tracking.
 
 ## Student and employer account status notifications
 

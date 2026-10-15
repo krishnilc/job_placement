@@ -15,7 +15,7 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        $allowedSorts = ['id', 'name', 'email', 'mobile', 'role', 'created_at'];
+        $allowedSorts = ['id', 'name', 'email', 'mobile', 'role', 'created_at', 'last_login_at'];
 
         $sort = $request->query('sort', 'created_at');
         $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';

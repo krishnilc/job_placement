@@ -167,6 +167,10 @@ class AuthController extends Controller
 
                 $request->session()->regenerate();
 
+                $user = Auth::user();
+                $user->last_login_at = now();
+                $user->saveOrFail();
+
                 // Authentication passed. Check user role and redirect accordingly
                 if (Auth::user()->hasAdminAccess()) {
                     return redirect()->route('admin.dashboard')

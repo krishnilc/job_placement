@@ -30,6 +30,17 @@
             padding-top: 80px;
         }
 
+        .processing-overlay:not([hidden]) {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.85);
+            cursor: wait;
+        }
+
         @media (max-width: 576px) {
             body {
                 padding-top: 110px;
@@ -41,6 +52,14 @@
 </head>
 
 <body data-instant-intensity="mousedown">
+    <div id="processingOverlay" class="processing-overlay" hidden tabindex="-1"
+        role="status" aria-live="polite" aria-atomic="true">
+        <div class="bg-white border rounded shadow p-4 text-center">
+            <span class="spinner-border text-primary mb-3" aria-hidden="true"></span>
+            <p class="fw-bold mb-1">Processing...</p>
+            <p class="mb-0">Please wait. Do not submit again.</p>
+        </div>
+    </div>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-2 fixed-top">
             <div class="container">
@@ -206,6 +225,7 @@
         </div>
     </footer>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('assets/js/processing-state.js') }}?v={{ filemtime(public_path('assets/js/processing-state.js')) }}"></script>
     <script src="{{ asset('assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
     <script src="{{ asset('assets/js/instantpages.5.1.0.min.js') }}"></script>
     <script src="{{ asset('assets/js/lazyload.17.6.0.min.js') }}"></script>

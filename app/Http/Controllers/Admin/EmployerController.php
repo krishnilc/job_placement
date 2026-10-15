@@ -22,6 +22,9 @@ class EmployerController extends Controller
     public function index(Request $request)
     {
         $allowedSorts = ['id', 'name', 'email', 'mobile', 'designation', 'company_name', 'status', 'created_at'];
+        if ($request->user()->role === 'super_admin') {
+            $allowedSorts[] = 'last_login_at';
+        }
 
         $sort = $request->query('sort', 'created_at');
         $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';

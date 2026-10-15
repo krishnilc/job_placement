@@ -138,6 +138,16 @@
                                                     @endif
                                                 </a>
                                             </th>
+                                            @if (auth()->user()->role === 'super_admin')
+                                            <th scope="col"><a href="{{ $buildSortUrl('last_login_at') }}"
+                                                    class="text-decoration-none text-dark">Last sign-in @if ($currentSort === 'last_login_at')
+                                                        <i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                    @else
+                                                        <i class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            @endif
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -173,6 +183,9 @@
                                                             </span>
                                                         @endif
                                                     </td>
+                                                    @if (auth()->user()->role === 'super_admin')
+                                                    <td>{{ $user->last_login_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e') ?? 'No sign-in recorded' }}</td>
+                                                    @endif
                                                     <td>
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
@@ -203,7 +216,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="8" class="text-center">No employers found.</td>
+                                                <td colspan="{{ auth()->user()->role === 'super_admin' ? 9 : 8 }}" class="text-center">No employers found.</td>
                                             </tr>
                                         @endif
                                     </tbody>

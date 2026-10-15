@@ -100,6 +100,14 @@
                                                     @endif
                                                 </a>
                                             </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('last_login_at') }}"
+                                                    class="text-decoration-none text-dark">Last sign-in @if ($currentSort === 'last_login_at')
+                                                        <i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                                    @else
+                                                        <i class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -112,6 +120,7 @@
                                                     <td>{{ $user->isReadOnlyManagement() ? 'Management (Read-only)' : ($user->role === 'super_admin' ? 'Super Admin' : 'Admin') }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
+                                                    <td>{{ $user->last_login_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e') ?? 'No sign-in recorded' }}</td>
                                                     <td>
                                                         <div class="action-dots">
                                                             <button href="#" class="btn" data-bs-toggle="dropdown"
@@ -140,7 +149,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="6" class="text-center">No admins found.</td>
+                                                <td colspan="7" class="text-center">No admins found.</td>
                                             </tr>
                                         @endif
                                     </tbody>
