@@ -41,6 +41,11 @@ class EmailVerificationController extends Controller
         $request->session()->put('verification_email', $data['email']);
         $user = User::where('email', $data['email'])->first();
 
+        if (! $user) {
+            return redirect()->route('verification.notice')
+                ->with('error', 'No account is registered with this email address. Please check the address or register for an account.');
+        }
+
         if ($user && $user->needsEmailVerification()) {
             try {
                 $user->sendEmailVerificationNotification();

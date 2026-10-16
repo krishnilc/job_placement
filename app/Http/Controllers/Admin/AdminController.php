@@ -42,7 +42,7 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|min:5|max:20',
+            'name' => 'required|min:5|max:50',
             'designation' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:5|same:confirm_password',

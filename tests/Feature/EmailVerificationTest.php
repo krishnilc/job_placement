@@ -181,7 +181,7 @@ class EmailVerificationTest extends TestCase
         $legacy = User::factory()->unverified()->create();
         $verified = User::factory()->create(['email_verification_required' => true]);
 
-        foreach ([$required->email, $legacy->email, $verified->email, 'missing@example.com'] as $email) {
+        foreach ([$required->email, $legacy->email, $verified->email] as $email) {
             $this->post(route('verification.send'), ['email' => $email])
                 ->assertRedirect(route('verification.notice'))
                 ->assertSessionHas('success', 'If this email belongs to an account that needs verification, a new verification link has been sent. Please check your inbox and spam folder.');
@@ -189,6 +189,19 @@ class EmailVerificationTest extends TestCase
         Notification::assertSentTo($required, VerifyEmail::class);
         Notification::assertNotSentTo([$legacy, $verified], VerifyEmail::class);
         Notification::assertCount(1);
+    }
+
+    public function test_resend_displays_a_message_when_email_is_not_registered(): void
+    {
+        Notification::fake();
+        $message = 'No account is registered with this email address. Please check the address or register for an account.';
+
+        $this->post(route('verification.send'), ['email' => 'missing@example.com'])
+            ->assertRedirect(route('verification.notice'))
+            ->assertSessionHas('error', $message);
+
+        $this->get(route('verification.notice'))->assertOk()->assertSee($message);
+        Notification::assertNothingSent();
     }
 
     public function test_resend_rejects_invalid_input_and_limits_requests(): void

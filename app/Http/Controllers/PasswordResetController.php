@@ -25,12 +25,22 @@ class PasswordResetController extends Controller
                 ->with('error', 'Unable to send a password reset email right now. Please try again later or contact the Placement Officer.');
         }
 
-        if (! in_array($status, [Password::RESET_LINK_SENT, Password::INVALID_USER, Password::RESET_THROTTLED], true)) {
+        if ($status === Password::INVALID_USER) {
+            return back()->withErrors(['email' => 'No account found with this email address.'])
+                ->withInput($request->only('email'));
+        }
+
+        if ($status === Password::RESET_THROTTLED) {
+            return back()->withInput($request->only('email'))
+                ->with('error', 'Please wait at least one minute before requesting another password reset link.');
+        }
+
+        if ($status !== Password::RESET_LINK_SENT) {
             return back()->withInput($request->only('email'))->with('error', __($status));
         }
 
         return redirect()->route('account.forgotPassword')
-            ->with('success', 'If this email belongs to an account, a password reset link has been requested. Check your inbox and spam folder. Please wait at least one minute before requesting another link.');
+            ->with('success', 'A password reset link has been sent. Please check your inbox and spam folder.');
     }
 
     public function edit(Request $request, string $token)

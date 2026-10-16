@@ -333,8 +333,10 @@ password reset notification. The POST endpoint and reset form use the password
 broker's hashed tokens in `password_reset_tokens`; no new migration is needed.
 Links expire after 60 minutes and are single-use. Link requests are throttled
 per account (60 seconds) and both POST routes are limited to six requests per
-minute. Unknown emails and throttled account requests receive the same generic
-confirmation. Mail transport errors are reported and displayed explicitly.
+minute. The broker verifies the account exists before creating a token or sending
+mail. Unknown emails show "No account found with this email address"; throttled
+requests show a wait message. This deliberately reveals whether an email is
+registered. Mail transport errors are reported and displayed explicitly.
 
 New passwords require at least eight characters and confirmation. Successful
 resets rotate the remember token and return to Login without automatically

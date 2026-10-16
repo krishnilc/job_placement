@@ -41,18 +41,32 @@ class PasswordRecoveryTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_unknown_and_throttled_accounts_receive_the_same_confirmation(): void
+    public function test_only_registered_emails_receive_links_and_throttled_requests_show_an_error(): void
     {
         Notification::fake();
         $user = User::factory()->create();
         $known = $this->post(route('password.email'), ['email' => $user->email]);
-        $message = session('success');
-        $known->assertRedirect(route('account.forgotPassword'));
+        $known->assertRedirect(route('account.forgotPassword'))->assertSessionHas('success');
+        session()->forget('success');
         $this->post(route('password.email'), ['email' => $user->email])
-            ->assertSessionHas('success', $message);
-        $this->post(route('password.email'), ['email' => 'missing@example.com'])
-            ->assertSessionHas('success', $message);
+            ->assertSessionHas('error')->assertSessionMissing('success');
         Notification::assertSentToTimes($user, ResetPassword::class, 1);
+    }
+
+    public function test_unknown_email_shows_a_field_error_without_sending_mail_or_creating_a_token(): void
+    {
+        Notification::fake();
+        $this->from(route('account.forgotPassword'))
+            ->post(route('password.email'), ['email' => 'missing@example.com'])
+            ->assertRedirect(route('account.forgotPassword'))
+            ->assertSessionHasErrors(['email' => 'No account found with this email address.'])
+            ->assertSessionHasInput('email', 'missing@example.com')
+            ->assertSessionMissing('success');
+        Notification::assertNothingSent();
+        $this->assertDatabaseCount('password_reset_tokens', 0);
+        $this->get(route('account.forgotPassword'))->assertOk()
+            ->assertSee('No account found with this email address.')
+            ->assertSee('value="missing@example.com"', false);
     }
 
     public function test_invalid_email_does_not_send_mail_and_requests_are_rate_limited(): void
