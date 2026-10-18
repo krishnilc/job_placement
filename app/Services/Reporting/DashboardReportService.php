@@ -34,7 +34,12 @@ class DashboardReportService
             })
             ->count();
         $blockedJobs = Job::where('status', 2)->count();
-        $featuredJobs = Job::where('isFeatured', 1)->count();
+        $featuredJobs = Job::where('isFeatured', 1)
+            ->where(function ($query) {
+                $query->whereNull('closing_date')
+                    ->orWhere('closing_date', '>=', now()->toDateString());
+            })
+            ->count();
         $totalEmployers = User::where('role', 'employer')->count();
         $activeEmployers = User::where('role', 'employer')->where('status', 'active')->count();
         $pendingEmployers = User::where('role', 'employer')->where('status', 'pending')->count();

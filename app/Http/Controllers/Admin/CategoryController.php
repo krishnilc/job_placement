@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $allowedSorts = ['id', 'name', 'status', 'created_at'];
+        $allowedSorts = ['id', 'name', 'status', 'created_at', 'jobs_count', 'college'];
 
         $sort = $request->query('sort', 'name');
         $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
@@ -23,17 +23,25 @@ class CategoryController extends Controller
 
         $search = trim((string) $request->query('search', ''));
 
+        $sortColumn = match ($sort) {
+            'jobs_count' => 'jobs_count',
+            'college' => 'colleges.name',
+            default => 'categories.'.$sort,
+        };
+
         $categories = Category::query()
+            ->select('categories.*')
+            ->when($sort === 'college', fn ($query) => $query->leftJoin('colleges', 'colleges.id', '=', 'categories.college_id'))
             ->with('college')
             ->withCount('jobs')
             ->when($search !== '', function ($query) use ($search) {
                 $like = '%' . $search . '%';
                 $query->where(function ($q) use ($like) {
-                    $q->where('name', 'like', $like)
+                    $q->where('categories.name', 'like', $like)
                         ->orWhereHas('college', fn ($c) => $c->where('name', 'like', $like));
                 });
             })
-            ->orderBy($sort, $direction)
+            ->orderBy($sortColumn, $direction)
             ->paginate(10);
         $categories->appends($request->query());
 

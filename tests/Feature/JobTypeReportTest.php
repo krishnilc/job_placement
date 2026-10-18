@@ -96,6 +96,36 @@ class JobTypeReportTest extends TestCase
         });
     }
 
+    public function test_dashboard_featured_jobs_excludes_jobs_past_their_closing_date(): void
+    {
+        Job::factory()->create([
+            'user_id' => $this->admin->id,
+            'job_type_id' => $this->ia->id,
+            'category_id' => Category::factory()->create()->id,
+            'isFeatured' => 1,
+            'closing_date' => '2000-01-01',
+        ]);
+        Job::factory()->create([
+            'user_id' => $this->admin->id,
+            'job_type_id' => $this->ia->id,
+            'category_id' => Category::factory()->create()->id,
+            'isFeatured' => 1,
+            'closing_date' => '2099-12-31',
+        ]);
+        Job::factory()->create([
+            'user_id' => $this->admin->id,
+            'job_type_id' => $this->ia->id,
+            'category_id' => Category::factory()->create()->id,
+            'isFeatured' => 1,
+            'closing_date' => null,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertViewHas('featuredJobs', 2);
+    }
+
     public function test_college_filter_applies_to_summary_drill_down_and_exports(): void
     {
         $filters = ['report_college' => $this->college->id, 'report_job_type' => $this->ia->id];

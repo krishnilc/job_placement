@@ -91,8 +91,22 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th scope="col">College/Center</th>
-                                            <th scope="col">Jobs</th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('college') }}"
+                                                    class="text-decoration-none text-dark">College/Center @if ($currentSort === 'college')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('jobs_count') }}"
+                                                    class="text-decoration-none text-dark">Jobs @if ($currentSort === 'jobs_count')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
                                             <th scope="col"><a href="{{ $buildSortUrl('status') }}"
                                                     class="text-decoration-none text-dark">Status @if ($currentSort === 'status')
                                                         <i
