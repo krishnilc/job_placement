@@ -53,9 +53,25 @@
                                                 'sort' => $column,
                                                 'direction' => $nextDirection,
                                                 'page' => 1,
+                                                'search' => request()->query('search'),
                                             ]);
                                     };
                                 @endphp
+
+                                <form method="GET" action="{{ $baseRoute }}" class="row g-2 my-3">
+                                    <input type="hidden" name="sort" value="{{ $currentSort }}">
+                                    <input type="hidden" name="direction" value="{{ $currentDirection }}">
+                                    <div class="col-md-6 col-lg-4">
+                                        <input type="text" name="search" value="{{ request()->query('search') }}"
+                                            class="form-control" placeholder="Search name, email, mobile, role, status...">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>
+                                            Search</button>
+                                        <a href="{{ $baseRoute }}" class="btn btn-secondary ms-1"><i
+                                                class="fa fa-times"></i> Clear</a>
+                                    </div>
+                                </form>
 
                                 <table class="table table-hover border-0 align-middle mb-0">
                                     <thead class="bg-light">
@@ -100,6 +116,14 @@
                                                     @endif
                                                 </a>
                                             </th>
+                                            <th scope="col"><a href="{{ $buildSortUrl('status') }}"
+                                                    class="text-decoration-none text-dark">Account status @if ($currentSort === 'status')
+                                                        <i
+                                                        class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>@else<i
+                                                            class="fa fa-sort text-muted ms-1"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
                                             <th scope="col"><a href="{{ $buildSortUrl('last_login_at') }}"
                                                     class="text-decoration-none text-dark">Last sign-in @if ($currentSort === 'last_login_at')
                                                         <i class="fa fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} ms-1"></i>
@@ -120,6 +144,9 @@
                                                     <td>{{ $user->isReadOnlyManagement() ? 'Management (Read-only)' : ($user->role === 'super_admin' ? 'Super Admin' : 'Admin') }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->mobile }}</td>
+                                                    <td><span
+                                                            class="badge bg-{{ $user->status === 'active' ? 'success' : ($user->status === 'blocked' ? 'danger' : 'warning text-dark') }}">{{ ucfirst($user->status ?? 'unknown') }}</span>
+                                                    </td>
                                                     <td>{{ $user->last_login_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e') ?? 'No sign-in recorded' }}</td>
                                                     <td>
                                                         <div class="action-dots">
@@ -149,7 +176,7 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="7" class="text-center">No admins found.</td>
+                                                <td colspan="8" class="text-center">No admins found.</td>
                                             </tr>
                                         @endif
                                     </tbody>

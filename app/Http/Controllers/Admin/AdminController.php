@@ -15,7 +15,7 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        $allowedSorts = ['id', 'name', 'email', 'mobile', 'role', 'created_at', 'last_login_at'];
+        $allowedSorts = ['id', 'name', 'email', 'mobile', 'role', 'status', 'created_at', 'last_login_at'];
 
         $sort = $request->query('sort', 'created_at');
         $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
@@ -24,7 +24,20 @@ class AdminController extends Controller
             $sort = 'created_at';
         }
 
+        $search = trim((string) $request->query('search', ''));
+
         $users = User::whereIn('role', ['admin', 'super_admin', 'management'])
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . $search . '%';
+                $query->where(function ($query) use ($like) {
+                    $query->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like)
+                        ->orWhere('mobile', 'like', $like)
+                        ->orWhere('designation', 'like', $like)
+                        ->orWhere('status', 'like', $like)
+                        ->orWhere('role', 'like', $like);
+                });
+            })
             ->orderBy($sort, $direction)
             ->paginate(10);
         $users->appends($request->query());
