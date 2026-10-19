@@ -11,11 +11,17 @@ class EnsureManagementIsReadOnly
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if (! $user || ! $user->isReadOnlyManagement()) {
+        if (! $user) {
             return $next($request);
         }
 
-        abort_unless($user->status === 'active' || $request->routeIs('account.logout'), 403, 'Your account is not active.');
+        if (in_array($user->role, ['admin', 'super_admin', 'management'], true)) {
+            abort_unless($user->status === 'active' || $request->routeIs('account.logout'), 403, 'Your account is not active.');
+        }
+
+        if (! $user->isReadOnlyManagement()) {
+            return $next($request);
+        }
 
         // These handlers always update the authenticated user, never a supplied user ID.
         if ($request->routeIs('account.updateProfile', 'account.updatePassword', 'account.updateProfilePic')) {

@@ -32,7 +32,8 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'mobile' => fake()->numerify('#######'),
             'designation' => fake()->jobTitle(),
-            'role' => 'student'
+            'role' => 'student',
+            'status' => 'active',
         ];
     }
 

@@ -66,7 +66,7 @@ class AdminLastLoginDisplayTest extends TestCase
     public function test_display_uses_the_configured_timezone(): void
     {
         config(['reporting.timezone' => 'UTC']);
-        $viewer = User::factory()->create(['role' => 'super_admin']);
+        $viewer = User::factory()->create(['role' => 'super_admin', 'status' => 'active']);
         User::factory()->create([
             'role' => 'student',
             'last_login_at' => '2026-10-14 18:30:00',

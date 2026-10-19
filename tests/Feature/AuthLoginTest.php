@@ -75,6 +75,10 @@ class AuthLoginTest extends TestCase
             'blocked employer' => ['employer', 'blocked', false, 'password', 'account.login'],
             'pending management' => ['management', 'pending', false, 'password', 'account.login'],
             'blocked management' => ['management', 'blocked', false, 'password', 'account.login'],
+            'pending admin' => ['admin', 'pending', false, 'password', 'account.login'],
+            'blocked admin' => ['admin', 'blocked', false, 'password', 'account.login'],
+            'pending super admin' => ['super_admin', 'pending', false, 'password', 'account.login'],
+            'blocked super admin' => ['super_admin', 'blocked', false, 'password', 'account.login'],
             'unverified user' => ['student', 'active', true, 'password', 'verification.notice'],
         ];
     }
@@ -106,5 +110,17 @@ class AuthLoginTest extends TestCase
             $this->assertGuest();
             $this->assertEquals($lastLogin, $user->fresh()->last_login_at);
         }
+    }
+
+    public function test_blocked_staff_account_cannot_continue_using_an_authenticated_session(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'blocked',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertForbidden();
     }
 }

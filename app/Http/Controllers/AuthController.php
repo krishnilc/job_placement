@@ -139,7 +139,7 @@ class AuthController extends Controller
 
         if ($validator->passes()) {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                if (in_array(Auth::user()->role, ['student', 'employer', 'management'], true) && Auth::user()->status !== 'active') {
+                if (Auth::user()->status !== 'active') {
                     $status = Auth::user()->status;
                     $needsVerification = Auth::user()->needsEmailVerification();
                     Auth::logout();
