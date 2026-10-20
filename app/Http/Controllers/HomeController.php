@@ -16,8 +16,17 @@ class HomeController extends Controller
     //home page
     public function index()
     {
-        // $categories = Category::where('status', 1)->orderBy('name', 'asc')->take(8)->get();
-        $categories = Category::where('status', 1)->withCount('jobs')->orderBy('jobs_count', 'desc')->take(8)->get();
+        $categories = Category::where('status', 1)
+            ->withCount(['jobs' => function ($query) {
+                $query->where('status', 1)
+                    ->where(function ($query) {
+                        $query->whereNull('closing_date')
+                            ->orWhere('closing_date', '>=', now()->toDateString());
+                    });
+            }])
+            ->orderBy('jobs_count', 'desc')
+            ->take(8)
+            ->get();
         $newCategories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $featuredJobs = Job::where('status', 1)

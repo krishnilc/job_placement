@@ -147,4 +147,38 @@ class AdminJobOrganizationTest extends TestCase
             $this->assertSame('25000', $job->salary);
         }
     }
+
+    public function test_job_edit_uses_post_with_put_override_and_returns_json(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $data = $this->jobData();
+        $job = Job::factory()->create([
+            'user_id' => $admin->id,
+            'category_id' => $data['category'],
+            'job_type_id' => $data['job_type'],
+        ]);
+
+        $this->actingAs($admin)->get(route('admin.jobs.edit', $job->id))
+            ->assertOk()
+            ->assertSee('action="'.route('admin.jobs.update', $job->id).'"', false)
+            ->assertSee('name="_method" value="PUT"', false)
+            ->assertSee('name="_token"', false);
+
+        $this->post(route('admin.jobs.update', $job->id), [
+            ...$data,
+            '_method' => 'PUT',
+        ], ['Accept' => 'application/json', 'X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()->assertHeader('Content-Type', 'application/json')
+            ->assertJsonPath('status', true);
+        $this->assertSame($data['title'], $job->fresh()->title);
+
+        $this->post(route('admin.jobs.update', $job->id), [
+            ...$data,
+            '_method' => 'PUT',
+            'closing_date' => 'not-a-date',
+        ], ['Accept' => 'application/json', 'X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()->assertHeader('Content-Type', 'application/json')
+            ->assertJsonPath('status', false)
+            ->assertJsonStructure(['errors' => ['closing_date']]);
+    }
 }

@@ -20,8 +20,9 @@
                 </div>
                 <div class="col-lg-9">
                     @include('front.message')
-                    <form action="" method="POST" id="editJobForm" name="editJobForm">
+                    <form action="{{ route('admin.jobs.update', $job->id) }}" method="POST" id="editJobForm" name="editJobForm">
                         @csrf
+                        @method('PUT')
                         <div class="card border-0 shadow mb-4 ">
                             <div class="card-body card-form p-4">
                                 <h3 class="fs-4 mb-1">Edit Job Details</h3>
@@ -108,6 +109,7 @@
                                             <label for="" class="mb-2">Closing Date</label>
                                             <input type="date" id="closing_date" name="closing_date"
                                                 class="form-control" value="{{ $job->closing_date }}">
+                                            <p class="text-danger" id="closingDateError"></p>
                                         </div>
                                     </div>
 
@@ -269,20 +271,18 @@
         updateStatusColor();
         $('#editJobForm').submit(function(e) {
             e.preventDefault();
-            $("button[type='submit']").prop('disabled',
-                true); // Disable the submit button to prevent multiple clicks
-            // var formData = $(this).serialize();
-            //    console.log($(this).serializeArray());
-            //     return false;
+            var $form = $(this);
+            var $submitButton = $form.find("button[type='submit']");
+            $submitButton.prop('disabled', true);
 
             $.ajax({
-                url: "{{ route('admin.jobs.update', $job->id) }}",
-                type: "PUT",
+                url: $form.attr('action'),
+                type: "POST",
                 dataType: "json",
-                data: $("#editJobForm").serializeArray(), // Use serializeArray to get an array of form data
+                headers: { 'Accept': 'application/json' },
+                data: $form.serializeArray(),
 
                 success: function(response) {
-                    $("button[type='submit']").prop('disabled', false); // Enable the submit button
                     // Always clear all error messages first
                     $("#titleError").text('');
                     $("#categoryError").text('');
@@ -291,6 +291,7 @@
                     $("#locationError").text('');
                     $("#descriptionError").text('');
                     $("#experienceError").text('');
+                    $("#closingDateError").text('');
                     $("#organizationDetailsError").text('');
 
                     if (response.status == true) {
@@ -319,6 +320,9 @@
                         if (errors.experience) {
                             $("#experienceError").text(errors.experience[0]);
                         }
+                        if (errors.closing_date) {
+                            $("#closingDateError").text(errors.closing_date[0]);
+                        }
                         var organizationErrors = ['organization_id', 'company_name', 'company_location', 'company_website', 'organization_name', 'organization_location', 'organization_website'];
                         organizationErrors.forEach(function(field) {
                             if (errors[field]) {
@@ -327,8 +331,21 @@
                         });
                     }
                 },
-                error: function(xhr, status, error) {
-                    alert('An error occurred: ' + error);
+                error: function(xhr) {
+                    var message;
+                    if (xhr.status === 401 || xhr.status === 419) {
+                        message = 'Your session has expired. Reload this page and sign in again before retrying.';
+                    } else if (xhr.status === 403) {
+                        message = 'The update was denied. Check that your account is active and has permission to edit jobs. If it does, contact the administrator to check the server security rules.';
+                    } else if (xhr.status === 0) {
+                        message = 'Unable to reach the server. Check your connection before retrying.';
+                    } else {
+                        message = 'The server could not confirm the update (HTTP ' + xhr.status + '). Reload the jobs list to check whether it was saved before retrying. If the problem continues, contact the administrator.';
+                    }
+                    alert(message);
+                },
+                complete: function() {
+                    $submitButton.prop('disabled', false);
                 }
             });
         });

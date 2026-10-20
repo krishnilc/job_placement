@@ -96,6 +96,13 @@ not locked. Existing request error handlers are preserved, with an alert for
 AJAX writes that do not provide one. This is a client-side interaction guard,
 not a replacement for server-side validation, authorization, or uniqueness checks.
 
+The admin job editor submits POST with Laravel's `_method=PUT` override so the
+update route also works behind hosts that restrict direct PUT requests. It
+requests JSON and reports session, permission, connection, or unexpected-response
+failures without displaying raw HTML. If an unexpected response persists, inspect
+the failed request's HTTP status and response in browser Network tools and the
+hosting/Laravel logs; an HTML response alone does not identify the server failure.
+
 - PHP classes and namespace directories use PascalCase and match PSR-4 paths,
   including `app/Http/Controllers/Admin`, `Employer`, and `Student`.
 - `AuthController` handles login/registration; `AccountController` handles
