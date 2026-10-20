@@ -92,6 +92,29 @@
                                 </div>
                             </div>
 
+                            <div class="profile-section mb-4">
+                                <div class="profile-section-heading">
+                                    <span class="profile-section-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></span>
+                                    <div><h2 class="profile-section-title">Registration information</h2></div>
+                                </div>
+                                <div class="row g-3">
+                                    @include('front.account.profile-field', [
+                                        'icon' => 'calendar',
+                                        'label' => 'Registered At',
+                                        'value' => $user->created_at?->copy()->timezone(config('reporting.timezone'))->format('M d, Y g:i A e'),
+                                    ])
+                                    @include('front.account.profile-field', [
+                                        'icon' => 'user-plus',
+                                        'label' => 'Registered By',
+                                        'value' => match ($user->registration_source) {
+                                            'self' => 'Self-registered',
+                                            'staff' => $user->registered_by_name ?? 'Unknown',
+                                            default => 'Unknown',
+                                        },
+                                    ])
+                                </div>
+                            </div>
+
                             @if ($isEmployer)
                                 <div class="profile-section mb-4"><div class="profile-section-heading"><span class="profile-section-icon"><i class="fa fa-address-card-o" aria-hidden="true"></i></span><div><h2 class="profile-section-title">Contact information</h2><p class="profile-section-caption">Account contact details</p></div></div><div class="row g-3">
                                     @include('front.account.profile-field', ['icon' => 'envelope-o', 'label' => 'Email', 'value' => $user->email])

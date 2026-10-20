@@ -66,6 +66,7 @@ class AdminController extends Controller
 
         if ($validator->passes()) {
             $user = new User();
+            $user->setRegistrationCreator($request->user());
             $user->name = $request->name;
             $user->designation = $request->designation;
             $user->email = $request->email;

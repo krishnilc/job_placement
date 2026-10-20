@@ -36,6 +36,15 @@ administrators. Running migrations with `--seed` initializes reference data only
 provision the first administrator separately through an approved process.
 Existing user accounts are not removed.
 
+New public registrations are recorded as self-registered. Accounts created through
+the admin student, employer, or staff forms record the signed-in creator's user ID
+and name at registration. The admin user profile shows **Registered At** (in the
+configured reporting timezone) and **Registered By** for every account type.
+Existing accounts show **Unknown** because their creator cannot be inferred.
+Deleting a creator's account clears the reference but preserves their recorded
+name; profile edits do not change registration attribution. Run `php artisan migrate`
+when deploying this feature.
+
 Alternatively, `composer run setup` provisions the SQLite file, migrates, and
 installs/builds the starter Vite assets. Do not use setup to regenerate the
 application key on an existing production deployment. Configure SMTP before

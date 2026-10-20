@@ -104,6 +104,7 @@ class EmployerController extends Controller
         if ($validator->passes()) {
             DB::transaction(function () use ($request) {
                 $user = new User();
+                $user->setRegistrationCreator($request->user());
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->mobile = $request->mobile;

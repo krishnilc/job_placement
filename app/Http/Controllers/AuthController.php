@@ -66,6 +66,7 @@ class AuthController extends Controller
         if ($validator->passes()) {
             $user = DB::transaction(function () use ($request, $isStudentType, $isAlumni, $dbRole) {
                 $user = new User;
+                $user->setRegistrationCreator(null);
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->mobile = $request->mobile;

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -92,6 +93,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function studentProfile()
     {
         return $this->hasOne(StudentProfile::class);
+    }
+
+    public function registeredBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'registered_by_id');
+    }
+
+    public function setRegistrationCreator(?self $creator): void
+    {
+        $this->registration_source = $creator === null ? 'self' : 'staff';
+        $this->registeredBy()->associate($creator);
+        $this->registered_by_name = $creator?->name;
     }
 
     public function employerProfile()

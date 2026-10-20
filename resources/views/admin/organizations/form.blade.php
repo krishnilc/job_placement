@@ -25,7 +25,7 @@
                             <form method="POST" action="{{ $organization->exists ? route('admin.organizations.update', $organization) : route('admin.organizations.store') }}">
                                 @csrf
                                 @if ($organization->exists) @method('PUT') @endif
-                                @foreach (['name' => 'Organization name', 'address' => 'Address', 'phone' => 'Phone', 'email' => 'Email', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
+                                @foreach (['name' => 'Organization name', 'address' => 'Physical Address', 'phone' => 'Phone', 'email' => 'Email', 'website_url' => 'Website', 'linkedin_url' => 'LinkedIn page', 'facebook_url' => 'Facebook page', 'description' => 'Description'] as $field => $label)
                                     <div class="mb-3">
                                         <label for="{{ $field }}" class="form-label">{{ $label }}@if (in_array($field, ['name', 'address', 'phone', 'email'])) <span class="text-danger">*</span>@endif</label>
                                         @if (in_array($field, ['address', 'description']))

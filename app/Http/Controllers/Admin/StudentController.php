@@ -88,6 +88,7 @@ class StudentController extends Controller
 
         if ($validator->passes()) {
             $user = new User();
+            $user->setRegistrationCreator($request->user());
             $user->name = $request->name;
             $user->email = $request->email;
             $user->mobile = $request->mobile;
