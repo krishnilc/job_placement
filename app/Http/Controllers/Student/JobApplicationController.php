@@ -65,7 +65,7 @@ class JobApplicationController extends Controller
             ]);
         }
 
-        JobApplication::find($request->id)->delete(); // Permanently delete the job application from the database
+        $jobApplication->delete();
 
         session()->flash('success', 'Job application removed successfully!');
 

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class JobApplication extends Model
 {
@@ -27,6 +29,41 @@ class JobApplication extends Model
      protected $casts = [
          'applied_at' => 'datetime',
      ];
+
+     protected static function booted(): void
+     {
+         static::deleting(function (JobApplication $application) {
+             $paths = $application->storedFilePaths();
+             if ($paths === []) {
+                 return;
+             }
+
+             foreach (['applications', 'public'] as $diskName) {
+                 if (! Storage::disk($diskName)->delete($paths)) {
+                     throw new RuntimeException("Unable to delete job application files from the [$diskName] disk.");
+                 }
+             }
+         });
+     }
+
+     private function storedFilePaths(): array
+     {
+         $paths = [$this->application_file, $this->resume_file];
+         $certificates = json_decode($this->certificates_file ?? '[]', true);
+
+         if (is_array($certificates)) {
+             $paths = array_merge($paths, $certificates);
+         }
+
+         return array_values(array_unique(array_filter($paths, function ($path) {
+             return is_string($path)
+                 && $path !== ''
+                 && ! str_contains($path, "\0")
+                 && ! str_contains($path, ':')
+                 && ! preg_match('~(^|[\\\\/])\\.\\.([\\\\/]|$)~', $path)
+                 && ! preg_match('~^[\\\\/]~', $path);
+         })));
+     }
 
      public function getApplicationFileLabelAttribute(): ?string
      {
