@@ -52,6 +52,7 @@ expecting actual email delivery; the log mailer does not send messages.
 The queue defaults to `sync` because current notifications run synchronously.
 Super administrators can use **System Setup > Email Test** in the admin sidebar
 to send an immediate test to their account email or another mailbox they can check.
+The test email's requested-at timestamp is displayed in Fiji time (`Pacific/Fiji`).
 The page shows the configured mailer and sender, reports sending failures without
 exposing server credentials, and limits attempts to three per minute.
 Confirm receipt in the inbox/spam folder: submitting a message does not guarantee

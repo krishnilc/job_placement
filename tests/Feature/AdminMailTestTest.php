@@ -37,7 +37,7 @@ class AdminMailTestTest extends TestCase
     {
         $transport = $this->useDeliveryTransport();
         Event::fake([MessageSent::class]);
-        $this->travelTo(now()->startOfSecond());
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-22T22:06:17+00:00'));
         $admin = User::factory()->create(['role' => 'super_admin']);
 
         $this->actingAs($admin)->post(route('admin.emailTest.send'), ['email' => 'check@example.com'])
@@ -50,7 +50,8 @@ class AdminMailTestTest extends TestCase
             return $event->message->getTo()[0]->getAddress() === 'check@example.com'
                 && $event->message->getFrom()[0]->getAddress() === config('mail.from.address')
                 && $event->message->getSubject() === 'FNU Job Placement - Test Email'
-                && str_contains($event->message->getHtmlBody(), now()->toIso8601String())
+                && str_contains($event->message->getHtmlBody(), 'Requested at (Fiji time):')
+                && str_contains($event->message->getHtmlBody(), '23 October 2026, 10:06:17 AM')
                 && str_contains($event->message->getHtmlBody(), 'No action is required.');
         });
     }
@@ -179,10 +180,12 @@ class AdminMailTestTest extends TestCase
 
     public function test_mailable_identifies_the_test_and_its_timestamp(): void
     {
-        $mail = new MailTest('2026-10-23T10:00:00+12:00');
+        $mail = new MailTest('2026-10-22T22:06:17+00:00');
 
         $mail->assertHasSubject('FNU Job Placement - Test Email');
-        $mail->assertSeeInHtml('2026-10-23T10:00:00+12:00');
+        $mail->assertSeeInHtml('Requested at (Fiji time):');
+        $mail->assertSeeInHtml('23 October 2026, 10:06:17 AM');
+        $mail->assertDontSeeInHtml('2026-10-22T22:06:17+00:00');
         $mail->assertSeeInHtml('If you received this message');
     }
 
