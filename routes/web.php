@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\JobApplicationController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\JobTypeController;
+use App\Http\Controllers\Admin\MailTestController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
@@ -70,6 +71,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function
     Route::get('/users/employers', [EmployerController::class, 'index'])->name('admin.users.employers');
 
     Route::middleware('superAdminAccess')->group(function () {
+        Route::get('/email-test', [MailTestController::class, 'index'])->name('admin.emailTest');
+        Route::post('/email-test', [MailTestController::class, 'send'])
+            ->middleware('throttle:3,1')->name('admin.emailTest.send');
         Route::get('/users/admins', [AdminController::class, 'index'])->name('admin.users.admins');
         Route::get('/users/admins/create', [AdminController::class, 'create'])->name('admin.users.admins.create');
         Route::post('/users/admins/store', [AdminController::class, 'store'])->name('admin.users.admins.store');

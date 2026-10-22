@@ -109,6 +109,16 @@
 
                 @if (Auth::user()->hasAdminAccess())
                     <li class="{{ $headingClass }}"> System Setup</li>
+                    @if (Auth::user()->role === 'super_admin')
+                        <li @class([
+                            $itemClass,
+                            'account-nav-active' => request()->routeIs('admin.emailTest*'),
+                        ])>
+                            <a href="{{ route('admin.emailTest') }}">
+                                <i class="fa fa-envelope"></i> Email Test
+                            </a>
+                        </li>
+                    @endif
                     <li @class([
                         $itemClass,
                         'account-nav-active' => request()->routeIs('admin.organizations.*'),

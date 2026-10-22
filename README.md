@@ -50,6 +50,13 @@ installs/builds the starter Vite assets. Do not use setup to regenerate the
 application key on an existing production deployment. Configure SMTP before
 expecting actual email delivery; the log mailer does not send messages.
 The queue defaults to `sync` because current notifications run synchronously.
+Super administrators can use **System Setup > Email Test** in the admin sidebar
+to send an immediate test to their account email or another mailbox they can check.
+The page shows the configured mailer and sender, reports sending failures without
+exposing server credentials, and limits attempts to three per minute.
+Confirm receipt in the inbox/spam folder: submitting a message does not guarantee
+delivery. Log/array mailers are flagged as local-only; multi-transport mailers
+show a warning because a local-only fallback may have been used.
 The domain's `jobs` table contains job postings, not queue payloads; configure
 a separate queue table and its migration before enabling a database queue.
 `composer run dev` starts the PHP server and optional Vite watcher without

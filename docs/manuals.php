@@ -235,6 +235,14 @@ return [
                 '4. Check the result; if deletion is refused because the record is related to other data, read the error and resolve it through the normal workflow.',
                 'User-account deletion, application deletion, and organization deletion are super-admin-only actions. Do not assume a deleted record can be restored through the portal.',
             ],
+            'Check email delivery' => [
+                '1. Open System Setup > Email Test in the admin sidebar. This option is available only to super administrators.',
+                '2. Review the configured mailer and sender address. Keep your account email as the recipient or enter another mailbox you can check.',
+                '3. Select Send Test Email. The message is sent immediately, without a queue worker. You can make up to three attempts per minute.',
+                '4. Read the result, then check the recipient inbox and spam folder for the FNU Job Placement - Test Email message. Its timestamp identifies the test.',
+                'A successful send request does not guarantee delivery. Log/array mailers do not deliver email, and multi-transport mailers may use a local-only fallback. Confirm receipt before concluding that email works.',
+                'If sending fails, ask the system maintainer to review the mail server configuration and application logs. Mail server credentials are not shown on this page.',
+            ],
         ] + $administration + $reports + $account,
     ],
 ];
