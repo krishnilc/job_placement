@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/laravel/laravel/compare/v12.12.1...12.x)
 
+* Submit admin account edits using POST with Laravel's PUT method override for hosting compatibility, and show actionable errors for expired sessions, denied requests, and unexpected server responses.
+
 ## [v12.12.1](https://github.com/laravel/laravel/compare/v12.12.0...v12.12.1) - 2026-03-10
 
 * [12.x] Makes imports consistent by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/laravel/pull/6760

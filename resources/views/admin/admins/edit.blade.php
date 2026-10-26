@@ -23,8 +23,9 @@
                     <div class="card border-0 shadow mb-4">
                         <div class="card-body card-form">
                             <div class="card border-0 shadow mb-4">
-                                <form action="" method="POST" id="userForm" name="userForm">
+                                <form action="{{ route('admin.users.update', $user->id) }}" method="POST" id="userForm" name="userForm">
                                     @csrf
+                                    @method('PUT')
                                     <div class="card-body  p-4">
                                         <h3 class="fs-4 mb-1">Admin/Edit</h3>
                                         <div class="mb-4">
@@ -88,48 +89,53 @@
     <script>
         $('#userForm').submit(function(e) {
             e.preventDefault();
+            var $form = $(this);
+            var $submitButton = $form.find("button[type='submit']");
+            var fields = ['name', 'email', 'designation', 'mobile', 'role', 'status'];
+            $submitButton.prop('disabled', true);
+
+            function showErrors(errors) {
+                fields.forEach(function(field) {
+                    $("#" + field + "Error").text(errors[field] ? errors[field][0] : '');
+                });
+            }
+            showErrors({});
 
             $.ajax({
-                url: "{{ route('admin.users.update', $user->id) }}",
-                type: "PUT",
+                url: $form.attr('action'),
+                type: "POST",
                 dataType: "json",
-                data: $("#userForm").serializeArray(),
+                headers: { 'Accept': 'application/json' },
+                data: $form.serializeArray(),
 
                 success: function(response) {
-                    $("#nameError").text('');
-                    $("#emailError").text('');
-                    $("#designationError").text('');
-                    $("#mobileError").text('');
-                    $("#roleError").text('');
-                    $("#statusError").text('');
-
-                    if (response.status == true) {
+                    if (response && response.status === true) {
                         window.location.href = "{{ route('admin.users.admins') }}";
+                    } else if (response && response.status === false && response.errors) {
+                        showErrors(response.errors);
                     } else {
-                        var errors = response.errors;
-
-                        if (errors.name) {
-                            $("#nameError").text(errors.name[0]);
-                        }
-                        if (errors.email) {
-                            $("#emailError").text(errors.email[0]);
-                        }
-                        if (errors.designation) {
-                            $("#designationError").text(errors.designation[0]);
-                        }
-                        if (errors.mobile) {
-                            $("#mobileError").text(errors.mobile[0]);
-                        }
-                        if (errors.role) {
-                            $("#roleError").text(errors.role[0]);
-                        }
-                        if (errors.status) {
-                            $("#statusError").text(errors.status[0]);
-                        }
+                        alert('The server returned an unexpected response. Reload the admins list to check whether the update was saved before retrying.');
                     }
                 },
-                error: function(xhr, status, error) {
-                    alert('An error occurred: ' + error);
+                error: function(xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                        showErrors(xhr.responseJSON.errors);
+                        return;
+                    }
+                    var message;
+                    if (xhr.status === 401 || xhr.status === 419) {
+                        message = 'Your session has expired. Reload this page and sign in again before retrying.';
+                    } else if (xhr.status === 403) {
+                        message = 'The update was denied. Only super admins can edit staff accounts. If you have permission, contact the administrator to check the server security rules.';
+                    } else if (xhr.status === 0) {
+                        message = 'Unable to reach the server. Check your connection before retrying.';
+                    } else {
+                        message = 'The server could not confirm the update (HTTP ' + xhr.status + '). Reload the admins list to check whether it was saved before retrying. If the problem continues, contact the administrator.';
+                    }
+                    alert(message);
+                },
+                complete: function() {
+                    $submitButton.prop('disabled', false);
                 }
             });
         });
