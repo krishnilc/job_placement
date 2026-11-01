@@ -160,6 +160,10 @@
                                                                             class="fa fa-user" aria-hidden="true"></i>
                                                                         View Profile</a></li>
                                                                 <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.users.statusHistory', $user->id) }}"><i
+                                                                            class="fa fa-history" aria-hidden="true"></i>
+                                                                        View Status History</a></li>
+                                                                <li><a class="dropdown-item"
                                                                         href="{{ route('admin.users.edit', $user->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>

@@ -13,12 +13,16 @@ class StatusHistoryController extends Controller
     public function user(Request $request, User $user): View
     {
         $this->authorizeViewer($request);
-        abort_unless(in_array($user->role, ['student', 'employer'], true), 404);
+        abort_unless(in_array($user->role, ['student', 'employer', 'admin', 'super_admin', 'management'], true), 404);
+        $isStaff = in_array($user->role, ['admin', 'super_admin', 'management'], true);
+        if ($isStaff) {
+            abort_unless($request->user()->role === 'super_admin', 403);
+        }
 
         return view('admin.status-history', [
             'subjectName' => $user->name,
-            'listLabel' => $user->role === 'student' ? 'Students' : 'Employers',
-            'listUrl' => route('admin.users.'.$user->role.'s'),
+            'listLabel' => $isStaff ? 'Administrators' : ($user->role === 'student' ? 'Students' : 'Employers'),
+            'listUrl' => route($isStaff ? 'admin.users.admins' : 'admin.users.'.$user->role.'s'),
             'histories' => $user->statusHistories()->paginate(20),
         ]);
     }

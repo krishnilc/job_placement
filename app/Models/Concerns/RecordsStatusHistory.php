@@ -17,7 +17,7 @@ trait RecordsStatusHistory
 
     public function save(array $options = [])
     {
-        if (($this instanceof User && $this->role !== null && ! in_array($this->role, ['student', 'employer'], true))
+        if (($this instanceof User && $this->role !== null && ! in_array($this->role, ['student', 'employer', 'admin', 'super_admin', 'management'], true))
             || ($this->exists && ! $this->isDirty('status'))) {
             return parent::save($options);
         }

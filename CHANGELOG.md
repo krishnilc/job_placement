@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/laravel/laravel/compare/v12.12.1...12.x)
 
+* Extend account status audit trails to administrators, super admins, and management, with super-admin-only viewing and baselines for existing staff.
 * Add admin-only student, employer, and job status histories with initial statuses, actor snapshots, atomic audit writes, and clearly marked baselines for existing records.
 * Correct the shared profile-image label to target its file input, resolving the invalid label association on the Students list and other pages.
 * Submit admin account edits using POST with Laravel's PUT method override for hosting compatibility, and show actionable errors for expired sessions, denied requests, and unexpected server responses.

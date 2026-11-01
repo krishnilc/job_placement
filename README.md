@@ -420,12 +420,16 @@ before retrying.
 Run employer notification tests with
 `php artisan test --filter=EmployerStatusNotificationTest`.
 
-## Student, employer, and job status audit trails
+## Account and job status audit trails
 
 Admins and super admins can select **View Status History** from the actions menu
 on the Students, Employers, and Manage Jobs lists. History is paginated, newest
 first, and includes the previous/new status, event, actor name, and timestamp in
 `REPORT_TIMEZONE`. Management, employers, students, and guests cannot view it.
+The Administrators list also offers status history for admin, super-admin, and
+management accounts. Only super admins can view these staff histories, matching
+the existing staff-list permissions. Staff creation and status edits use the same
+audit mechanism; unchanged statuses and role-only edits do not create transitions.
 
 New accounts (including alumni) and jobs record their initial status. Subsequent
 model saves record only actual status transitions, including admin profile edits
@@ -443,6 +447,8 @@ Run `php artisan migrate` to create `status_histories`. Existing records receive
 an **Existing status (migration)** baseline of their current status at migration
 time. Older transitions and original creators cannot be reconstructed and are
 not fabricated.
+The staff-history migration adds baselines only for staff accounts with no
+existing history, preserving audit entries already recorded.
 
 Run `php artisan test --filter=StatusHistoryTest` to verify audit coverage.
 

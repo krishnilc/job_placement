@@ -11,6 +11,7 @@ use App\Models\StatusHistory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -106,7 +107,7 @@ class StatusHistoryTest extends TestCase
             $this->assertSame($admin->id, $history->changed_by);
             $this->assertSame('Audit Admin', $history->changed_by_name);
         }
-        $this->assertCount(0, $admin->statusHistories);
+        $this->assertSame('created', $admin->statusHistories()->sole()->event);
     }
 
     public function test_account_dropdowns_record_all_transitions_but_not_unchanged_or_rejected_updates(): void
@@ -257,7 +258,7 @@ class StatusHistoryTest extends TestCase
         $this->assertSame('pending', $user->fresh()->status);
         $this->assertSame(0, $job->fresh()->status);
         $this->assertDatabaseCount('users', 2);
-        $this->assertDatabaseCount('status_histories', 2);
+        $this->assertDatabaseCount('status_histories', 3);
     }
 
     public function test_notification_failure_does_not_remove_saved_history(): void
@@ -296,7 +297,11 @@ class StatusHistoryTest extends TestCase
                 ->assertOk()->assertSee('Created');
             $this->get(route('admin.users.statusHistory', $employer))->assertOk();
             $this->get(route('admin.jobs.statusHistory', $job))->assertOk()->assertSee('Active');
-            $this->get(route('admin.users.statusHistory', $admin))->assertNotFound();
+            if ($role === 'super_admin') {
+                $this->get(route('admin.users.statusHistory', $admin))->assertOk();
+            } else {
+                $this->get(route('admin.users.statusHistory', $admin))->assertForbidden();
+            }
             foreach (['admin.users.students', 'admin.users.employers', 'admin.jobs'] as $list) {
                 $this->get(route($list))->assertOk()->assertSee('View Status History');
             }
@@ -355,5 +360,110 @@ class StatusHistoryTest extends TestCase
             $this->assertSame((string) $subject->fresh()->status, $history->current_status);
         }
         $this->assertSame('Blocked', $job->statusHistories()->sole()->statusLabel('2'));
+    }
+
+    public function test_staff_creation_and_status_edits_record_audit_entries_for_every_staff_role(): void
+    {
+        Mail::fake();
+        Notification::fake();
+        $superAdmin = User::factory()->create(['role' => 'super_admin', 'name' => 'Audit Super Admin']);
+        $this->actingAs($superAdmin);
+
+        foreach (['admin', 'super_admin', 'management'] as $role) {
+            $this->postJson(route('admin.users.admins.store'), [
+                'name' => 'Audit Staff', 'email' => $role.'@example.com', 'mobile' => '1234567',
+                'designation' => 'Administrator', 'role' => $role,
+                'password' => 'password', 'confirm_password' => 'password',
+            ])->assertOk()->assertJsonPath('status', true);
+            $staff = User::where('email', $role.'@example.com')->firstOrFail();
+            $history = $staff->statusHistories()->sole();
+            $this->assertSame('created', $history->event);
+            $this->assertNull($history->previous_status);
+            $this->assertSame('active', $history->current_status);
+            $this->assertSame($role, $history->subject_kind);
+            $this->assertSame($superAdmin->id, $history->changed_by);
+            $this->assertSame('Audit Super Admin', $history->changed_by_name);
+
+            $data = [
+                '_method' => 'PUT', 'name' => $staff->name, 'email' => $staff->email,
+                'mobile' => '1234567', 'designation' => 'Administrator', 'role' => $role,
+            ];
+            foreach (['blocked', 'pending', 'active'] as $status) {
+                $previous = $staff->fresh()->status;
+                $this->postJson(route('admin.users.update', $staff), [...$data, 'status' => $status])
+                    ->assertOk()->assertJsonPath('status', true);
+                $history = $staff->statusHistories()->firstOrFail();
+                $this->assertSame($previous, $history->previous_status);
+                $this->assertSame($status, $history->current_status);
+                $this->assertSame($superAdmin->id, $history->changed_by);
+            }
+            $this->postJson(route('admin.users.update', $staff), [...$data, 'status' => 'active'])
+                ->assertOk()->assertJsonPath('status', true);
+            $this->postJson(route('admin.users.update', $staff), [...$data, 'status' => 'invalid'])
+                ->assertOk()->assertJsonPath('status', false);
+            $this->postJson(route('admin.users.update', $staff), [
+                ...$data, 'role' => $role === 'management' ? 'admin' : 'management', 'status' => 'active',
+            ])->assertOk()->assertJsonPath('status', true);
+            $this->assertSame(4, $staff->statusHistories()->count());
+        }
+        Notification::assertNothingSent();
+    }
+
+    public function test_only_super_admins_can_view_staff_histories_or_edit_staff_statuses(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        foreach (['admin', 'super_admin', 'management'] as $role) {
+            $staff = User::factory()->create(['role' => $role]);
+            $this->actingAs($superAdmin)->get(route('admin.users.statusHistory', $staff))
+                ->assertOk()->assertSee('Administrators')->assertSee('Created')
+                ->assertSee(route('admin.users.admins'), false);
+            foreach (['admin', 'management', 'student', 'employer'] as $viewerRole) {
+                $this->actingAs(User::factory()->create(['role' => $viewerRole]));
+                $response = $this->get(route('admin.users.statusHistory', $staff));
+                if (in_array($viewerRole, ['admin', 'management'], true)) {
+                    $response->assertForbidden();
+                } else {
+                    $response->assertRedirect();
+                }
+                $update = $this->putJson(route('admin.users.update', $staff), ['status' => 'blocked']);
+                if ($viewerRole === 'student') {
+                    $update->assertRedirect();
+                } else {
+                    $update->assertForbidden();
+                }
+            }
+            $this->assertSame('active', $staff->fresh()->status);
+            $this->assertSame(1, $staff->statusHistories()->count());
+        }
+        $this->actingAs($superAdmin)->get(route('admin.users.admins'))
+            ->assertOk()->assertSee('View Status History');
+        auth()->forgetGuards();
+        $this->get(route('admin.users.statusHistory', $superAdmin))->assertRedirect();
+    }
+
+    public function test_staff_history_migration_backfills_only_accounts_without_history(): void
+    {
+        $staff = [];
+        foreach (['admin', 'super_admin', 'management'] as $role) {
+            $staff[] = User::factory()->create(['role' => $role, 'status' => 'blocked']);
+        }
+        $staff[0]->statusHistories()->delete();
+        $staff[1]->statusHistories()->delete();
+        $originalId = $staff[2]->statusHistories()->sole()->id;
+        $migration = require database_path('migrations/2026_11_02_000002_backfill_staff_status_histories.php');
+        $migration->up();
+        $migration->up();
+        $this->assertDatabaseCount('status_histories', 3);
+        foreach (array_slice($staff, 0, 2) as $user) {
+            $history = $user->statusHistories()->sole();
+            $this->assertSame('baseline', $history->event);
+            $this->assertSame('blocked', $history->current_status);
+            $this->assertSame($user->role, $history->subject_kind);
+            $this->assertNull($history->previous_status);
+            $this->assertNull($history->changed_by);
+        }
+        $this->assertSame($originalId, $staff[2]->statusHistories()->sole()->id);
+        $migration->down();
+        $this->assertDatabaseCount('status_histories', 3);
     }
 }
