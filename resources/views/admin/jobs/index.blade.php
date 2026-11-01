@@ -161,6 +161,10 @@
                                                                         View</a></li>
                                                                 @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
                                                                 <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.jobs.statusHistory', $job->id) }}"><i
+                                                                            class="fa fa-history" aria-hidden="true"></i>
+                                                                        View Status History</a></li>
+                                                                <li><a class="dropdown-item"
                                                                         href="{{ route('admin.jobs.edit', $job->id) }}"><i
                                                                             class="fa fa-edit" aria-hidden="true"></i>
                                                                         Edit</a></li>

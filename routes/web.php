@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\JobTypeController;
 use App\Http\Controllers\Admin\MailTestController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StatusHistoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
@@ -99,6 +100,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'backOfficeAccess'], function
     Route::post('/job-applications/{application}/feedback', [FeedbackController::class, 'store'])->name('admin.jobApplications.feedback.store');
 
     Route::middleware('adminAccess')->group(function () {
+        Route::get('/users/{user}/status-history', [StatusHistoryController::class, 'user'])->name('admin.users.statusHistory');
+        Route::get('/jobs/{job}/status-history', [StatusHistoryController::class, 'job'])->name('admin.jobs.statusHistory');
         Route::get('/organizations', [AdminOrganizationController::class, 'index'])->name('admin.organizations.index');
         Route::get('/organizations/create', [AdminOrganizationController::class, 'create'])->name('admin.organizations.create');
         Route::post('/organizations', [AdminOrganizationController::class, 'store'])->name('admin.organizations.store');

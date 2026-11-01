@@ -197,6 +197,12 @@
                                                                         href="{{ route('admin.users.profile', $user->id) }}"><i
                                                                             class="fa fa-user" aria-hidden="true"></i>
                                                                         View Profile</a></li>
+                                                                @if (in_array(auth()->user()->role, ['admin', 'super_admin'], true))
+                                                                <li><a class="dropdown-item"
+                                                                        href="{{ route('admin.users.statusHistory', $user->id) }}"><i
+                                                                            class="fa fa-history" aria-hidden="true"></i>
+                                                                        View Status History</a></li>
+                                                                @endif
                                                                 @unless (auth()->user()->isReadOnlyManagement())
                                                                 <li><a class="dropdown-item"
                                                                         href="{{ route('admin.users.edit', $user->id) }}"><i

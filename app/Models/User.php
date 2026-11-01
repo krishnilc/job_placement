@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsStatusHistory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,9 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+    use RecordsStatusHistory {
+        save as private saveWithStatusHistory;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -176,7 +180,7 @@ class User extends Authenticatable implements MustVerifyEmail
             $this->email_verified_at = null;
         }
 
-        $saved = parent::save($options);
+        $saved = $this->saveWithStatusHistory($options);
 
         if ($saved) {
             foreach (['studentProfile', 'employerProfile'] as $relation) {

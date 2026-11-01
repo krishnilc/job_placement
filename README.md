@@ -420,6 +420,32 @@ before retrying.
 Run employer notification tests with
 `php artisan test --filter=EmployerStatusNotificationTest`.
 
+## Student, employer, and job status audit trails
+
+Admins and super admins can select **View Status History** from the actions menu
+on the Students, Employers, and Manage Jobs lists. History is paginated, newest
+first, and includes the previous/new status, event, actor name, and timestamp in
+`REPORT_TIMEZONE`. Management, employers, students, and guests cannot view it.
+
+New accounts (including alumni) and jobs record their initial status. Subsequent
+model saves record only actual status transitions, including admin profile edits
+and employers blocking/unblocking their jobs. Registration and console operations
+without an authenticated actor appear as **System / unauthenticated**.
+Actor names and subject details are snapshots; history is retained if an actor or
+subject is deleted. There is no UI for modifying audit entries.
+
+Each status save and its audit entry share a database transaction; an audit write
+failure fails and rolls back the status save. Email delivery failures do not
+remove a saved status or its history. Use model `save()`/`update()` for status
+writes; query-builder bulk updates and direct SQL bypass this audit mechanism.
+
+Run `php artisan migrate` to create `status_histories`. Existing records receive
+an **Existing status (migration)** baseline of their current status at migration
+time. Older transitions and original creators cannot be reconstructed and are
+not fabricated.
+
+Run `php artisan test --filter=StatusHistoryTest` to verify audit coverage.
+
 ## Application status notifications
 
 When an admin, super admin, or an employer managing their own job changes an

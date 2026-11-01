@@ -67,6 +67,17 @@ class StudentStatusNotificationTest extends TestCase
         ];
     }
 
+    public function test_students_list_profile_image_label_targets_the_file_input(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $this->get(route('admin.users.students'))
+            ->assertOk()
+            ->assertSee('<label for="profile_pic" class="form-label">Profile Image</label>', false)
+            ->assertSee('<input type="file" class="form-control" id="profile_pic" name="profile_pic" required>', false)
+            ->assertDontSee('for="exampleInputEmail1"', false);
+    }
+
     public function test_admins_and_super_admins_notify_students_for_every_status_transition(): void
     {
         Notification::fake();

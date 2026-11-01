@@ -189,7 +189,7 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Profile Image</label>
+                            <label for="profile_pic" class="form-label">Profile Image</label>
                             <input type="file" class="form-control" id="profile_pic" name="profile_pic" required>
                             <p class="text-danger" id="image-error"></p>
                         </div>
