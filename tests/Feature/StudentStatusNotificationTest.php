@@ -100,6 +100,34 @@ class StudentStatusNotificationTest extends TestCase
         Notification::assertSentToTimes($student, StudentAccountStatusChanged::class, 1);
     }
 
+    public function test_post_method_override_updates_student_status_and_notifies(): void
+    {
+        Notification::fake();
+        $student = $this->student();
+
+        foreach (['admin', 'super_admin'] as $role) {
+            $this->actingAs(User::factory()->create(['role' => $role]));
+            foreach (['active', 'blocked', 'pending'] as $status) {
+                $this->postJson(route('admin.users.students.status', $student), [
+                    '_method' => 'PATCH', 'status' => $status,
+                ])->assertOk()->assertJson(['status' => true, 'notification_sent' => true]);
+                $this->assertSame($status, $student->fresh()->status);
+            }
+        }
+
+        Notification::assertSentToTimes($student, StudentAccountStatusChanged::class, 6);
+        $this->postJson(route('admin.users.students.status', $student), [
+            '_method' => 'PATCH', 'status' => 'unknown',
+        ])->assertUnprocessable()->assertJsonValidationErrors('status');
+
+        $this->actingAs(User::factory()->create(['role' => 'employer']));
+        $this->postJson(route('admin.users.students.status', $student), [
+            '_method' => 'PATCH', 'status' => 'active',
+        ])->assertRedirect();
+        $this->assertSame('pending', $student->fresh()->status);
+        Notification::assertCount(6);
+    }
+
     public function test_unchanged_status_sends_no_notification_from_either_editor(): void
     {
         Notification::fake();

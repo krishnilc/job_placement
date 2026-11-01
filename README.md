@@ -412,6 +412,11 @@ reported, and the admin sees a warning to contact the student directly.
 
 Run status-notification tests with
 `php artisan test --filter=StudentStatusNotificationTest`.
+The Students list submits status updates using POST with Laravel's PATCH method
+override so hosts that restrict direct PATCH requests can process them. The route
+remains PATCH-only. Failed requests display validation, session, permission, or
+HTTP errors; after an unconfirmed update, reload the list to check the saved status
+before retrying.
 Run employer notification tests with
 `php artisan test --filter=EmployerStatusNotificationTest`.
 

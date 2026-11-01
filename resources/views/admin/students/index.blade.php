@@ -159,6 +159,7 @@
                                                             <select class="form-select form-select-sm status-select status-{{ $user->status }}"
                                                                 style="min-width: 150px"
                                                                 data-id="{{ $user->id }}"
+                                                                data-url="{{ route('admin.users.students.status', $user->id) }}"
                                                                 data-original="{{ $user->status }}">
                                                                 <option value="pending" @selected($user->status === 'pending')>Pending Approval</option>
                                                                 <option value="active" @selected($user->status === 'active')>Active</option>
@@ -241,25 +242,48 @@
             select.prop('disabled', true);
 
             $.ajax({
-                url: "{{ url('admin/users/students') }}/" + select.data('id') + "/status",
-                type: "PATCH",
+                url: select.data('url'),
+                type: "POST",
                 dataType: "json",
+                headers: { 'Accept': 'application/json' },
                 data: {
+                    _method: "PATCH",
                     status: select.val(),
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
+                    if (!response || response.status !== true) {
+                        select.val(previous);
+                        applyStatusColor(select);
+                        alert('The server returned an unexpected response. Reload the students list to check whether the status was saved before retrying.');
+                        return;
+                    }
                     select.data('original', select.val());
                     const label = select.find('option:selected').text();
-                    const name = select.closest('tr').find('td').eq(1).text().trim();
+                    const name = select.closest('tr').find('td').eq(0).text().trim();
                     $('#statusAlertText').text(name + "'s status is " + label + '. ' + response.message);
                     $('#statusAlert').removeClass('d-none alert-success alert-warning')
                         .addClass(response.notification_sent === false ? 'alert-warning' : 'alert-success');
                 },
-                error: function() {
+                error: function(xhr) {
                     select.val(previous);
                     applyStatusColor(select);
-                    alert('Could not update the status. Please try again.');
+                    var errors = xhr.responseJSON && xhr.responseJSON.errors;
+                    var message;
+                    if (xhr.status === 422 && errors && errors.status) {
+                        message = errors.status[0];
+                    } else if (xhr.status === 401 || xhr.status === 419) {
+                        message = 'Your session has expired. Reload this page and sign in again before retrying.';
+                    } else if (xhr.status === 403) {
+                        message = 'The status update was denied. Only admins and super admins can change student statuses. If you have permission, contact the administrator to check the server security rules.';
+                    } else if (xhr.status === 404) {
+                        message = 'The student or status endpoint could not be found. Reload the students list before retrying.';
+                    } else if (xhr.status === 0) {
+                        message = 'Unable to reach the server. Check your connection before retrying.';
+                    } else {
+                        message = 'The server could not confirm the status update (HTTP ' + xhr.status + '). Reload the students list to check whether it was saved before retrying. If the problem continues, contact the administrator.';
+                    }
+                    alert(message);
                 },
                 complete: function() {
                     select.prop('disabled', false);
